@@ -20,15 +20,18 @@ Este aplicativo tem como objetivo monitorar derivadores. Para isso, antes da apl
 <span id="tecnologias"></span>
 <h1 align="center">Tecnologias</h1>
 <p align="center">
-    ![Node.js Badge](https://img.shields.io/badge/-Node.js-43853d?style=flat-square&logo=node.js&logoColor=white)
-    ![React Native Badge](https://img.shields.io/badge/-React_Native-61DAFB?style=flat-square&logo=react&logoColor=white)
-    ![Expo Badge](https://img.shields.io/badge/-Expo-000020?style=flat-square&logo=expo&logoColor=white)
-    ![TypeScript Badge](https://img.shields.io/badge/-TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
-    ![Trello Badge](https://img.shields.io/badge/-Trello-0079BF?style=flat-square&logo=trello&logoColor=white)
-    ![Kanban Badge](https://img.shields.io/badge/-Kanban-00AFD0?style=flat-square)
-    ![Git Badge](https://img.shields.io/badge/-Git-F05032?style=flat-square&logo=git&logoColor=white)
+  <img src="https://img.shields.io/badge/node.js-%23339933?style=for-the-badge&logo=nodedotjs&logoColor=black">
+  <img src="https://img.shields.io/badge/ts--node.js-%23339933?style=for-the-badge&logo=ts-node&logoColor=black">
+  <img src="https://img.shields.io/badge/mongodb-%23339933?style=for-the-badge&logo=mongodb&logoColor=white">
+  <img src="https://img.shields.io/badge/typescript-%233178C6?style=for-the-badge&logo=typescript&logoColor=black">
+  <img src="https://img.shields.io/badge/react-%2361DAFB?style=for-the-badge&logo=react&logoColor=black">
+  <img src="https://img.shields.io/badge/react%20native-%2361DAFB?style=for-the-badge&logo=react&logoColor=black">
+  <img src="https://img.shields.io/badge/android-%2334C759?style=for-the-badge&logo=android&logoColor=white">
+  <img src="https://img.shields.io/badge/ios-%23000000?style=for-the-badge&logo=apple&logoColor=white">
+  <img src="https://img.shields.io/badge/c++-%230059A5?style=for-the-badge&logo=c%2B%2B&logoColor=white">
+  <img src="https://img.shields.io/badge/trello-%234169E1?style=for-the-badge&logo=trello&logoColor=black">
+  <img src="https://img.shields.io/badge/Kanban-%234169E1?style=for-the-badge&logo=kanban&logoColor=white">
 </p>
-
 <span id="equipe"></span>
 <h1 align="center">Equipe</h1>
 
