@@ -14,10 +14,10 @@
 <span id="sobre"></span>
 <h1 align="center">Sobre</h1>
 <p>
-Esse projeto foi desenvolvido pelos alunos do 3º semestre da Fatec Professor Francisco de Moura, Jacareí com a proposta de empreendedorismo.
+Esse projeto foi desenvolvido pelos alunos do 4º semestre da Fatec Professor Francisco de Moura, Jacareí com a proposta de empreendedorismo.
 </p>
 <p>
-Este aplicativo tem como objetivo monitorar a ingestão diária de calorias e nutrientes, oferecendo suporte para o controle da alimentação e a manutenção de uma saúde equilibrada.
+
 </p>
 
 <span id="tecnologias"></span>
@@ -54,56 +54,22 @@ O projeto tem por base a metodologia ágil SCRUM, por isso foi separado em 3 ent
 
 <details>
 <summary><h2>Sprint 1</h2></summary>
-<p>Focada no desenvolvimento da aplicação web, mais especificamente os CRUDs de usuário, perfil, alimentos e refeições.</p>
+<p></p>
 
-[Assista ao vídeo de demonstração aqui](https://www.youtube.com/watch?v=9zNIedji9bk)
+[Assista ao vídeo de demonstração aqui]()
 
 <b>Sprint Backlog:<b>
 
 | Sprint | Funcionalidade | Prioridade |
 | :--:   | :-----------:  | :--------: |
 | **01** |Cadastro de Usuário | Alta |
-| **01** | Listagem de Usuário  | Alta |
-| **01** | Exclusão de Usuário  | Alta |
-| **01** | Alteração de Usuário  | Alta |
-| **01** | Login como Usuário | Alta |
-| **01** | Cadastro de Perfil | Alta |
-| **01** | Listagem de Perfil | Alta |
-| **08** | Exclusão de Perfil | Alta |
-| **01** | Alteração de Perfil | Alta |
-| **01** | Cadastro de Alimentos | Alta |
-| **01** | Listagem de Alimento | Alta |
-| **01** | Alteração de Alimento | Alta |
-| **01** | Exclusão de Alimento | Alta |
-| **01** | Cadastro de Refeição | Alta |
-| **01** | Listagem de Refeição | Alta |
-| **01** | Alteração de Refeição | Alta |
-| **01** | Exclusão de Refeição | Alta |
 
 
 ## Gráfico de Burndown
-![Gráfico de Burndown](/docs/imagem_2024-09-17_150955586.png)
+![Gráfico de Burndown]()
 
 <h2>Tarefas</h2>
-<p>O grupo optou pela organização das tarefas fazendo uso de épicos, User Story, tarefas e subtarefas.</p>
-<p>Nesta Sprint 1, o foco do grupo foi realizar o CRUD de alimentos, com a User Story relacionado a cadastrar novos alimentos.Foram realizados também o desenvolvimento da 
-tela de edição de dados pessoais, para cálculo da Taxa Metabólica Basal.</p>
 
-| Tipo       | Descrição |
-| :--:       | :--------:| 
-| Épico      | CRUD dos alimentos da tabela nutricional |
-| User Story | Cadastro de novos alimentos para registrar os alimentos consumidos |
-| Subtarefa  | Normalização de dados dos alimentos no banco de dados MongoDB      |
-| Subtarefa  | Criação de Tela para consulta dos alimentos cadastrados            |
-| Subtarefa  | Criação de Formulário na tela para adicionar um novo alimento      |
-| Subtarefa  | Criação de rotas e funções para o CRUD de alimentos no backend     |
-
-| Tipo       | Descrição |
-| :--:       | :--------:| 
-| Épico      | CRUD do perfil do usuário  |
-| User Story | Cadastro de perfil de usuário contendo dados para cálculo das calorias |
-| Subtarefa  | Criação da Tela para adicionar as informações para cálculo de Taxa Metabólica Basal |
-| Subtarefa  | Criação da rota no backend para cadastro das informações e o cálculo das calorias |
 
 </details>
 
@@ -114,38 +80,19 @@ tela de edição de dados pessoais, para cálculo da Taxa Metabólica Basal.</p>
 
 | Sprint | Funcionalidade | Prioridade |
 | :--:   | :-----------:  | :--------: |
-| **02** | Dashboard de Consumo Calórico  | Alta |
-| **02** | Sincronização de com aplicativo de exercício | Média |
-| **02** | Disparos de Alertas  | Média |
-| **02** | Histórico consumo  | Alta |
 
 
-[Assista ao vídeo de demonstração aqui](https://www.youtube.com/watch?v=9zNIedji9bk)
+[Assista ao vídeo de demonstração aqui]()
 
 ## Gráfico de Burndown
-![Gráfico de Burndown](/docs/burndown_spt2.png)
+![Gráfico de Burndown]()
 
 <h2>Tarefas</h2>
-<p>Optando por dar continuidade a metodologia adotada na sprint 1 , com utilização de épicos, User Story, tarefas e subtarefas</p>
-<p> Na Sprint 2, o grupo direcionou seus esforços para o desenvolvimento da tela de dashboard com o limite de consumo diário, além de acesso a histórico de consumo do usuário.</p>
+<p></p>
+<p> </p>
 
-| Tipo       | Descrição |
-| :--:       | :--------:| 
-| Épico      | Criação de Dashboard para monitoramento de calorias |
-| User Story | Acesso as informações de consumo calórico do usuário |
-| Subtarefa  | Criação da Tela para visualização do consumo calórico (Dashboard) |
-| Subtarefa  | Integração das informações do usuário no backend com a tela de perfil |
-| Subtarefa  | Conexão das informações do dashboard no backend para exibir a meta diária de calorias |
-| Subtarefa  | Conexão da tela de alimentos no backend para retornar busca |
-| Subtarefa  | Criação de rota POST para gravar dados do perfil do usuário no backend |
-| Subtarefa  | Busca de alimentos conectada com o backend |
 
-| Tipo       | Descrição |
-| :--:       | :--------:| 
-| Épico      | CRUD do perfil do usuário  |
-| User Story | Cadastro de perfil de usuário contendo dados para cálculo das calorias |
-| Subtarefa  | Criação da Tela para adicionar as informações para cálculo de Taxa Metabólica Basal |
-| Subtarefa  | Criação da rota no backend para cadastro das informações e o cálculo das calorias |
+
 </details>
 
 <details>    
