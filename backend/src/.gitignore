@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Output do TypeScript
+dist/
+
+# Arquivos de ambiente e configs sensíveis
+.env
+src/config/config.yaml
+/config.yaml
+config/config.yaml
+
+# Cache e logs
+*.log
+*.tmp
+.cache/
