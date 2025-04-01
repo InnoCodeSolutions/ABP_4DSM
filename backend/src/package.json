@@ -11,10 +11,12 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.7",
+    "express": "^5.1.0",
     "pg": "^8.14.1",
     "yaml": "^2.7.0"
   },
   "devDependencies": {
+    "@types/express": "^5.0.1",
     "@types/node": "^22.13.14",
     "@types/pg": "^8.11.11",
     "ts-node": "^10.9.2",

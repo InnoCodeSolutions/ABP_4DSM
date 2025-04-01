@@ -1,11 +1,13 @@
-import { UserDao } from './models/UserDao';
+// src/index.ts
+import express from 'express';
+import userRoutes from './routes/userRoutes';
 
-(async () => {
-  const dao = new UserDao();
-  
-  const newUser = await dao.createUser('Alice', 'alice5@example.com','Felicia','0909');
-  console.log('Created:', newUser);
+const app = express();
+app.use(express.json());
 
-  const users = await dao.getAllUsers();
-  console.log('All users:', users);
-})();
+app.use('/users', userRoutes);
+
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
