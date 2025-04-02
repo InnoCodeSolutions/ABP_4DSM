@@ -1,19 +1,19 @@
-// src/index.ts
 import express from 'express';
-import userRoutes from './routes/userRoutes';
-import authRoutes from './routes/authRoutes';
+import { createDatabaseIfNotExists } from './initDatabase';
 import { setupDatabase } from './setupDatabase';
 
-const app = express();
-app.use(express.json());
+const start = async () => {
+  await createDatabaseIfNotExists();
+  await setupDatabase();
 
-// ⚡ Chama o setup do banco antes de tudo
-setupDatabase();
+  const app = express();
+  app.use(express.json());
 
-app.use('/users', userRoutes);
-app.use(authRoutes);
+  // rotas aqui...
 
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
-});
+  app.listen(3000, () => {
+    console.log('🚀 Server online em http://localhost:3000');
+  });
+};
+
+start();
