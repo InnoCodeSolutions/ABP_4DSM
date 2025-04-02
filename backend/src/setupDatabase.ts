@@ -19,6 +19,10 @@ export const setupDatabase = async () => {
   try {
     // Cria schema
     await client.query(`
+        CREATE DATABASE bdAbp;
+;
+      `);
+    await client.query(`
       CREATE SCHEMA IF NOT EXISTS login;
     `);
 
