@@ -97,21 +97,25 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState<string>('');
   const [surname, setSurname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
 
   const handleRegister = () => {
-    // Basic validation
-    if (!name || !surname || !email || !phone) {
+    navigation.navigate("Home");
+  };
+
+  {/*
+    // usar 
+    if (!name || !surname || !email || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
     // Add the new user to the "users" array (for now, we’ll assume email is the username and phone is the password)
-    users.push({ username: email, password: phone });
+    users.push({ username: email, password: password });
     Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
     navigation.navigate('Login'); // Navigate back to Login after registration
   };
-
+  */}
   return (
     <View style={styles.container}>
       {/* Logo */}
@@ -153,11 +157,11 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
         {/* Phone Input */}
         <TextInput
           style={styles.input}
-          placeholder="Telefone"
+          placeholder="Senha"
           placeholderTextColor="#9CA3AF"
-          value={phone}
-          onChangeText={setPhone}
-          keyboardType="phone-pad"
+          value={password}
+          onChangeText={setPassword}
+          keyboardType="password-pad"
         />
 
         {/* Buttons */}

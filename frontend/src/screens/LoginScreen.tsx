@@ -182,7 +182,11 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
 
   const handleLogin = () => {
-    const user = users.find((u) => u.username === username && u.password === password);
+
+    navigation.navigate("Home");
+  };
+  
+  {/*const user = users.find((u) => u.username === username && u.password === password);
 
     if (user) {
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
@@ -190,7 +194,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     } else {
       Alert.alert('Erro', 'Usuário ou senha incorretos.');
     }
-  };
+  };*/}
 
   return (
     <View style={styles.container}>
