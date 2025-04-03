@@ -3,8 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
-// Placeholder imports for future screens
-// import HomeScreen from '../screens/HomeScreen';
+import HomeScreen from '../screens/HomeScreen'; // Apenas HomeScreen foi descomentada
+
+// Placeholder imports para futuras telas
 // import ViewDeviceScreen from '../screens/ViewDeviceScreen';
 // import MapScreen from '../screens/MapScreen';
 // import DashboardScreen from '../screens/DashboardScreen';
@@ -29,22 +30,21 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{ headerShown: false }} // Hide header for a clean look
+          options={{ headerShown: false }}
         />
         {/* Register Screen */}
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
-          options={{
-            headerShown: false, // Hide header to match the LoginScreen's design
-          }}
+          options={{ headerShown: false }}
         />
-        {/* Placeholder screens for future implementation 
+        {/* Home Screen - Agora está ativa */}
         <Stack.Screen
           name="Home"
           component={HomeScreen}
           options={{ title: 'Home' }}
         />
+        {/* Placeholder screens para futuras implementações
         <Stack.Screen
           name="ViewDevice"
           component={ViewDeviceScreen}
