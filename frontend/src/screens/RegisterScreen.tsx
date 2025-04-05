@@ -11,34 +11,44 @@ import {
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigaton';
-import { users } from './LoginScreen'; // Certifique-se de que `users` está sendo exportado corretamente
+import axios from 'axios'; // Importa Axios para fazer a requisição ao backend
 
 type Props = StackScreenProps<RootStackParamList, 'Register'>;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState<string>('');
-  const [surname, setSurname] = useState<string>('');
+  const [surname, setSurname] = useState<string>(''); // Sobrenome será mapeado como lastname
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
-  const [password, setPassword] = useState<string>(''); // Corrigido
+  const [password, setPassword] = useState<string>('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name || !surname || !email || !phone || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
-    // Adiciona o usuário (a estrutura depende de como o `LoginScreen` espera)
-    users.push({
-      username: email,
-      password: password,
-      name,
-      surname,
-      phone,
-    });
-
-    Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
-    navigation.navigate('Login');
+    try {
+      const response = await axios.post('http://10.68.55.167:3000/users', {
+        name,
+        email,
+        lastname: surname, // Mapeia surname para lastname conforme o backend
+        password,
+        phone,
+      });
+      console.log('Resposta do backend:', response.data);
+      Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
+      navigation.navigate('Login');
+    } catch (error: any) {
+      console.log('Erro ao cadastrar:', error.message);
+      if (error.response) {
+        console.log('Resposta do servidor:', error.response.data);
+        console.log('Status:', error.response.status);
+      } else if (error.request) {
+        console.log('Nenhuma resposta recebida:', error.request);
+      }
+      Alert.alert('Erro', error.response?.data?.message || 'Erro ao cadastrar usuário.');
+    }
   };
 
   return (
@@ -75,20 +85,20 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#9CA3AF"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-
-        <TextInput
-          style={styles.input}
           placeholder="Telefone"
           placeholderTextColor="#9CA3AF"
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#9CA3AF"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
         />
 
         <View style={styles.buttonContainer}>
@@ -130,14 +140,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: "#fff",
-    textAlign: "center",
+    color: '#fff',
+    textAlign: 'center',
     marginBottom: 40,
     fontWeight: 'bold',
   },
   input: {
-    width: "100%",
-    backgroundColor: "#D1D5DB",
+    width: '100%',
+    backgroundColor: '#D1D5DB',
     padding: 12,
     marginBottom: 15,
     borderRadius: 10,
@@ -146,25 +156,25 @@ const styles = StyleSheet.create({
       web: { fontSize: 14 },
     }),
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 20,
   },
   registerButton: {
     flex: 1,
-    backgroundColor: "#3B82F6",
+    backgroundColor: '#3B82F6',
     paddingVertical: 12,
     borderRadius: 20,
-    alignItems: "center",
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
@@ -176,13 +186,13 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingVertical: 12,
     borderRadius: 20,
     marginLeft: 15,
-    alignItems: "center",
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
@@ -193,9 +203,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   footer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 20,
-    color: "#fff",
+    color: '#fff',
     fontSize: 12,
     ...Platform.select({
       web: { fontSize: 10 },

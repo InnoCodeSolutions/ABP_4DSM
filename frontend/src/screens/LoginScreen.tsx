@@ -2,56 +2,55 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Platform } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigaton';
-
-// Definição da interface do usuário
-export interface User {
-  username: string;
-  password: string;
-  name: string;
-  surname: string;
-  phone: string;
-}
-
-// "Banco de dados" local simulando armazenamento de usuários
-export const users: User[] = [];
+import axios from 'axios'; // Importa Axios para fazer a requisição ao backend
 
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>(''); // Mudado de username para email
   const [password, setPassword] = useState<string>('');
 
-  const handleLogin = () => {
-    const user = users.find((u) => u.username === username && u.password === password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
 
-    if (user) {
+    try {
+      const response = await axios.post('http://10.68.55.167:3000/auth/login', {
+        email, // Envia email em vez de username
+        password,
+      });
+      console.log('Resposta do backend:', response.data);
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      // Aqui você pode salvar o token retornado, se houver, para autenticação futura
       navigation.navigate('Home');
-    } else {
-      Alert.alert('Erro', 'Usuário ou senha incorretos.');
+    } catch (error: any) {
+      console.log('Erro ao fazer login:', error.message);
+      if (error.response) {
+        console.log('Resposta do servidor:', error.response.data);
+        console.log('Status:', error.response.status);
+      }
+      Alert.alert('Erro', error.response?.data?.message || 'Usuário ou senha incorretos.');
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image source={require('../assets/icon.png')} style={styles.logo} />
 
-      {/* Box Container */}
       <View style={styles.box}>
-        {/* Title */}
         <Text style={styles.title}>floatData</Text>
 
-        {/* Email/Username Input */}
         <TextInput
           style={styles.input}
-          placeholder="Email, nome de usuário"
+          placeholder="E-mail"
           placeholderTextColor="#9CA3AF"
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address" // Melhor para entrada de email
         />
 
-        {/* Password Input */}
         <TextInput
           style={styles.input}
           placeholder="Senha"
@@ -61,7 +60,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           secureTextEntry
         />
 
-        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerButton}
@@ -75,7 +73,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Footer */}
       <Text style={styles.footer}>Made by Innocode Solutions</Text>
     </View>
   );
@@ -102,14 +99,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: "#fff",
-    textAlign: "center",
+    color: '#fff',
+    textAlign: 'center',
     marginBottom: 40,
     fontWeight: 'bold',
   },
   input: {
-    width: "100%",
-    backgroundColor: "#D1D5DB",
+    width: '100%',
+    backgroundColor: '#D1D5DB',
     padding: 12,
     marginBottom: 15,
     borderRadius: 10,
@@ -118,56 +115,56 @@ const styles = StyleSheet.create({
       web: { fontSize: 14 },
     }),
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 20,
   },
   registerButton: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     paddingVertical: 12,
     borderRadius: 20,
     marginRight: 15,
-    alignItems: "center",
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   registerButtonText: {
-    color: "#1E3A8A",
+    color: '#1E3A8A',
     fontSize: 16,
     fontWeight: 'bold',
   },
   loginButton: {
     flex: 1,
-    backgroundColor: "#3B82F6",
+    backgroundColor: '#3B82F6',
     paddingVertical: 12,
     borderRadius: 20,
-    alignItems: "center",
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   loginButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
   footer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 20,
-    color: "#fff",
+    color: '#fff',
     fontSize: 12,
     ...Platform.select({
       web: { fontSize: 10 },
