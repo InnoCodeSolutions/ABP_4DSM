@@ -8,16 +8,19 @@ import {
   Alert,
   Image,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigaton';
-import axios from 'axios'; // Importa Axios para fazer a requisição ao backend
+import axios from 'axios';
+
+const { width, height } = Dimensions.get('window');
 
 type Props = StackScreenProps<RootStackParamList, 'Register'>;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState<string>('');
-  const [surname, setSurname] = useState<string>(''); // Sobrenome será mapeado como lastname
+  const [surname, setSurname] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -29,10 +32,10 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://10.68.55.167:3000/users', {
+      const response = await axios.post('http://192.168.15.4:3000/users', {
         name,
         email,
-        lastname: surname, // Mapeia surname para lastname conforme o backend
+        lastname: surname,
         password,
         phone,
       });
@@ -54,7 +57,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/icon.png')} style={styles.logo} />
-
       <View style={styles.box}>
         <Text style={styles.title}>Cadastrar</Text>
 
@@ -113,11 +115,13 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
       <Text style={styles.footer}>Made by Innocode Solutions</Text>
     </View>
   );
 };
+
+// Função para limitar tamanhos em telas grandes (web)
+const scale = (size: number, max: number) => Math.min(size, max);
 
 const styles = StyleSheet.create({
   container: {
@@ -125,35 +129,69 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1E3A8A',
+    paddingHorizontal: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.05,
+    }),
+    width: '100%',
+    minHeight: height,
   },
   logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 20,
+    width: Platform.select({
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    height: Platform.select({
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
+    }),
+    resizeMode: 'contain',
   },
   box: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
-    padding: 30,
-    width: '85%',
+    padding: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.08,
+    }),
+    width: Platform.select({
+      web: scale(width * 0.5, 400),
+      native: width > 600 ? width * 0.5 : width * 0.9,
+    }),
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: Platform.select({
+      web: scale(width * 0.05, 28),
+      native: width * 0.07,
+    }),
     color: '#fff',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: Platform.select({
+      web: scale(height * 0.03, 30),
+      native: height * 0.05,
+    }),
     fontWeight: 'bold',
   },
   input: {
     width: '100%',
     backgroundColor: '#D1D5DB',
-    padding: 12,
-    marginBottom: 15,
+    padding: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
     borderRadius: 10,
-    fontSize: 16,
-    ...Platform.select({
-      web: { fontSize: 14 },
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
     }),
     elevation: 2,
     shadowColor: '#000',
@@ -165,13 +203,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
+    marginTop: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
+    }),
   },
   registerButton: {
     flex: 1,
     backgroundColor: '#3B82F6',
-    paddingVertical: 12,
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
     borderRadius: 20,
+    marginRight: Platform.select({
+      web: scale(width * 0.03, 15),
+      native: width * 0.04,
+    }),
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
@@ -181,15 +229,20 @@ const styles = StyleSheet.create({
   },
   registerButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
+    }),
     fontWeight: 'bold',
   },
   loginButton: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingVertical: 12,
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
     borderRadius: 20,
-    marginLeft: 15,
     alignItems: 'center',
     elevation: 2,
     shadowColor: '#000',
@@ -199,16 +252,22 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: '#1E3A8A',
-    fontSize: 16,
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
+    }),
     fontWeight: 'bold',
   },
   footer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: Platform.select({
+      web: scale(height * 0.01, 20),
+      native: height * 0.02,
+    }),
     color: '#fff',
-    fontSize: 12,
-    ...Platform.select({
-      web: { fontSize: 10 },
+    fontSize: Platform.select({
+      web: scale(width * 0.02, 12),
+      native: width * 0.03,
     }),
   },
 });
