@@ -29,7 +29,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.15.4:3000/auth/login', {
+      const response = await axios.post('http://10.68.55.167:3000/auth/login', {
         email,
         password,
       });
