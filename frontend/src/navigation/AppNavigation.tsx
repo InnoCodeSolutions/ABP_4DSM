@@ -41,9 +41,22 @@ const AppNavigator: React.FC = () => {
         options={{ headerShown: false }}
       />
 
-      {/* Outras telas podem ser adicionadas aqui futuramente */}
-
-      
+      {/* Placeholder screens para futuras implementações
+        <Stack.Screen
+          name="ViewDevice"
+          component={ViewDeviceScreen}
+          options={{ title: 'View Device' }}
+        />
+        <Stack.Screen
+          name="Map"
+          component={MapScreen}
+          options={{ title: 'Map' }}
+        />
+        <Stack.Screen
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{ title: 'Dashboard' }}
+        />*/}
     </Stack.Navigator>
   );
 };

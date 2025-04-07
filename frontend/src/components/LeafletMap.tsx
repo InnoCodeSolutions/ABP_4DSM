@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+/* import React, { useEffect } from "react";
 
 // Só importa se estiver no web
 if (typeof document === "undefined") {
@@ -32,3 +32,4 @@ const LeafletMap: React.FC = () => {
 };
 
 export default LeafletMap;
+*/
