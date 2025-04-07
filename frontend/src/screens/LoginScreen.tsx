@@ -1,57 +1,64 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigaton';
+import axios from 'axios';
 
-// Definição da interface do usuário
-export interface User {
-  username: string;
-  password: string;
-  name: string;
-  surname: string;
-  phone: string;
-}
-
-// "Banco de dados" local simulando armazenamento de usuários
-export const users: User[] = [];
+const { width, height } = Dimensions.get('window');
 
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
-  const [username, setUsername] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    const user = users.find((u) => u.username === username && u.password === password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      return;
+    }
 
-    if (user) {
+    try {
+      const response = await axios.post('http://10.68.55.167:3000/auth/login', {
+        email,
+        password,
+      });
+      console.log('Resposta do backend:', response.data);
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
       navigation.navigate('Home');
-    } else {
-      Alert.alert('Erro', 'Usuário ou senha incorretos.');
+    } catch (error: any) {
+      console.log('Erro ao fazer login:', error.message);
+      if (error.response) {
+        console.log('Resposta do servidor:', error.response.data);
+      }
+      Alert.alert('Erro', error.response?.data?.message || 'Usuário ou senha incorretos.');
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Logo */}
       <Image source={require('../assets/icon.png')} style={styles.logo} />
-
-      {/* Box Container */}
       <View style={styles.box}>
-        {/* Title */}
         <Text style={styles.title}>floatData</Text>
 
-        {/* Email/Username Input */}
         <TextInput
           style={styles.input}
-          placeholder="Email, nome de usuário"
+          placeholder="E-mail"
           placeholderTextColor="#9CA3AF"
-          value={username}
-          onChangeText={setUsername}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
         />
-
-        {/* Password Input */}
         <TextInput
           style={styles.input}
           placeholder="Senha"
@@ -61,7 +68,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           secureTextEntry
         />
 
-        {/* Buttons */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={styles.registerButton}
@@ -74,12 +80,13 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Footer */}
       <Text style={styles.footer}>Made by Innocode Solutions</Text>
     </View>
   );
 };
+
+// Função para limitar tamanhos em telas grandes (web)
+const scale = (size: number, max: number) => Math.min(size, max);
 
 const styles = StyleSheet.create({
   container: {
@@ -87,90 +94,145 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1E3A8A',
+    paddingHorizontal: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.05,
+    }),
+    width: '100%',
+    minHeight: height,
   },
   logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 20,
+    width: Platform.select({
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    height: Platform.select({
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
+    }),
+    resizeMode: 'contain',
   },
   box: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 20,
-    padding: 30,
-    width: '85%',
+    padding: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.08,
+    }),
+    width: Platform.select({
+      web: scale(width * 0.5, 400),
+      native: width > 600 ? width * 0.5 : width * 0.9, // Convertendo porcentagens para números
+    }),
     alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    color: "#fff",
-    textAlign: "center",
-    marginBottom: 40,
+    fontSize: Platform.select({
+      web: scale(width * 0.05, 28),
+      native: width * 0.07,
+    }),
+    color: '#fff',
+    textAlign: 'center',
+    marginBottom: Platform.select({
+      web: scale(height * 0.03, 30),
+      native: height * 0.05,
+    }),
     fontWeight: 'bold',
   },
   input: {
-    width: "100%",
-    backgroundColor: "#D1D5DB",
-    padding: 12,
-    marginBottom: 15,
+    width: '100%',
+    backgroundColor: '#D1D5DB',
+    padding: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
     borderRadius: 10,
-    fontSize: 16,
-    ...Platform.select({
-      web: { fontSize: 14 },
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
     }),
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
+    }),
   },
   registerButton: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingVertical: 12,
+    backgroundColor: '#fff',
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
     borderRadius: 20,
-    marginRight: 15,
-    alignItems: "center",
+    marginRight: Platform.select({
+      web: scale(width * 0.03, 15),
+      native: width * 0.04,
+    }),
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   registerButtonText: {
-    color: "#1E3A8A",
-    fontSize: 16,
+    color: '#1E3A8A',
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
+    }),
     fontWeight: 'bold',
   },
   loginButton: {
     flex: 1,
-    backgroundColor: "#3B82F6",
-    paddingVertical: 12,
+    backgroundColor: '#3B82F6',
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
     borderRadius: 20,
-    alignItems: "center",
+    alignItems: 'center',
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   loginButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    color: '#fff',
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
+    }),
     fontWeight: 'bold',
   },
   footer: {
-    position: "absolute",
-    bottom: 20,
-    color: "#fff",
-    fontSize: 12,
-    ...Platform.select({
-      web: { fontSize: 10 },
+    position: 'absolute',
+    bottom: Platform.select({
+      web: scale(height * 0.01, 20),
+      native: height * 0.02,
+    }),
+    color: '#fff',
+    fontSize: Platform.select({
+      web: scale(width * 0.02, 12),
+      native: width * 0.03,
     }),
   },
 });

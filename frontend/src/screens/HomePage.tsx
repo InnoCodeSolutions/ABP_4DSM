@@ -18,7 +18,7 @@ const HomePage: React.FC = () => {
   const [MapComponent, setMapComponent] =
     useState<React.ComponentType<any> | null>(null);
 
-  useEffect(() => {
+ /* useEffect(() => {
     if (Platform.OS === "web") {
       import("../components/LeafletMap")
         .then((module) => setLeafletMap(() => module.default))
@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
           console.error("Erro ao carregar react-native-maps:", err)
         );
     }
-  }, []);
+  }, []);*/
 
   return (
     <View style={styles.container}>
