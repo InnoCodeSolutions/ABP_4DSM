@@ -1,7 +1,5 @@
-// src/setupDatabase.ts
 import { Client } from 'pg';
 import config from './models/config';
-
 
 export const setupDatabase = async () => {
   const dbConfig = config.database;
@@ -11,7 +9,7 @@ export const setupDatabase = async () => {
     host: dbConfig.host,
     password: dbConfig.password,
     port: dbConfig.port,
-    database: dbConfig.database, // agora sim conecta no banco criado
+    database: dbConfig.database,
   });
 
   await client.connect();
@@ -22,7 +20,7 @@ export const setupDatabase = async () => {
       CREATE SCHEMA IF NOT EXISTS login;
     `);
 
-    // Cria tabela users
+    // Cria tabela users com a coluna phone
     await client.query(`
       CREATE TABLE IF NOT EXISTS login.users (
         id SERIAL PRIMARY KEY,
@@ -30,8 +28,15 @@ export const setupDatabase = async () => {
         lastname VARCHAR(100) NOT NULL,
         email VARCHAR(150) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
+        phone VARCHAR(20), -- Adicionado aqui
         criado_em TIMESTAMP DEFAULT NOW()
       );
+    `);
+
+    // Adiciona a coluna phone em tabelas existentes (migração)
+    await client.query(`
+      ALTER TABLE login.users 
+      ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
     `);
 
     console.log('✅ Schema e tabela criados com sucesso!');
