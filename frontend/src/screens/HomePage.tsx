@@ -7,6 +7,7 @@ import {
   Image,
   Platform,
   Alert,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -33,78 +34,93 @@ const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Login" as never)}>
-          <Text style={styles.headerText}>Sair</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert(
-              "Sobre o App",
-              "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      <View style={styles.container}>
+        {/* Cabeçalho com Sair e Sobre */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Login" as never)}
+          >
+            <Text style={styles.headerText}>Sair</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                "Sobre o App",
+                "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
+              )
+            }
+          >
+            <Text style={styles.headerText}>Sobre</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Saudação */}
+        <Text style={styles.greeting}>Olá, Usuário</Text>
+
+        {/* Mapa */}
+        {Platform.OS === "web"
+          ? LeafletMap && (
+              <View style={styles.mapContainer}>
+                <LeafletMap />
+              </View>
             )
-          }
-        >
-          <Text style={styles.headerText}>Sobre</Text>
-        </TouchableOpacity>
-      </View>
+          : MapComponent && (
+              <MapComponent
+                style={styles.map}
+                initialRegion={{
+                  latitude: -22.9068,
+                  longitude: -43.1729,
+                  latitudeDelta: 0.05,
+                  longitudeDelta: 0.05,
+                }}
+              />
+            )}
 
-      <Text style={styles.greeting}>Olá, Usuário</Text>
-
-      {Platform.OS === "web"
-        ? LeafletMap && (
-            <View style={styles.mapContainer}>
-              <LeafletMap />
-            </View>
-          )
-        : MapComponent && (
-            <MapComponent
-              style={styles.map}
-              initialRegion={{
-                latitude: -22.9068,
-                longitude: -43.1729,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
-              }}
+        {/* Botões */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("ViewDevice" as never)}
+          >
+            <Image
+              source={require("../assets/dispositivo.png")}
+              style={styles.icon}
             />
-          )}
+            <Text style={styles.buttonText}>Dispositivos</Text>
+          </TouchableOpacity>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("ViewDevice" as never)}
-        >
-          <Image
-            source={require("../assets/dispositivo.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Dispositivos</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("../assets/grafico.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Dashboard</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Image
-            source={require("../assets/grafico.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Dashboard</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image source={require("../assets/mapa.png")} style={styles.icon} />
+            <Text style={styles.buttonText}>Mapa</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/mapa.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>Mapa</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/duvida.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>A definir</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("../assets/duvida.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>A definir</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 80,
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#041635",
@@ -115,15 +131,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 20,
-    paddingTop: 2,
-    paddingBottom: 2,
-    zIndex: 10,
+    width: "90%",
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   headerText: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 18,
   },
   greeting: {
     fontSize: 26,
@@ -131,8 +145,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "flex-start",
     marginLeft: "5%",
-    marginBottom: 5,
-    paddingTop: 40,
+    marginBottom: 10,
+    paddingTop: 10,
   },
   mapContainer: {
     width: "90%",
@@ -151,8 +165,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-between",
     width: "90%",
-    marginTop: 20,
-    paddingTop: 60,
+    marginTop: 30,
   },
   button: {
     backgroundColor: "#fff",
@@ -162,7 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "48%",
     aspectRatio: 1,
-    marginBottom: 40,
+    marginBottom: 20,
   },
   icon: {
     width: 50,
