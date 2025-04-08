@@ -32,6 +32,22 @@ export const setupDatabase = async () => {
         criado_em TIMESTAMP DEFAULT NOW()
       );
     `);
+    // Cria tabela gps_data
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS login.gps_data (
+        id SERIAL PRIMARY KEY,
+        device_id VARCHAR(50) NOT NULL,
+        latitude DOUBLE PRECISION NOT NULL,
+        longitude DOUBLE PRECISION NOT NULL,
+        altitude DOUBLE PRECISION,
+        speed DOUBLE PRECISION,
+        course DOUBLE PRECISION,
+        satellites INTEGER,
+        hdop DOUBLE PRECISION,
+        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
 
     // Adiciona a coluna phone em tabelas existentes (migração)
     await client.query(`

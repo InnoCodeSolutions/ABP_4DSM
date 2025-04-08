@@ -11,8 +11,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigaton';
 import axios from 'axios';
+import { RootStackParamList } from '../navigation/AppNavigation';
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,7 +32,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://10.68.55.167:3000/users', {
+      const response = await axios.post('http://localhost:3000/users', {
         name,
         email,
         lastname: surname,

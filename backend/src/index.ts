@@ -1,51 +1,43 @@
-/* CÓDIGO ANTIGO QUE NÃO DEIXA USAR O EXPO GO
 import express from 'express';
+import cors from 'cors';
+import os from 'os';
 import { createDatabaseIfNotExists } from './initDatabase';
 import { setupDatabase } from './setupDatabase';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
+import gpsRoutes from './routes/gpsRoutes'
+
+// Função auxiliar para obter o IP local
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name] || []) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return 'localhost';
+}
 
 const start = async () => {
   await createDatabaseIfNotExists();
   await setupDatabase();
 
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
-  // rotas aqui...
-  app.use('/users', userRoutes);
-  app.use(authRoutes);
+  // Rotas da aplicação
+  app.use('/users', userRoutes);  // ex: GET /users
+  app.use('/auth', authRoutes);   // ex: POST /auth/login
+  app.use('/',gpsRoutes)
 
-  app.listen(3000, () => {
-    console.log('🚀 Server online em http://localhost:3000');
-  });
-};
+  const PORT = 3000;
+  const HOST = '0.0.0.0'; // escuta em todas interfaces de rede
 
-start();
-
-*/
-
-import express from 'express';
-import cors from 'cors'; 
-import { createDatabaseIfNotExists } from './initDatabase';
-import { setupDatabase } from './setupDatabase';
-import authRoutes from './routes/authRoutes';
-import userRoutes from './routes/userRoutes';
-
-const start = async () => {
-  await createDatabaseIfNotExists();
-  await setupDatabase();
-
-  const app = express();
-  app.use(cors()); 
-  app.use(express.json());
-
-  // Definição das rotas com prefixo correto
-  app.use('/users', userRoutes);  // Mantém as rotas de usuários
-  app.use('/auth', authRoutes);   // Agora as rotas de autenticação ficam dentro de /auth
-
-  app.listen(3000, () => {
-    console.log('🚀 Server online em http://localhost:3000');
+  app.listen(PORT, HOST, () => {
+    console.log(`🚀 Server online em http://${getLocalIP()}:${PORT}`);
   });
 };
 
