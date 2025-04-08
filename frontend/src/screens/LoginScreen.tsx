@@ -11,8 +11,10 @@ import {
   Dimensions,
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigaton';
+import { RootStackParamList } from '../navigation/AppNavigation';
 import axios from 'axios';
+import {  } from ".";
+import { ENV } from '../config/env';
 
 const { width, height } = Dimensions.get('window');
 
@@ -29,7 +31,7 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://10.68.55.167:3000/auth/login', {
+      const response = await axios.post(`${ENV.API_URL}/auth/login`, {
         email,
         password,
       });
