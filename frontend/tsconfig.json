@@ -8,6 +8,9 @@
     "skipLibCheck": true,
     "types": ["react", "react-native"],
     "moduleResolution": "nodenext",
-    "module": "nodenext"
+    "module": "nodenext",
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   }
 }

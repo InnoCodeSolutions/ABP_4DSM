@@ -1,74 +1,67 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Image,
-  Platform,
   Alert,
+  Platform,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import MapView from "../components/MapView";
+
+const { width, height } = Dimensions.get("window");
 
 const HomePage: React.FC = () => {
   const navigation = useNavigation();
-  const [LeafletMap, setLeafletMap] = useState<React.ComponentType<any> | null>(
-    null
-  );
-  const [MapComponent, setMapComponent] =
-    useState<React.ComponentType<any> | null>(null);
 
- /* useEffect(() => {
+  const derivadores = [
+    { latitude: -22.9068, longitude: -43.1729, title: "Derivador 1" },
+    { latitude: -22.9000, longitude: -43.1800, title: "Derivador 2" },
+  ];
+
+  const handleLogout = () => {
     if (Platform.OS === "web") {
-      import("../components/LeafletMap")
-        .then((module) => setLeafletMap(() => module.default))
-        .catch((err) => console.error("Erro ao carregar LeafletMap:", err));
+      window.alert("Você foi desconectado com sucesso!");
+      navigation.navigate("Login" as never);
     } else {
-      import("react-native-maps")
-        .then((module) => setMapComponent(() => module.default))
-        .catch((err) =>
-          console.error("Erro ao carregar react-native-maps:", err)
-        );
+      Alert.alert("Sair", "Você foi desconectado com sucesso!", [
+        { text: "OK", onPress: () => navigation.navigate("Login" as never) },
+      ]);
     }
-  }, []);*/
+  };
+
+  const handleAbout = () => {
+    if (Platform.OS === "web") {
+      window.alert(
+        "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
+      );
+    } else {
+      Alert.alert(
+        "Sobre o App",
+        "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("Login" as never)}>
+        <TouchableOpacity onPress={handleLogout}>
           <Text style={styles.headerText}>Sair</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() =>
-            Alert.alert(
-              "Sobre o App",
-              "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
-            )
-          }
-        >
+        <TouchableOpacity onPress={handleAbout}>
           <Text style={styles.headerText}>Sobre</Text>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.greeting}>Olá, Usuário</Text>
 
-      {Platform.OS === "web"
-        ? LeafletMap && (
-            <View style={styles.mapContainer}>
-              <LeafletMap />
-            </View>
-          )
-        : MapComponent && (
-            <MapComponent
-              style={styles.map}
-              initialRegion={{
-                latitude: -22.9068,
-                longitude: -43.1729,
-                latitudeDelta: 0.05,
-                longitudeDelta: 0.05,
-              }}
-            />
-          )}
+      <View style={styles.mapContainer}>
+        <MapView markers={derivadores} />
+      </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
@@ -83,10 +76,7 @@ const HomePage: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
-          <Image
-            source={require("../assets/grafico.png")}
-            style={styles.icon}
-          />
+          <Image source={require("../assets/grafico.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Dashboard</Text>
         </TouchableOpacity>
 
@@ -104,55 +94,104 @@ const HomePage: React.FC = () => {
   );
 };
 
+const scale = (size: number, max: number) => Math.min(size, max);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#041635",
     alignItems: "center",
-    paddingTop: 50,
+    paddingTop: Platform.select({
+      web: scale(height * 0.02, 30),
+      native: 50,
+    }),
+    width: "100%",
+    minHeight: height,
+    maxWidth: Platform.select({
+      web: 1000,
+      native: width,
+    }),
+    alignSelf: "center",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    paddingHorizontal: 20,
-    paddingTop: 2,
-    paddingBottom: 2,
+    width: Platform.select({
+      web: scale(width * 0.8, 800),
+      native: width * 0.9,
+    }),
+    paddingHorizontal: Platform.select({
+      web: scale(width * 0.05, 20),
+      native: 20,
+    }),
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 10),
+      native: 2,
+    }),
     zIndex: 10,
   },
   headerText: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 20),
+      native: 20,
+    }),
+    fontWeight: "bold",
   },
   greeting: {
-    fontSize: 26,
+    fontSize: Platform.select({
+      web: scale(width * 0.05, 26),
+      native: 26,
+    }),
     color: "#fff",
     fontWeight: "bold",
     alignSelf: "flex-start",
-    marginLeft: "5%",
-    marginBottom: 5,
-    paddingTop: 40,
+    marginLeft: Platform.select({
+      web: scale(width * 0.1, 100), // Ajustado para alinhar com o mapa
+      native: width * 0.05,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.01, 5),
+      native: 5,
+    }),
+    paddingTop: Platform.select({
+      web: scale(height * 0.03, 30),
+      native: 40,
+    }),
   },
   mapContainer: {
-    width: "90%",
-    height: 200,
-    borderRadius: 10,
-    overflow: "hidden",
-  },
-  map: {
-    width: "90%",
-    height: 200,
-    borderRadius: 10,
-    overflow: "hidden",
+    width: Platform.select({
+      web: scale(width * 0.8, 800),
+      native: width * 0.9,
+    }),
+    height: Platform.select({
+      web: 300,
+      native: 200,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: 20,
+    }),
+    alignSelf: "center", // Centraliza o mapa
   },
   buttonContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-    width: "90%",
-    marginTop: 20,
-    paddingTop: 60,
+    width: Platform.select({
+      web: scale(width * 0.8, 800),
+      native: width * 0.9,
+    }),
+    marginTop: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: 20,
+    }),
+    gap: Platform.select({
+      web: 10,
+      native: 10,
+    }),
+    alignSelf: "center", // Centraliza os botões
   },
   button: {
     backgroundColor: "#fff",
@@ -160,17 +199,37 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    width: "48%",
-    aspectRatio: 1,
-    marginBottom: 40,
+    width: Platform.select({
+      web: 160,
+      native: width * 0.42,
+    }),
+    height: Platform.select({
+      web: 160,
+      native: width * 0.42,
+    }),
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: Platform.select({
+      web: scale(width * 0.05, 50),
+      native: 50,
+    }),
+    height: Platform.select({
+      web: scale(width * 0.05, 50),
+      native: 50,
+    }),
     marginBottom: 5,
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 14),
+      native: 14,
+    }),
     color: "#000",
     fontWeight: "bold",
   },

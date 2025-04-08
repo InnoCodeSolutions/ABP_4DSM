@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,54 +9,60 @@ import {
   Image,
   Platform,
   Dimensions,
-} from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigaton';
-import axios from 'axios';
+} from "react-native";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigation";
+import axios from "axios";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-type Props = StackScreenProps<RootStackParamList, 'Register'>;
+type Props = StackScreenProps<RootStackParamList, "Register">;
+
+const BASE_URL = "http://192.168.15.4:3000";
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
-  const [name, setName] = useState<string>('');
-  const [surname, setSurname] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [phone, setPhone] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [name, setName] = useState<string>("");
+  const [surname, setSurname] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const handleRegister = async () => {
     if (!name || !surname || !email || !phone || !password) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos.');
+      Alert.alert("Campos obrigatórios", "Por favor, preencha todos os campos.");
       return;
     }
 
     try {
-      const response = await axios.post('http://10.68.55.167:3000/users', {
+      const response = await axios.post(`${BASE_URL}/users`, {
         name,
         email,
         lastname: surname,
         password,
         phone,
       });
-      console.log('Resposta do backend:', response.data);
-      Alert.alert('Sucesso', 'Usuário cadastrado com sucesso!');
-      navigation.navigate('Login');
+      console.log("Resposta do backend:", response.data);
+      Alert.alert("Cadastro concluído", "Usuário cadastrado com sucesso!");
+      navigation.navigate("Login");
     } catch (error: any) {
-      console.log('Erro ao cadastrar:', error.message);
+      console.log("Erro ao cadastrar:", error.message);
       if (error.response) {
-        console.log('Resposta do servidor:', error.response.data);
-        console.log('Status:', error.response.status);
+        console.log("Resposta do servidor:", error.response.data);
+        console.log("Status:", error.response.status);
+        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
       } else if (error.request) {
-        console.log('Nenhuma resposta recebida:', error.request);
+        console.log("N visualisation resposta recebida:", error.request);
+        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
+      } else {
+        console.log("Erro:", error.message);
+        Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
       }
-      Alert.alert('Erro', error.response?.data?.message || 'Erro ao cadastrar usuário.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/icon.png')} style={styles.logo} />
+      <Image source={require("../assets/icon.png")} style={styles.logo} />
       <View style={styles.box}>
         <Text style={styles.title}>Cadastrar</Text>
 
@@ -109,7 +115,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.loginButton}
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => navigation.navigate("Login")}
           >
             <Text style={styles.loginButtonText}>Login</Text>
           </TouchableOpacity>
@@ -120,20 +126,19 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   );
 };
 
-// Função para limitar tamanhos em telas grandes (web)
 const scale = (size: number, max: number) => Math.min(size, max);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1E3A8A',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#1E3A8A",
     paddingHorizontal: Platform.select({
       web: scale(width * 0.05, 30),
       native: width * 0.05,
     }),
-    width: '100%',
+    width: "100%",
     minHeight: height,
   },
   logo: {
@@ -149,10 +154,10 @@ const styles = StyleSheet.create({
       web: scale(height * 0.02, 20),
       native: height * 0.03,
     }),
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   box: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     borderRadius: 20,
     padding: Platform.select({
       web: scale(width * 0.05, 30),
@@ -162,24 +167,24 @@ const styles = StyleSheet.create({
       web: scale(width * 0.5, 400),
       native: width > 600 ? width * 0.5 : width * 0.9,
     }),
-    alignItems: 'center',
+    alignItems: "center",
   },
   title: {
     fontSize: Platform.select({
       web: scale(width * 0.05, 28),
       native: width * 0.07,
     }),
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
     marginBottom: Platform.select({
       web: scale(height * 0.03, 30),
       native: height * 0.05,
     }),
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   input: {
-    width: '100%',
-    backgroundColor: '#D1D5DB',
+    width: "100%",
+    backgroundColor: "#D1D5DB",
     padding: Platform.select({
       web: scale(height * 0.01, 12),
       native: height * 0.015,
@@ -194,15 +199,15 @@ const styles = StyleSheet.create({
       native: width * 0.04,
     }),
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginTop: Platform.select({
       web: scale(height * 0.02, 20),
       native: height * 0.03,
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
   },
   registerButton: {
     flex: 1,
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     paddingVertical: Platform.select({
       web: scale(height * 0.01, 12),
       native: height * 0.015,
@@ -220,51 +225,51 @@ const styles = StyleSheet.create({
       web: scale(width * 0.03, 15),
       native: width * 0.04,
     }),
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   registerButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: Platform.select({
       web: scale(width * 0.03, 16),
       native: width * 0.04,
     }),
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loginButton: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: Platform.select({
       web: scale(height * 0.01, 12),
       native: height * 0.015,
     }),
     borderRadius: 20,
-    alignItems: 'center',
+    alignItems: "center",
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   loginButtonText: {
-    color: '#1E3A8A',
+    color: "#1E3A8A",
     fontSize: Platform.select({
       web: scale(width * 0.03, 16),
       native: width * 0.04,
     }),
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   footer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: Platform.select({
       web: scale(height * 0.01, 20),
       native: height * 0.02,
     }),
-    color: '#fff',
+    color: "#fff",
     fontSize: Platform.select({
       web: scale(width * 0.02, 12),
       native: width * 0.03,
