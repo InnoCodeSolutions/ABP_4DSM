@@ -9,5 +9,4 @@ const pool = new Pool({
   password: config.database.password,
   database: config.database.database, // Mude de 'name' para 'database'
 });
-
 export default pool;
