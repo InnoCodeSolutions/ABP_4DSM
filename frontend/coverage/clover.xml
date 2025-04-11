@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1744332497671" clover="3.2.0">
+  <project timestamp="1744332497671" name="All files">
+    <metrics statements="132" coveredstatements="21" conditionals="65" coveredconditionals="9" methods="42" coveredmethods="4" elements="239" coveredelements="34" complexity="0" loc="132" ncloc="132" packages="8" files="27" classes="27"/>
+    <package name="frontend">
+      <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="declarations.d.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\declarations.d.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="index.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\index.ts">
+        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src">
+      <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <file name="App.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\App.tsx">
+        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="6" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.components">
+      <metrics statements="33" coveredstatements="0" conditionals="25" coveredconditionals="0" methods="14" coveredmethods="0"/>
+      <file name="Collapsible.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\Collapsible.tsx">
+        <metrics statements="5" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="12" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+      </file>
+      <file name="ExternalLink.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ExternalLink.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="15" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
+      <file name="HapticTab.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\HapticTab.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="6" count="0" type="stmt"/>
+        <line num="10" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+      </file>
+      <file name="HelloWave.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\HelloWave.tsx">
+        <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="16" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+      </file>
+      <file name="LeafletMap.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\LeafletMap.tsx">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="ParallaxScrollView.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ParallaxScrollView.tsx">
+        <metrics statements="9" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="26" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="68" count="0" type="stmt"/>
+      </file>
+      <file name="ThemedText.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ThemedText.tsx">
+        <metrics statements="3" coveredstatements="0" conditionals="11" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="36" count="0" type="stmt"/>
+      </file>
+      <file name="ThemedView.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ThemedView.tsx">
+        <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.components.ui">
+      <metrics statements="8" coveredstatements="0" conditionals="3" coveredconditionals="0" methods="5" coveredmethods="0"/>
+      <file name="IconSymbol.ios.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ui\IconSymbol.ios.tsx">
+        <metrics statements="1" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
+      <file name="IconSymbol.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ui\IconSymbol.tsx">
+        <metrics statements="2" coveredstatements="0" conditionals="1" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+      </file>
+      <file name="TabBarBackground.ios.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ui\TabBarBackground.ios.tsx">
+        <metrics statements="4" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+      </file>
+      <file name="TabBarBackground.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\components\ui\TabBarBackground.tsx">
+        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.constants">
+      <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="Colors.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\constants\Colors.ts">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="1" count="0" type="stmt"/>
+        <line num="2" count="0" type="stmt"/>
+        <line num="4" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.hooks">
+      <metrics statements="12" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="3" coveredmethods="0"/>
+      <file name="useColorScheme.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\hooks\useColorScheme.ts">
+        <metrics statements="0" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      </file>
+      <file name="useColorScheme.web.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\hooks\useColorScheme.web.ts">
+        <metrics statements="7" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="8" count="0" type="stmt"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="17" count="0" type="stmt"/>
+      </file>
+      <file name="useThemeColor.ts" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\hooks\useThemeColor.ts">
+        <metrics statements="5" coveredstatements="0" conditionals="4" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="8" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="11" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.navigation">
+      <metrics statements="6" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+      <file name="AppNavigation.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\navigation\AppNavigation.tsx">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+      </file>
+      <file name="AppNavigaton.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\navigation\AppNavigaton.tsx">
+        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="frontend.src.screens">
+      <metrics statements="68" coveredstatements="21" conditionals="31" coveredconditionals="9" methods="17" coveredmethods="4"/>
+      <file name="HomePage.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\HomePage.tsx">
+        <metrics statements="9" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="107" count="0" type="stmt"/>
+      </file>
+      <file name="HomeScreen.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\HomeScreen.tsx">
+        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="9" count="0" type="stmt"/>
+        <line num="10" count="0" type="stmt"/>
+        <line num="12" count="0" type="stmt"/>
+        <line num="15" count="0" type="stmt"/>
+        <line num="20" count="0" type="stmt"/>
+      </file>
+      <file name="LoginScreen.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\LoginScreen.tsx">
+        <metrics statements="21" coveredstatements="21" conditionals="10" coveredconditionals="9" methods="4" coveredmethods="4"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="22" count="15" type="stmt"/>
+        <line num="23" count="15" type="stmt"/>
+        <line num="25" count="15" type="stmt"/>
+        <line num="26" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="32" count="3" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="41" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="42" count="1" type="stmt"/>
+        <line num="44" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="48" count="15" type="stmt"/>
+        <line num="74" count="1" type="stmt"/>
+        <line num="89" count="19" type="stmt"/>
+        <line num="91" count="1" type="stmt"/>
+      </file>
+      <file name="NotFoundScreen.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\NotFoundScreen.tsx">
+        <metrics statements="5" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="0"/>
+        <line num="4" count="0" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="7" count="0" type="stmt"/>
+        <line num="13" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+      </file>
+      <file name="RegisterScreen.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\RegisterScreen.tsx">
+        <metrics statements="27" coveredstatements="0" conditionals="15" coveredconditionals="0" methods="4" coveredmethods="0"/>
+        <line num="17" count="0" type="stmt"/>
+        <line num="21" count="0" type="stmt"/>
+        <line num="22" count="0" type="stmt"/>
+        <line num="23" count="0" type="stmt"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="25" count="0" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="28" count="0" type="stmt"/>
+        <line num="29" count="0" type="cond" truecount="0" falsecount="7"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="42" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="48" count="0" type="stmt"/>
+        <line num="49" count="0" type="stmt"/>
+        <line num="50" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="112" count="0" type="stmt"/>
+        <line num="124" count="0" type="stmt"/>
+        <line num="126" count="0" type="stmt"/>
+      </file>
+      <file name="index.tsx" path="C:\Users\jonatas filipe\Desktop\ABP_4DSM\frontend\src\screens\index.tsx">
+        <metrics statements="1" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="4" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>
