@@ -1,6 +1,7 @@
 import React from "react";
 import {
   View,
+  ScrollView,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -96,7 +97,6 @@ const HomePage: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ScrollView>
   );
 };
 
