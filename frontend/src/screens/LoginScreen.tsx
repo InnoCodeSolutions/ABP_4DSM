@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
-const BASE_URL = "http://192.168.15.4:3000";
+const BASE_URL = "http://192.168.0.101:3000"; //alterar de acordo com ip da sua rede por enquanto
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");

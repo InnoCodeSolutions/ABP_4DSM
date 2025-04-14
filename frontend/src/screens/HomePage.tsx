@@ -1,6 +1,7 @@
 import React from "react";
 import {
   View,
+  ScrollView,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -57,46 +58,55 @@ const HomePage: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.greeting}>Olá, Usuário</Text>
+        {/* Saudação */}
+        <Text style={styles.greeting}>Olá, Usuário</Text>
 
       <View style={styles.mapContainer}>
         <MapView markers={derivadores} />
       </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("ViewDevice" as never)}
-        >
-          <Image
-            source={require("../assets/dispositivo.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Dispositivos</Text>
-        </TouchableOpacity>
+        {/* Botões */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("ViewDevice" as never)}
+          >
+            <Image
+              source={require("../assets/dispositivo.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Dispositivos</Text>
+          </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
           <Image source={require("../assets/grafico.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Dashboard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/mapa.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>Mapa</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image source={require("../assets/mapa.png")} style={styles.icon} />
+            <Text style={styles.buttonText}>Mapa</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/duvida.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>A definir</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.button}>
+            <Image
+              source={require("../assets/duvida.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>A definir</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
   );
 };
 
 const scale = (size: number, max: number) => Math.min(size, max);
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 80,
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#041635",
