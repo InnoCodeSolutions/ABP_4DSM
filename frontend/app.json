@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Meu Projeto",
+    "slug": "meu-projeto",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/icon.png",
+    "splash": {
+      "image": "./src/assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "newArchEnabled": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "newArchEnabled": true,
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    }
+  }
+}
