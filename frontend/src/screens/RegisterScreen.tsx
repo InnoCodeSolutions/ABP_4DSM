@@ -13,12 +13,14 @@ import {
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
 import axios from "axios";
+import config from '../config/config.json'; // ou './config/config.json'
+
 
 const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Register">;
 
-const BASE_URL = "http://192.168.15.4:3000";
+const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState<string>("");
@@ -49,10 +51,16 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       if (error.response) {
         console.log("Resposta do servidor:", error.response.data);
         console.log("Status:", error.response.status);
-        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
+        Alert.alert(
+          "Erro no cadastro",
+          error.response?.data?.message || "Não foi possível cadastrar o usuário."
+        );
       } else if (error.request) {
-        console.log("N visualisation resposta recebida:", error.request);
-        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
+        console.log("Nenhuma resposta recebida:", error.request);
+        Alert.alert(
+          "Erro de conexão",
+          "Não foi possível conectar ao servidor. Verifique sua rede."
+        );
       } else {
         console.log("Erro:", error.message);
         Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");

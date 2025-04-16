@@ -14,3 +14,47 @@ config/config.yaml
 *.log
 *.tmp
 .cache/
+
+# Configurações sensíveis (incluindo config.json)
+config.json
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+web-build/
+expo-env.d.ts
+
+# Native
+*.orig.*
+*.jks
+*.p8
+*.p12
+
+# Cache e logs
+*.log
+*.tmp
+.cache/
+
+# Certificados e chaves
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# Debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# Arquivos de ambiente local
+.env*.local
+
+# TypeScript
+*.tsbuildinfo

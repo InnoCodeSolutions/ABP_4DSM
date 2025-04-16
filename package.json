@@ -1,0 +1,15 @@
+{
+  "name": "meu-projeto",
+  "version": "1.0.0",
+  "scripts": {
+    "generate-config": "node scripts/generateConfig.js",
+    "prestart": "node ../scripts/generateConfig.js"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9"
+  }
+}

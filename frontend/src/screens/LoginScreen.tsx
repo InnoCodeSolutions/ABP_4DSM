@@ -13,12 +13,14 @@ import {
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
 import axios from "axios";
+import config from '../config/config.json'; // ou './config/config.json'
+
 
 const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
-const BASE_URL = "http://192.168.15.4:3000";
+const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");

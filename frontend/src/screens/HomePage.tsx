@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MapView from "../components/MapView";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -49,8 +50,8 @@ const HomePage: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.headerText}>Sair</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+          <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity onPress={handleAbout}>
           <Text style={styles.headerText}>Sobre</Text>
@@ -129,7 +130,10 @@ const styles = StyleSheet.create({
       web: scale(height * 0.01, 10),
       native: 2,
     }),
-    zIndex: 10,
+  },
+  iconButton: {
+    padding: 6,
+    borderRadius: 20,
   },
   headerText: {
     color: "#fff",
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "flex-start",
     marginLeft: Platform.select({
-      web: scale(width * 0.1, 100), // Ajustado para alinhar com o mapa
+      web: scale(width * 0.1, 100),
       native: width * 0.05,
     }),
     marginBottom: Platform.select({
@@ -173,7 +177,7 @@ const styles = StyleSheet.create({
       web: scale(height * 0.02, 20),
       native: 20,
     }),
-    alignSelf: "center", // Centraliza o mapa
+    alignSelf: "center",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -191,7 +195,7 @@ const styles = StyleSheet.create({
       web: 10,
       native: 10,
     }),
-    alignSelf: "center", // Centraliza os botões
+    alignSelf: "center",
   },
   button: {
     backgroundColor: "#fff",
