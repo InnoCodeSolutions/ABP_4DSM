@@ -6,7 +6,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["react", "react-native"],
+    "types": ["jest", "react", "react-native", "@testing-library/jest-native"],
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "allowSyntheticDefaultImports": true,
