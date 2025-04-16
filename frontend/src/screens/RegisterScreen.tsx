@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Register">;
 
-const BASE_URL = "http://192.168.15.4:3000";
+const BASE_URL = "http://192.168.15.25:3000";
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [name, setName] = useState<string>("");
