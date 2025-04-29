@@ -4,6 +4,7 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import HomePage from "../screens/HomePage";
 import NotFoundScreen from "../screens/NotFoundScreen";
+import ViewDevice from "../screens/ViewDevice"; // Importe o componente ViewDevice
 
 export type RootStackParamList = {
   Login: undefined;
@@ -40,23 +41,23 @@ const AppNavigator: React.FC = () => {
         component={NotFoundScreen}
         options={{ headerShown: false }}
       />
-
-      {/* Placeholder screens para futuras implementações
-        <Stack.Screen
-          name="ViewDevice"
-          component={ViewDeviceScreen}
-          options={{ title: 'View Device' }}
-        />
-        <Stack.Screen
-          name="Map"
-          component={MapScreen}
-          options={{ title: 'Map' }}
-        />
-        <Stack.Screen
-          name="Dashboard"
-          component={DashboardScreen}
-          options={{ title: 'Dashboard' }}
-        />*/}
+      {/* Adicionando a tela ViewDevice */}
+      <Stack.Screen
+        name="ViewDevice"
+        component={ViewDevice}
+        options={{ headerShown: false }} // Seguindo o padrão das outras telas
+      />
+      {/* Placeholder screens para futuras implementações */}
+      {/* <Stack.Screen
+        name="Map"
+        component={MapScreen}
+        options={{ title: 'Map' }}
+      />
+      <Stack.Screen
+        name="Dashboard"
+        component={DashboardScreen}
+        options={{ title: 'Dashboard' }}
+      /> */}
     </Stack.Navigator>
   );
 };
