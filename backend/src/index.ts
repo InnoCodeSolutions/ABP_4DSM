@@ -15,11 +15,23 @@ const configPath = path.resolve(__dirname, 'config', 'config.json');
 // Verifica se o config.json existe; se não, executa o script para gerar
 if (!fs.existsSync(configPath)) {
   console.log('⚙️  Gerando config.json via generateConfig.js...');
-  execSync('node ../../scripts/generateConfig.js', { stdio: 'inherit' });
+  try {
+    execSync('node ../../scripts/generateConfig.js', { stdio: 'inherit' });
+  } catch (e) {
+    console.error('❌ Erro ao executar generateConfig.js:', e);
+    process.exit(1);
+  }
 }
 
 // Agora que o JSON existe, podemos importar
-const config = require('./config/config.json'); // Usar require pois import não aceita arquivos gerados dinamicamente
+let config;
+try {
+  config = require('./config/config.json');
+  console.log('Config carregada:', config); // Log para depuração
+} catch (e) {
+  console.error('❌ Erro ao carregar config.json:', e);
+  process.exit(1);
+}
 
 const start = async () => {
   await createDatabaseIfNotExists();
@@ -33,12 +45,22 @@ const start = async () => {
   app.use('/auth', authRoutes);
   app.use('/', gpsRoutes);
 
-  const PORT = config.backend.port || 3000;
-  const HOST = config.backend.host || '0.0.0.0';
+  // Usar config.database em vez de config.backend
+  if (!config.database) {
+    console.error('❌ Seção "database" não encontrada em config.json');
+    process.exit(1);
+  }
 
+  const PORT = process.env.PORT || config.backend?.port || 3000;
+  const HOST = '0.0.0.0';
+  
   app.listen(PORT, HOST, () => {
     console.log(`🚀 Server online em http://${HOST}:${PORT}`);
   });
+  
 };
 
-start();
+start().catch((e) => {
+  console.error('❌ Erro ao iniciar o servidor:', e);
+  process.exit(1);
+});

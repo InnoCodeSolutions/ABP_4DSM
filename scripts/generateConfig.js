@@ -2,9 +2,9 @@ const fs = require('fs');
 const yaml = require('js-yaml');
 const path = require('path');
 
-// Caminho do arquivo YAML original (no backend)
+// Caminho do arquivo YAML original
 const yamlPath = path.join(__dirname, '..', 'backend', 'src', 'config', 'config.yaml');
-console.log('Caminho do arquivo YAML:', yamlPath);  // Verifique o caminho do YAML
+console.log('Caminho do arquivo YAML:', yamlPath);
 
 // Caminhos de saída
 const backendJsonPath = path.join(__dirname, '..', 'backend', 'src', 'config', 'config.json');
@@ -24,8 +24,11 @@ try {
   const data = yaml.load(fileContents);
   console.log('Conteúdo YAML convertido para objeto:', data);
 
+  // Gera JSON válido com formatação limpa
+  const cleanJson = JSON.stringify(data, null, 2);
+
   // Salva no backend
-  fs.writeFileSync(backendJsonPath, JSON.stringify(data, null, 2));
+  fs.writeFileSync(backendJsonPath, cleanJson);
   console.log('✅ config.json gerado no backend.');
 
   // Garante que a pasta do frontend exista
@@ -36,8 +39,9 @@ try {
   }
 
   // Salva no frontend
-  fs.writeFileSync(frontendJsonPath, JSON.stringify(data, null, 2));
+  fs.writeFileSync(frontendJsonPath, cleanJson);
   console.log('✅ config.json gerado no frontend!');
 } catch (e) {
   console.error('❌ Erro ao gerar config.json:', e);
+  process.exit(1);
 }

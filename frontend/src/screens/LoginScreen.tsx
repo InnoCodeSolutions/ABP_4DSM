@@ -15,12 +15,13 @@ import { RootStackParamList } from "../navigation/AppNavigation";
 import axios from "axios";
 import config from '../config/config.json'; // ou './config/config.json'
 
-
 const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
+// Atualize o BASE_URL para utilizar o novo host do backend
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
+
 
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
