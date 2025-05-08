@@ -33,6 +33,8 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
+    console.log("URL de login:", `${BASE_URL}/auth/login`); // <----- CONSOLE DE LOG ADICIONADO
+
     try {
       const response = await axios.post(`${BASE_URL}/auth/login`, {
         email,

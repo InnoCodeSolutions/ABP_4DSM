@@ -38,7 +38,11 @@ const start = async () => {
   await setupDatabase();
 
   const app = express();
-  app.use(cors());
+  app.use(cors({
+    origin: 'http://localhost:8081',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  }));
   app.use(express.json());
 
   app.use('/users', userRoutes);

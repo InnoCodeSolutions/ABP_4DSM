@@ -1,13 +1,10 @@
-{
-  "database": {
-    "host": "localhost",
-    "port": 5432,
-    "user": "postgres",
-    "password": "SENHA",
-    "database": "bdAbp"
-  },
-  "backend": {
-    "host": "192.168.15.4",
-    "port": 3000
-  }
-}
+database:
+  host: shuttle.proxy.rlwy.net (usamos railway)
+  port: porta do projeto
+  user: postgres
+  password: senho do projeto
+  database: bdAbp
+
+backend:
+  host: 192.168.15.4 // colocar o IP do localhosta aqui
+  port: 3000
