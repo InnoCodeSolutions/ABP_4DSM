@@ -27,6 +27,7 @@ frontend\.expo\devices.json
 frontend\app.json
 frontend\declarations.d.ts
 frontend\index.ts
+frontend\jest.setup.js
 frontend\metro.config.js
 frontend\package.json
 frontend\package-lock.json
@@ -56,6 +57,7 @@ frontend\src\screens\LoginScreen.tsx
 frontend\src\screens\NotFoundScreen.tsx
 frontend\src\screens\RegisterScreen.tsx
 frontend\src\screens\ViewDevice.tsx
+frontend\src\tests\LoginScreen.test.tsx
 frontend\tsconfig.json
 package.json
 package-lock.json
