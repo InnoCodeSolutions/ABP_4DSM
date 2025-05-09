@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform, View, StyleSheet, Text } from "react-native";
+import { Platform, View, StyleSheet, Text, StyleProp, ViewStyle } from "react-native";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 
 // Define types for markers
@@ -18,6 +18,7 @@ interface MapViewProps {
     latitudeDelta: number;
     longitudeDelta: number;
   };
+  style?: StyleProp<ViewStyle>;
 }
 
 const defaultRegion = {
@@ -27,7 +28,7 @@ const defaultRegion = {
   longitudeDelta: 0.05,
 };
 
-const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = defaultRegion }) => {
+const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = defaultRegion, style }) => {
   // Render map for web
   if (Platform.OS === "web") {
     const region = initialRegion || defaultRegion;
@@ -38,7 +39,7 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
     }&layer=mapnik&marker=${region.latitude},${region.longitude}`;
 
     return (
-      <View style={styles.mapContainer}>
+      <View style={[styles.mapContainer, style]}>
         <iframe
           style={{
             width: "100%",
@@ -58,7 +59,7 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
     return (
       <MapView
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
-        style={styles.map}
+        style={[styles.map, style]}
         initialRegion={initialRegion}
       >
         {markers.map((marker, index) => (
@@ -76,7 +77,7 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
   } catch (err) {
     console.error("Failed to render map on mobile:", err);
     return (
-      <View style={styles.mapContainer}>
+      <View style={[styles.mapContainer, style]}>
         <Text style={{ color: "#fff" }}>Erro ao carregar o mapa no mobile.</Text>
       </View>
     );

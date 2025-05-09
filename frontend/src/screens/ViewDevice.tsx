@@ -20,6 +20,7 @@ const ViewDevice: React.FC = () => {
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   // Função para buscar os dados da API
   const loadDerivadores = async () => {
@@ -34,11 +35,17 @@ const ViewDevice: React.FC = () => {
   // Função para buscar o histórico de um dispositivo
   const loadDeviceHistory = async (deviceId: string) => {
     try {
+      setIsLoadingHistory(true);
+      console.log("Fetching history for deviceId:", deviceId); // Debug device ID
       const history = await fetchDeviceHistory(deviceId);
-      setDeviceHistory(history);
+      console.log("Device History Response:", history); // Debug API response
+      setDeviceHistory(Array.isArray(history) ? history : []);
       setSelectedDevice(deviceId);
     } catch (error) {
       console.error("Erro ao buscar histórico:", error);
+      setDeviceHistory([]); // Fallback to empty array on error
+    } finally {
+      setIsLoadingHistory(false);
     }
   };
 
@@ -167,7 +174,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     gap: 10,
     alignSelf: "center",
-    flex: 1,
   },
   deviceButton: {
     backgroundColor: "#fff",
