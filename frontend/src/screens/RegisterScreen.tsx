@@ -412,7 +412,7 @@ import {
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
-import { register } from "../../service/authService";
+import { register } from "../service/authService";
 
 const { width, height } = Dimensions.get("window");
 

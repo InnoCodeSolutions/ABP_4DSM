@@ -1,5 +1,7 @@
 import axios from "axios";
 import config from "@config/config.json";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
@@ -8,16 +10,25 @@ export interface Derivador {
   latitude?: number;
   longitude?: number;
   timestamp?: string;
-  altitude?: number; // Adicionado
-  speed?: number; // Adicionado
-  course?: number; // Adicionado
-  satellites?: number; // Adicionado
-  hdop?: number; // Adicionado
+  altitude?: number;
+  speed?: number;
+  course?: number;
+  satellites?: number;
+  hdop?: number;
 }
+
+// Função para obter o token dependendo da plataforma
+const getToken = async (): Promise<string | null> => {
+  if (Platform.OS === 'web') {
+    return localStorage.getItem('token');
+  } else {
+    return await AsyncStorage.getItem('token');
+  }
+};
 
 export const fetchDerivadores = async (): Promise<Derivador[]> => {
   try {
-    const token = localStorage.getItem('token');
+    const token = await getToken();
     const response = await axios.get(`${BASE_URL}/devices`, {
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -36,7 +47,7 @@ export const fetchDerivadores = async (): Promise<Derivador[]> => {
 
 export const fetchDeviceHistory = async (deviceId: string): Promise<Derivador[]> => {
   try {
-    const token = localStorage.getItem('token');
+    const token = await getToken();
     const response = await axios.get(`${BASE_URL}/devices/${deviceId}/history`, {
       headers: { Authorization: `Bearer ${token}` }
     });

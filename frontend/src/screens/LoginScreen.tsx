@@ -265,7 +265,7 @@ import {
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
-import { login } from "../../service/authService";
+import { login } from "../service/authService";
 
 const { width, height } = Dimensions.get("window");
 

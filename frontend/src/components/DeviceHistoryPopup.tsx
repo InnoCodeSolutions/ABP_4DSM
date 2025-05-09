@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, Modal, ScrollView, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import MapView, { Marker } from 'react-native-maps';
-import { Derivador } from '../../service/deviceService';
-
+import CustomMapView from '../components/MapView'; // Corrigindo a importação
+import { Derivador } from '../service/deviceService';
 const { width, height } = Dimensions.get('window');
 
 interface DeviceHistoryPopupProps {
@@ -60,23 +59,19 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
           </ScrollView>
           {selectedLocation && (
             <View style={styles.mapContainer}>
-              <MapView
-                style={styles.map}
+              <CustomMapView
                 initialRegion={{
                   latitude: selectedLocation.latitude,
                   longitude: selectedLocation.longitude,
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
                 }}
-              >
-                <Marker
-                  coordinate={{
-                    latitude: selectedLocation.latitude,
-                    longitude: selectedLocation.longitude,
-                  }}
-                  title={deviceId}
-                />
-              </MapView>
+                markers={[{
+                  latitude: selectedLocation.latitude,
+                  longitude: selectedLocation.longitude,
+                  title: deviceId,
+                }]}
+              />
             </View>
           )}
         </View>
@@ -142,9 +137,6 @@ const styles = StyleSheet.create({
   mapContainer: {
     height: 200,
     marginTop: 10,
-  },
-  map: {
-    ...StyleSheet.absoluteFillObject,
   },
 });
 
