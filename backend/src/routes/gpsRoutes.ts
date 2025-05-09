@@ -1,5 +1,5 @@
 import express, { RequestHandler } from 'express';
-import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData, getDeviceList } from '../service/gpsService';
+import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData, getDeviceList, getDeviceHistoryList } from '../service/gpsService';
 import { GPSData } from '../types/GPSData';
 import { authenticateToken } from '../middlewares/authMiddleware';
 
@@ -30,6 +30,17 @@ router.get('/devices', async (req, res) => {
     res.status(200).json(devices);
   } catch (error) {
     res.status(500).json({ error: 'Erro ao buscar dispositivos' });
+  }
+});
+
+// GET - histórico de um dispositivo
+router.get('/devices/:deviceId/history', async (req, res) => {
+  try {
+    const deviceId = req.params.deviceId;
+    const history = await getDeviceHistoryList(deviceId);
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar histórico do dispositivo' });
   }
 });
 

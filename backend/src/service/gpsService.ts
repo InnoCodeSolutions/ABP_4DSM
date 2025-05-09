@@ -1,4 +1,4 @@
-import { deleteGPSData, getAllGPSData, getDevices, insertGPSData, updateGPSData } from '../models/gpsDao';
+import { deleteGPSData, getAllGPSData, getDevices, getDeviceHistory, insertGPSData, updateGPSData } from '../models/gpsDao';
 import { GPSData } from '../types/GPSData';
 
 export const saveGPSData = async (data: GPSData) => {
@@ -19,4 +19,8 @@ export const removeGPSData = async (id: number) => {
 
 export const getDeviceList = async () => {
   return await getDevices();
+};
+
+export const getDeviceHistoryList = async (deviceId: string) => {
+  return await getDeviceHistory(deviceId);
 };

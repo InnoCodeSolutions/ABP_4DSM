@@ -21,13 +21,22 @@ export const getAllGPSData = async () => {
   return result.rows;
 };
 
-// Ajuste para retornar a última localização de cada dispositivo
 export const getDevices = async (): Promise<{ device_id: string, latitude: number, longitude: number, timestamp: string }[]> => {
   const result = await pool.query(`
     SELECT DISTINCT ON (device_id) device_id, latitude, longitude, timestamp
     FROM login.gps_data
     ORDER BY device_id, timestamp DESC
   `);
+  return result.rows;
+};
+
+// Nova função para buscar o histórico de um dispositivo
+export const getDeviceHistory = async (deviceId: string): Promise<GPSData[]> => {
+  const result = await pool.query(`
+    SELECT * FROM login.gps_data
+    WHERE device_id = $1
+    ORDER BY timestamp DESC
+  `, [deviceId]);
   return result.rows;
 };
 

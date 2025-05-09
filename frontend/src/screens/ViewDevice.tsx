@@ -537,13 +537,15 @@ const styles = StyleSheet.create({
 export default ViewDevice;
 
 */
+
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../navigation/AppNavigation";
-import { Derivador, fetchDerivadores } from "../../service/deviceService";
+import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../../service/deviceService";
+import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
 
 const { width, height } = Dimensions.get("window");
 
@@ -555,6 +557,9 @@ const ViewDevice: React.FC = () => {
 
   // Estado para armazenar os dados dos dispositivos
   const [derivadores, setDerivadores] = useState<Derivador[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Função para buscar os dados da API
   const loadDerivadores = async () => {
@@ -563,6 +568,17 @@ const ViewDevice: React.FC = () => {
       setDerivadores(data.length > 0 ? data : []);
     } catch (error) {
       console.error("Erro ao buscar derivadores:", error);
+    }
+  };
+
+  // Função para buscar o histórico de um dispositivo
+  const loadDeviceHistory = async (deviceId: string) => {
+    try {
+      const history = await fetchDeviceHistory(deviceId);
+      setDeviceHistory(history);
+      setSelectedDevice(deviceId);
+    } catch (error) {
+      console.error("Erro ao buscar histórico:", error);
     }
   };
 
@@ -594,7 +610,11 @@ const ViewDevice: React.FC = () => {
       {/* Lista de dispositivos */}
       <View style={styles.deviceContainer}>
         {derivadores.map((derivador, index) => (
-          <TouchableOpacity key={index} style={styles.deviceButton}>
+          <TouchableOpacity
+            key={index}
+            style={styles.deviceButton}
+            onPress={() => loadDeviceHistory(derivador.device_id)}
+          >
             <View style={styles.deviceRow}>
               {/* Ícone do dispositivo */}
               <Image
@@ -620,6 +640,20 @@ const ViewDevice: React.FC = () => {
         ))}
       </View>
 
+      {/* Popup com histórico */}
+      <DeviceHistoryPopup
+        visible={!!selectedDevice}
+        onClose={() => {
+          setSelectedDevice(null);
+          setDeviceHistory([]);
+          setSelectedLocation(null);
+        }}
+        history={deviceHistory}
+        deviceId={selectedDevice || ''}
+        selectedLocation={selectedLocation}
+        onSelectLocation={(location) => setSelectedLocation(location)}
+      />
+
       {/* Botão de saída */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <Icon name="logout" size={28} color="#fff" />
@@ -629,7 +663,6 @@ const ViewDevice: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  // Mantém os estilos existentes
   container: {
     flex: 1,
     backgroundColor: "#041635",
