@@ -31,6 +31,8 @@ frontend\jest.setup.js
 frontend\metro.config.js
 frontend\package.json
 frontend\package-lock.json
+frontend\service\authService.ts
+frontend\service\deviceService.ts
 frontend\src\App.tsx
 frontend\src\components\Collapsible.tsx
 frontend\src\components\ExternalLink.tsx

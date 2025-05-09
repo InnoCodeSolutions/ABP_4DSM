@@ -21,6 +21,16 @@ export const getAllGPSData = async () => {
   return result.rows;
 };
 
+// Ajuste para retornar a última localização de cada dispositivo
+export const getDevices = async (): Promise<{ device_id: string, latitude: number, longitude: number, timestamp: string }[]> => {
+  const result = await pool.query(`
+    SELECT DISTINCT ON (device_id) device_id, latitude, longitude, timestamp
+    FROM login.gps_data
+    ORDER BY device_id, timestamp DESC
+  `);
+  return result.rows;
+};
+
 export const updateGPSData = async (id: number, data: Partial<GPSData>): Promise<void> => {
   const fields = Object.keys(data);
   const values = Object.values(data);

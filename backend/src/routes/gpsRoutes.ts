@@ -1,12 +1,12 @@
 import express, { RequestHandler } from 'express';
-import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData } from '../service/gpsService';
+import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData, getDeviceList } from '../service/gpsService';
 import { GPSData } from '../types/GPSData';
 import { authenticateToken } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
 // POST - cria novo dado
-router.post('/gps', async (req:any, res:any) => {
+router.post('/gps', async (req: any, res: any) => {
   const data = req.body as GPSData;
 
   if (!data.device_id || data.latitude === undefined || data.longitude === undefined) {
@@ -23,8 +23,18 @@ router.get('/gps', async (req, res) => {
   res.status(200).json(rows);
 });
 
+// GET - lista dispositivos únicos
+router.get('/devices', async (req, res) => {
+  try {
+    const devices = await getDeviceList();
+    res.status(200).json(devices);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar dispositivos' });
+  }
+});
+
 // PUT - atualiza dado por ID
-router.put('/gps/:id',authenticateToken, async (req:any, res:any) => {
+router.put('/gps/:id', authenticateToken, async (req: any, res: any) => {
   const id = parseInt(req.params.id);
   const data = req.body as Partial<GPSData>;
 
@@ -35,7 +45,7 @@ router.put('/gps/:id',authenticateToken, async (req:any, res:any) => {
 });
 
 // DELETE - remove por ID
-router.delete('/gps/:id',authenticateToken, async (req:any, res:any) => {
+router.delete('/gps/:id', authenticateToken, async (req: any, res: any) => {
   const id = parseInt(req.params.id);
 
   if (isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
