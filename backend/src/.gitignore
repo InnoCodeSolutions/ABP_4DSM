@@ -9,6 +9,8 @@ dist/
 src/config/config.yaml
 /config.yaml
 config/config.yaml
+/config.json
+config/config.json
 
 # Cache e logs
 *.log
