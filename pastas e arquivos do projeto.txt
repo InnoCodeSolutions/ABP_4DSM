@@ -46,7 +46,6 @@ frontend\src\components\ui\IconSymbol.ios.tsx
 frontend\src\components\ui\IconSymbol.tsx
 frontend\src\components\ui\TabBarBackground.ios.tsx
 frontend\src\components\ui\TabBarBackground.tsx
-frontend\src\config\config.json
 frontend\src\constants\Colors.ts
 frontend\src\hooks\useColorScheme.ts
 frontend\src\hooks\useColorScheme.web.ts
@@ -65,17 +64,3 @@ frontend\tsconfig.json
 package.json
 package-lock.json
 scripts\generateConfig.js
-TempProject\.eslintrc.js
-TempProject\.prettierrc.js
-TempProject\__tests__\App.test.tsx
-TempProject\app.json
-TempProject\App.tsx
-TempProject\babel.config.js
-TempProject\index.js
-TempProject\ios\TempProject\Images.xcassets\AppIcon.appiconset\Contents.json
-TempProject\ios\TempProject\Images.xcassets\Contents.json
-TempProject\jest.config.js
-TempProject\metro.config.js
-TempProject\package.json
-TempProject\package-lock.json
-TempProject\tsconfig.json
