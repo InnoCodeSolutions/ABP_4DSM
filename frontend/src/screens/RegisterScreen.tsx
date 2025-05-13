@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
   Image,
   Platform,
   Dimensions,
-  Modal,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
@@ -21,13 +20,11 @@ type Props = StackScreenProps<RootStackParamList, "Register">;
 
 const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [fullName, setFullName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [rawPhone, setRawPhone] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [passwordStrength, setPasswordStrength] = useState<string>("");
 
   // Format Brazilian phone number as (XX) XXXX-XXXX or (XX) XXXXX-XXXX
   const formatPhoneNumber = (input: string): string => {
@@ -43,89 +40,74 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     const digits = text.replace(/\D/g, "");
     setRawPhone(digits);
     setPhone(formatPhoneNumber(digits));
-    validatePhone(digits);
   };
 
   // Validate email in real-time
   const validateEmail = (emailValue: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    let emailError = "";
-    if (!emailValue.trim()) {
-      emailError = "E-mail é obrigatório.";
-    } else if (!emailRegex.test(emailValue)) {
-      emailError = "E-mail inválido.";
+    if (!emailValue.trim() || !emailRegex.test(emailValue)) {
+      return false;
     }
-    setErrors((prev) => ({ ...prev, email: emailError }));
+    return true;
   };
 
   // Validate phone in real-time
   const validatePhone = (phoneValue: string) => {
     const phoneRegex = /^\d{10,11}$/;
-    let phoneError = "";
-    if (!phoneValue) {
-      phoneError = "Telefone é obrigatório.";
-    } else if (!phoneRegex.test(phoneValue)) {
-      phoneError = "Telefone inválido (use 10 ou 11 dígitos, ex: (12) 3456-7890 ou (12) 93456-7890).";
+    if (!phoneValue || !phoneRegex.test(phoneValue)) {
+      return false;
     }
-    setErrors((prev) => ({ ...prev, phone: phoneError }));
+    return true;
   };
 
-  // Validate full name
+  // Validate full name in real-time
   const validateFullName = (nameValue: string) => {
-    let nameError = "";
-    if (!nameValue.trim()) {
-      nameError = "Nome completo é obrigatório.";
-    } else if (nameValue.length < 2) {
-      nameError = "Nome deve ter pelo menos 2 caracteres.";
+    if (!nameValue.trim() || nameValue.length < 2) {
+      return false;
     }
-    setErrors((prev) => ({ ...prev, fullName: nameError }));
+    return true;
+  };
+
+  // Validate last name in real-time
+  const validateLastName = (lastNameValue: string) => {
+    if (!lastNameValue.trim() || lastNameValue.length < 2) {
+      return false;
+    }
+    return true;
   };
 
   // Validate password
   const validatePassword = (passValue: string) => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
-    let passError = "";
-    if (!passValue) {
-      passError = "Senha é obrigatória.";
-    } else if (!passwordRegex.test(passValue)) {
-      passError = "Senha deve ter 8+ caracteres, com letras e números.";
+    if (!passValue || !passwordRegex.test(passValue)) {
+      return false;
     }
-    setErrors((prev) => ({ ...prev, password: passError }));
+    return true;
   };
 
   // Validate inputs on form submission
   const validateInputs = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!fullName.trim()) {
-      newErrors.fullName = "Nome completo é obrigatório.";
-    } else if (fullName.length < 2) {
-      newErrors.fullName = "Nome deve ter pelo menos 2 caracteres.";
+    if (!validateFullName(fullName)) {
+      Alert.alert("Erro", "Nome deve ter pelo menos 2 caracteres.");
+      return false;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      newErrors.email = "E-mail é obrigatório.";
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = "E-mail inválido.";
+    if (!validateLastName(lastName)) {
+      Alert.alert("Erro", "Sobrenome deve ter pelo menos 2 caracteres.");
+      return false;
     }
-
-    const phoneRegex = /^\d{10,11}$/;
-    if (!rawPhone) {
-      newErrors.phone = "Telefone é obrigatório.";
-    } else if (!phoneRegex.test(rawPhone)) {
-      newErrors.phone = "Telefone inválido (use 10 ou 11 dígitos, ex: (12) 3456-7890 ou (12) 93456-7890).";
+    if (!validateEmail(email)) {
+      Alert.alert("Erro", "E-mail inválido.");
+      return false;
     }
-
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
-    if (!password) {
-      newErrors.password = "Senha é obrigatória.";
-    } else if (!passwordRegex.test(password)) {
-      newErrors.password = "Senha deve ter 8+ caracteres, com letras e números.";
+    if (!validatePhone(rawPhone)) {
+      Alert.alert("Erro", "Telefone inválido (use 10 ou 11 dígitos).");
+      return false;
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!validatePassword(password)) {
+      Alert.alert("Erro", "Senha deve ter 8+ caracteres, com letras e números.");
+      return false;
+    }
+    return true;
   };
 
   const checkPasswordStrength = (pass: string) => {
@@ -138,31 +120,29 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   useEffect(() => {
-    setPasswordStrength(checkPasswordStrength(password));
-    validatePassword(password);
+    checkPasswordStrength(password);
   }, [password]);
 
   const handleRegister = async () => {
     if (!validateInputs()) {
-      Alert.alert("Erro", "Corrija os erros nos campos antes de continuar.");
       return;
     }
 
     try {
-      const response = await register(fullName, "", email, rawPhone, password);
-      setModalVisible(true);
+      const response = await register(fullName, lastName, email, rawPhone, password);
+      console.log("Resposta do backend:", response);
+      Alert.alert("Bem-vindo!", "Cadastro realizado com sucesso!");
+      navigation.navigate("Login");
     } catch (error: any) {
+      console.log("Erro ao fazer cadastro:", error.message);
       if (error.response) {
-        Alert.alert(
-          "Erro no cadastro",
-          error.response?.data?.message || "Não foi possível cadastrar o usuário."
-        );
+        console.log("Resposta do servidor:", error.response.data);
+        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
       } else if (error.request) {
-        Alert.alert(
-          "Erro de conexão",
-          "Não foi possível conectar ao servidor. Verifique sua rede."
-        );
+        console.log("Nenhuma resposta recebida:", error.request);
+        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
       } else {
+        console.log("Erro:", error.message);
         Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
       }
     }
@@ -174,83 +154,49 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.box}>
         <Text style={styles.title}>Cadastrar</Text>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, errors.fullName && styles.inputError]}
-            placeholder="Nome completo"
-            placeholderTextColor="#9CA3AF"
-            value={fullName}
-            onChangeText={(text) => {
-              setFullName(text);
-              validateFullName(text);
-            }}
-            onBlur={() => validateFullName(fullName)}
-            autoCapitalize="words"
-          />
-          {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, errors.email && styles.inputError]}
-            placeholder="E-mail"
-            placeholderTextColor="#9CA3AF"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              validateEmail(text);
-            }}
-            onBlur={() => validateEmail(email)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, errors.phone && styles.inputError]}
-            placeholder="Telefone (ex: (12) 93456-7890)"
-            placeholderTextColor="#9CA3AF"
-            value={phone}
-            onChangeText={handlePhoneChange}
-            onBlur={() => validatePhone(rawPhone)}
-            keyboardType="phone-pad"
-            maxLength={15} // (XX) XXXXX-XXXX
-          />
-          {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={[styles.input, errors.password && styles.inputError]}
-            placeholder="Senha"
-            placeholderTextColor="#9CA3AF"
-            value={password}
-            onChangeText={setPassword}
-            onBlur={() => validatePassword(password)}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-          {password && (
-            <Text
-              style={[
-                styles.strengthText,
-                {
-                  color:
-                    passwordStrength === "Forte"
-                      ? "#22C55E"
-                      : passwordStrength === "Média"
-                      ? "#F59E0B"
-                      : "#EF4444",
-                },
-              ]}
-            >
-              Força da senha: {passwordStrength}
-            </Text>
-          )}
-        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Nome"
+          placeholderTextColor="#9CA3AF"
+          value={fullName}
+          onChangeText={setFullName}
+          autoCapitalize="words"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Sobrenome"
+          placeholderTextColor="#9CA3AF"
+          value={lastName}
+          onChangeText={setLastName}
+          autoCapitalize="words"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone (ex: (12) 93456-7890)"
+          placeholderTextColor="#9CA3AF"
+          value={phone}
+          onChangeText={handlePhoneChange}
+          keyboardType="phone-pad"
+          maxLength={15}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#9CA3AF"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
@@ -263,48 +209,8 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.loginButtonText}>Login</Text>
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          style={styles.forgotPassword}
-          onPress={() => navigation.navigate("ForgotPassword")}
-        >
-          <Text style={styles.forgotPasswordText}>Esqueceu sua senha?</Text>
-        </TouchableOpacity>
       </View>
       <Text style={styles.footer}>Made by Innocode Solutions</Text>
-
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>d'eriva</Text>
-            <Text style={styles.modalMessage}>
-              Sucesso!{"\n"}O seu cadastro foi concluído com sucesso. Clique para entrar.
-            </Text>
-            <View style={styles.modalButtonContainer}>
-              <TouchableOpacity
-                style={styles.modalCancelButton}
-                onPress={() => setModalVisible(false)}
-              >
-                <Text style={styles.modalCancelButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.modalLoginButton}
-                onPress={() => {
-                  setModalVisible(false);
-                  navigation.navigate("Login");
-                }}
-              >
-                <Text style={styles.modalButtonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
@@ -365,13 +271,6 @@ const styles = StyleSheet.create({
     }),
     fontWeight: "bold",
   },
-  inputContainer: {
-    width: "100%",
-    marginBottom: Platform.select({
-      web: scale(height * 0.015, 15),
-      native: height * 0.02,
-    }),
-  },
   input: {
     width: "100%",
     backgroundColor: "#D1D5DB",
@@ -379,7 +278,10 @@ const styles = StyleSheet.create({
       web: scale(height * 0.01, 12),
       native: height * 0.015,
     }),
-    marginBottom: 0,
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
     borderRadius: 10,
     fontSize: Platform.select({
       web: scale(width * 0.03, 16),
@@ -390,26 +292,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
-  },
-  inputError: {
-    borderWidth: 1,
-    borderColor: "#EF4444",
-  },
-  errorText: {
-  color: "#fff", // Changed to white for better contrast and aesthetics
-  fontSize: Platform.select({
-    web: scale(width * 0.03, 14), // Increased font size for web
-    native: width * 0.04, // Increased font size for mobile
-  }),
-  marginTop: 4,
-  paddingVertical: 2, // Added for better spacing
-},
-  strengthText: {
-    fontSize: Platform.select({
-      web: scale(width * 0.025, 12),
-      native: width * 0.035,
-    }),
-    marginTop: 4,
   },
   buttonContainer: {
     flexDirection: "row",
@@ -470,20 +352,6 @@ const styles = StyleSheet.create({
     }),
     fontWeight: "bold",
   },
-  forgotPassword: {
-    marginTop: Platform.select({
-      web: scale(height * 0.015, 15),
-      native: height * 0.02,
-    }),
-  },
-  forgotPasswordText: {
-    color: "#fff",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 14),
-      native: width * 0.035,
-    }),
-    textDecorationLine: "underline",
-  },
   footer: {
     position: "absolute",
     bottom: Platform.select({
@@ -496,82 +364,1088 @@ const styles = StyleSheet.create({
       native: width * 0.03,
     }),
   },
-  modalOverlay: {
+});
+
+export default RegisterScreen;*/
+/*
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Platform,
+  Dimensions,
+  KeyboardAvoidingView,
+  ScrollView,
+  TextInput as RNTextInput,
+} from "react-native";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigation";
+import { register } from "../service/authService";
+
+const { width, height } = Dimensions.get("window");
+
+type Props = StackScreenProps<RootStackParamList, "Register">;
+
+const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+  const [fullName, setFullName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [rawPhone, setRawPhone] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+
+  // Refs for each TextInput to manage focus and scrolling
+  const fullNameRef = useRef<RNTextInput>(null);
+  const lastNameRef = useRef<RNTextInput>(null);
+  const emailRef = useRef<RNTextInput>(null);
+  const phoneRef = useRef<RNTextInput>(null);
+  const passwordRef = useRef<RNTextInput>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Format Brazilian phone number as (XX) XXXX-XXXX or (XX) XXXXX-XXXX
+  const formatPhoneNumber = (input: string): string => {
+    const digits = input.replace(/\D/g, "");
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+  };
+
+  // Handle phone input changes
+  const handlePhoneChange = (text: string) => {
+    const digits = text.replace(/\D/g, "");
+    setRawPhone(digits);
+    setPhone(formatPhoneNumber(digits));
+    validatePhone(digits);
+  };
+
+  // Validate full name in real-time
+  const validateFullName = (nameValue: string) => {
+    let nameError = "";
+    if (!nameValue.trim()) {
+      nameError = "Nome é obrigatório.";
+    } else if (nameValue.length < 2) {
+      nameError = "Nome deve ter pelo menos 2 caracteres.";
+    }
+    setErrors((prev) => ({ ...prev, fullName: nameError }));
+  };
+
+  // Validate last name in real-time
+  const validateLastName = (lastNameValue: string) => {
+    let lastNameError = "";
+    if (!lastNameValue.trim()) {
+      lastNameError = "Sobrenome é obrigatório.";
+    } else if (lastNameValue.length < 2) {
+      lastNameError = "Sobrenome deve ter pelo menos 2 caracteres.";
+    }
+    setErrors((prev) => ({ ...prev, lastName: lastNameError }));
+  };
+
+  // Validate email in real-time
+  const validateEmail = (emailValue: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let emailError = "";
+    if (!emailValue.trim()) {
+      emailError = "E-mail é obrigatório.";
+    } else if (!emailRegex.test(emailValue)) {
+      emailError = "E-mail inválido.";
+    }
+    setErrors((prev) => ({ ...prev, email: emailError }));
+  };
+
+  // Validate phone in real-time
+  const validatePhone = (phoneValue: string) => {
+    const phoneRegex = /^\d{10,11}$/;
+    let phoneError = "";
+    if (!phoneValue) {
+      phoneError = "Telefone é obrigatório.";
+    } else if (!phoneRegex.test(phoneValue)) {
+      phoneError = "Telefone inválido (use 10 ou 11 dígitos).";
+    }
+    setErrors((prev) => ({ ...prev, phone: phoneError }));
+  };
+
+  // Validate password in real-time
+  const validatePassword = (passValue: string) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+    let passError = "";
+    if (!passValue) {
+      passError = "Senha é obrigatória.";
+    } else if (!passwordRegex.test(passValue)) {
+      passError = "Senha deve ter 8+ caracteres, com letras e números.";
+    }
+    setErrors((prev) => ({ ...prev, password: passError }));
+  };
+
+  // Check password strength
+  const checkPasswordStrength = (pass: string) => {
+    if (pass.length < 8) return "Fraca";
+    const hasSpecialChar = /[!@#$%^&*]/.test(pass);
+    const hasLettersAndNumbers = /^(?=.*[A-Za-z])(?=.*\d)/.test(pass);
+    if (hasSpecialChar && hasLettersAndNumbers && pass.length >= 12) return "Forte";
+    if (hasLettersAndNumbers && pass.length >= 8) return "Média";
+    return "Fraca";
+  };
+
+  // Validate inputs on form submission
+  const validateInputs = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!fullName.trim()) {
+      newErrors.fullName = "Nome é obrigatório.";
+    } else if (fullName.length < 2) {
+      newErrors.fullName = "Nome deve ter pelo menos 2 caracteres.";
+    }
+
+    if (!lastName.trim()) {
+      newErrors.lastName = "Sobrenome é obrigatório.";
+    } else if (lastName.length < 2) {
+      newErrors.lastName = "Sobrenome deve ter pelo menos 2 caracteres.";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      newErrors.email = "E-mail é obrigatório.";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "E-mail inválido.";
+    }
+
+    const phoneRegex = /^\d{10,11}$/;
+    if (!rawPhone) {
+      newErrors.phone = "Telefone é obrigatório.";
+    } else if (!phoneRegex.test(rawPhone)) {
+      newErrors.phone = "Telefone inválido (use 10 ou 11 dígitos).";
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!password) {
+      newErrors.password = "Senha é obrigatória.";
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password = "Senha deve ter 8+ caracteres, com letras e números.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  useEffect(() => {
+    setPasswordStrength(checkPasswordStrength(password));
+    validatePassword(password);
+  }, [password]);
+
+  const handleRegister = async () => {
+    if (!validateInputs()) {
+      Alert.alert("Erro", "Corrija os erros nos campos antes de continuar.");
+      return;
+    }
+
+    try {
+      const response = await register(fullName, lastName, email, rawPhone, password);
+      console.log("Resposta do backend:", response);
+      Alert.alert("Bem-vindo!", "Cadastro realizado com sucesso!");
+      navigation.navigate("Login");
+    } catch (error: any) {
+      console.log("Erro ao fazer cadastro:", error.message);
+      if (error.response) {
+        console.log("Resposta do servidor:", error.response.data);
+        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
+      } else if (error.request) {
+        console.log("Nenhuma resposta recebida:", error.request);
+        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
+      } else {
+        console.log("Erro:", error.message);
+        Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
+      }
+    }
+  };
+
+  // Scroll to the focused input
+  const handleFocus = (ref: React.RefObject<RNTextInput>) => {
+    if (scrollViewRef.current && ref.current) {
+      ref.current.measureLayout(
+        scrollViewRef.current as any,
+        (x, y) => {
+          scrollViewRef.current?.scrollTo({ y: y - 20, animated: true }); // Adjust y offset for better visibility
+        },
+        () => {}
+      );
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Image source={require("../assets/icon.png")} style={styles.logo} />
+        <View style={styles.box}>
+          <Text style={styles.title}>Cadastrar</Text>
+
+          <TextInput
+            ref={fullNameRef}
+            style={styles.input}
+            placeholder="Nome"
+            placeholderTextColor="#9CA3AF"
+            value={fullName}
+            onChangeText={(text) => {
+              setFullName(text);
+              validateFullName(text);
+            }}
+            onFocus={() => handleFocus(fullNameRef)}
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={() => lastNameRef.current?.focus()}
+          />
+          {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+
+          <TextInput
+            ref={lastNameRef}
+            style={styles.input}
+            placeholder="Sobrenome"
+            placeholderTextColor="#9CA3AF"
+            value={lastName}
+            onChangeText={(text) => {
+              setLastName(text);
+              validateLastName(text);
+            }}
+            onFocus={() => handleFocus(lastNameRef)}
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current?.focus()}
+          />
+          {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+
+          <TextInput
+            ref={emailRef}
+            style={styles.input}
+            placeholder="E-mail"
+            placeholderTextColor="#9CA3AF"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              validateEmail(text);
+            }}
+            onFocus={() => handleFocus(emailRef)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            returnKeyType="next"
+            onSubmitEditing={() => phoneRef.current?.focus()}
+          />
+          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+          <TextInput
+            ref={phoneRef}
+            style={styles.input}
+            placeholder="Telefone (ex: (12) 93456-7890)"
+            placeholderTextColor="#9CA3AF"
+            value={phone}
+            onChangeText={handlePhoneChange}
+            onFocus={() => handleFocus(phoneRef)}
+            keyboardType="phone-pad"
+            maxLength={15}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
+          {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+
+          <TextInput
+            ref={passwordRef}
+            style={styles.input}
+            placeholder="Senha"
+            placeholderTextColor="#9CA3AF"
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => handleFocus(passwordRef)}
+            secureTextEntry
+            autoCapitalize="none"
+            returnKeyType="done"
+          />
+          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+          {password && (
+            <Text
+              style={[
+                styles.strengthText,
+                {
+                  color:
+                    passwordStrength === "Forte"
+                      ? "#22C55E"
+                      : passwordStrength === "Média"
+                      ? "#F59E0B"
+                      : "#EF4444",
+                },
+              ]}
+            >
+              Força da senha: {passwordStrength}
+            </Text>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+              <Text style={styles.registerButtonText}>Cadastrar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => navigation.navigate("Login")}
+            >
+              <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text style={styles.footer}>Made by Innocode Solutions</Text>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+};
+
+const scale = (size: number, max: number) => Math.min(size, max);
+
+const styles = StyleSheet.create({
+  container: {
     flex: 1,
+    backgroundColor: "#1E3A8A",
+    width: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    paddingHorizontal: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.05,
+    }),
+    paddingBottom: Platform.select({
+      web: scale(height * 0.01, 20),
+      native: height * 0.02,
+    }),
   },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 10,
+  logo: {
     width: Platform.select({
-      web: scale(width * 0.5, 300),
-      native: width * 0.8,
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    height: Platform.select({
+      web: scale(width * 0.1, 80),
+      native: width * 0.2,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
+    }),
+    resizeMode: "contain",
+  },
+  box: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
+    padding: Platform.select({
+      web: scale(width * 0.05, 30),
+      native: width * 0.08,
+    }),
+    width: Platform.select({
+      web: scale(width * 0.5, 400),
+      native: width > 600 ? width * 0.5 : width * 0.9,
     }),
     alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
-  modalTitle: {
+  title: {
     fontSize: Platform.select({
-      web: scale(width * 0.05, 24),
-      native: 24,
+      web: scale(width * 0.05, 28),
+      native: width * 0.07,
+    }),
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: Platform.select({
+      web: scale(height * 0.03, 30),
+      native: height * 0.05,
     }),
     fontWeight: "bold",
-    color: "#1E3A8A",
-    marginBottom: 10,
   },
-  modalMessage: {
+  input: {
+    width: "100%",
+    backgroundColor: "#D1D5DB",
+    padding: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
+    borderRadius: 10,
     fontSize: Platform.select({
       web: scale(width * 0.03, 16),
-      native: 16,
+      native: width * 0.04,
     }),
-    color: "#333",
-    textAlign: "center",
-    marginBottom: 20,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
   },
-  modalButtonContainer: {
+  errorText: {
+    color: "#fff",
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 14),
+      native: width * 0.04,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
+    textAlign: "left",
+    width: "100%",
+  },
+  strengthText: {
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 14),
+      native: width * 0.04,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
+    textAlign: "left",
+    width: "100%",
+  },
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-  },
-  modalCancelButton: {
-    flex: 1,
-    backgroundColor: "#E5E7EB",
-    paddingVertical: 10,
-    borderRadius: 10,
-    alignItems: "center",
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: "#3B82F6",
-  },
-  modalCancelButtonText: {
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: 16,
+    marginTop: Platform.select({
+      web: scale(height * 0.02, 20),
+      native: height * 0.03,
     }),
-    fontWeight: "bold",
-    color: "#1E3A8A",
   },
-  modalLoginButton: {
+  registerButton: {
     flex: 1,
     backgroundColor: "#3B82F6",
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
+    borderRadius: 20,
+    marginRight: Platform.select({
+      web: scale(width * 0.03, 15),
+      native: width * 0.04,
+    }),
     alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
   },
-  modalButtonText: {
+  registerButtonText: {
+    color: "#fff",
     fontSize: Platform.select({
       web: scale(width * 0.03, 16),
-      native: 16,
+      native: width * 0.04,
     }),
     fontWeight: "bold",
+  },
+  loginButton: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingVertical: Platform.select({
+      web: scale(height * 0.01, 12),
+      native: height * 0.015,
+    }),
+    borderRadius: 20,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  loginButtonText: {
+    color: "#1E3A8A",
+    fontSize: Platform.select({
+      web: scale(width * 0.03, 16),
+      native: width * 0.04,
+    }),
+    fontWeight: "bold",
+  },
+  footer: {
     color: "#fff",
+    fontSize: Platform.select({
+      web: scale(width * 0.02, 12),
+      native: width * 0.03,
+    }),
+    marginTop: Platform.select({
+      web: scale(height * 0.01, 20),
+      native: height * 0.02,
+    }),
+    marginBottom: Platform.select({
+      web: scale(height * 0.01, 20),
+      native: height * 0.02,
+    }),
+  },
+});
+
+export default RegisterScreen;*/
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Platform,
+  Dimensions,
+  KeyboardAvoidingView,
+  ScrollView,
+  TextInput as RNTextInput,
+} from "react-native";
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../navigation/AppNavigation";
+import { register } from "../service/authService";
+
+const { width, height } = Dimensions.get("window");
+
+type Props = StackScreenProps<RootStackParamList, "Register">;
+
+const RegisterScreen: React.FC<Props> = ({ navigation }) => {
+  const [fullName, setFullName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [rawPhone, setRawPhone] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [passwordStrength, setPasswordStrength] = useState<string>("");
+
+  // Refs for each TextInput and ScrollView
+  const fullNameRef = useRef<RNTextInput>(null);
+  const lastNameRef = useRef<RNTextInput>(null);
+  const emailRef = useRef<RNTextInput>(null);
+  const phoneRef = useRef<RNTextInput>(null);
+  const passwordRef = useRef<RNTextInput>(null);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  // Format Brazilian phone number as (XX) XXXX-XXXX or (XX) XXXXX-XXXX
+  const formatPhoneNumber = (input: string): string => {
+    const digits = input.replace(/\D/g, "");
+    if (digits.length <= 2) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+  };
+
+  // Handle phone input changes
+  const handlePhoneChange = (text: string) => {
+    const digits = text.replace(/\D/g, "");
+    setRawPhone(digits);
+    setPhone(formatPhoneNumber(digits));
+    validatePhone(digits);
+  };
+
+  // Validate full name in real-time
+  const validateFullName = (nameValue: string) => {
+    let nameError = "";
+    if (!nameValue.trim()) {
+      nameError = "Nome é obrigatório.";
+    } else if (nameValue.length < 2) {
+      nameError = "Nome deve ter pelo menos 2 caracteres.";
+    }
+    setErrors((prev) => ({ ...prev, fullName: nameError }));
+  };
+
+  // Validate last name in real-time
+  const validateLastName = (lastNameValue: string) => {
+    let lastNameError = "";
+    if (!lastNameValue.trim()) {
+      lastNameError = "Sobrenome é obrigatório.";
+    } else if (lastNameValue.length < 2) {
+      lastNameError = "Sobrenome deve ter pelo menos 2 caracteres.";
+    }
+    setErrors((prev) => ({ ...prev, lastName: lastNameError }));
+  };
+
+  // Validate email in real-time
+  const validateEmail = (emailValue: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let emailError = "";
+    if (!emailValue.trim()) {
+      emailError = "E-mail é obrigatório.";
+    } else if (!emailRegex.test(emailValue)) {
+      emailError = "E-mail inválido.";
+    }
+    setErrors((prev) => ({ ...prev, email: emailError }));
+  };
+
+  // Validate phone in real-time
+  const validatePhone = (phoneValue: string) => {
+    const phoneRegex = /^\d{10,11}$/;
+    let phoneError = "";
+    if (!phoneValue) {
+      phoneError = "Telefone é obrigatório.";
+    } else if (!phoneRegex.test(phoneValue)) {
+      phoneError = "Telefone inválido (use 10 ou 11 dígitos).";
+    }
+    setErrors((prev) => ({ ...prev, phone: phoneError }));
+  };
+
+  // Validate password in real-time
+  const validatePassword = (passValue: string) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+    let passError = "";
+    if (!passValue) {
+      passError = "Senha é obrigatória.";
+    } else if (!passwordRegex.test(passValue)) {
+      passError = "Senha deve ter 8+ caracteres, com letras e números.";
+    }
+    setErrors((prev) => ({ ...prev, password: passError }));
+  };
+
+  // Check password strength
+  const checkPasswordStrength = (pass: string) => {
+    if (pass.length < 8) return "Fraca";
+    const hasSpecialChar = /[!@#$%^&*]/.test(pass);
+    const hasLettersAndNumbers = /^(?=.*[A-Za-z])(?=.*\d)/.test(pass);
+    if (hasSpecialChar && hasLettersAndNumbers && pass.length >= 12) return "Forte";
+    if (hasLettersAndNumbers && pass.length >= 8) return "Média";
+    return "Fraca";
+  };
+
+  // Validate inputs on form submission
+  const validateInputs = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!fullName.trim()) {
+      newErrors.fullName = "Nome é obrigatório.";
+    } else if (fullName.length < 2) {
+      newErrors.fullName = "Nome deve ter pelo menos 2 caracteres.";
+    }
+
+    if (!lastName.trim()) {
+      newErrors.lastName = "Sobrenome é obrigatório.";
+    } else if (lastName.length < 2) {
+      newErrors.lastName = "Sobrenome deve ter pelo menos 2 caracteres.";
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      newErrors.email = "E-mail é obrigatório.";
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "E-mail inválido.";
+    }
+
+    const phoneRegex = /^\d{10,11}$/;
+    if (!rawPhone) {
+      newErrors.phone = "Telefone é obrigatório.";
+    } else if (!phoneRegex.test(rawPhone)) {
+      newErrors.phone = "Telefone inválido (use 10 ou 11 dígitos).";
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
+    if (!password) {
+      newErrors.password = "Senha é obrigatória.";
+    } else if (!passwordRegex.test(password)) {
+      newErrors.password = "Senha deve ter 8+ caracteres, com letras e números.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  useEffect(() => {
+    setPasswordStrength(checkPasswordStrength(password));
+    validatePassword(password);
+  }, [password]);
+
+  const handleRegister = async () => {
+    if (!validateInputs()) {
+      Alert.alert("Erro", "Corrija os erros nos campos antes de continuar.");
+      return;
+    }
+
+    try {
+      const response = await register(fullName, lastName, email, rawPhone, password);
+      console.log("Resposta do backend:", response);
+      Alert.alert("Bem-vindo!", "Cadastro realizado com sucesso!");
+      navigation.navigate("Login");
+    } catch (error: any) {
+      console.log("Erro ao fazer cadastro:", error.message);
+      if (error.response) {
+        console.log("Resposta do servidor:", error.response.data);
+        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
+      } else if (error.request) {
+        console.log("Nenhuma resposta recebida:", error.request);
+        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
+      } else {
+        console.log("Erro:", error.message);
+        Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
+      }
+    }
+  };
+
+  // Fixed scroll to focused input
+  const handleFocus = (ref: React.RefObject<RNTextInput>) => {
+    if (scrollViewRef.current && ref.current) {
+      ref.current.measureLayout(
+        scrollViewRef.current as any,
+        (x, y) => {
+          const keyboardHeight = Platform.select({
+            ios: 300, // Approximate iOS keyboard height
+            android: 250, // Approximate Android keyboard height
+            default: 0,
+          });
+          const offset = y - (height - keyboardHeight - 40); // Adjusted buffer for better visibility
+          if (offset > 0) {
+            scrollViewRef.current?.scrollTo({ y: offset, animated: true });
+          }
+        },
+        () => {}
+      );
+    }
+  };
+
+  return (
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      enabled={Platform.OS === "ios" || Platform.OS === "android"}
+      keyboardVerticalOffset={Platform.select({ ios: 60, android: 80, default: 0 })}
+    >
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Image source={require("../assets/icon.png")} style={styles.logo} />
+        <View style={styles.box}>
+          <Text style={styles.title}>Cadastrar</Text>
+
+          <TextInput
+            ref={fullNameRef}
+            style={styles.input}
+            placeholder="Nome"
+            placeholderTextColor="#9CA3AF"
+            value={fullName}
+            onChangeText={(text) => {
+              setFullName(text);
+              validateFullName(text);
+            }}
+            onFocus={() => handleFocus(fullNameRef)}
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={() => lastNameRef.current?.focus()}
+          />
+          {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+
+          <TextInput
+            ref={lastNameRef}
+            style={styles.input}
+            placeholder="Sobrenome"
+            placeholderTextColor="#9CA3AF"
+            value={lastName}
+            onChangeText={(text) => {
+              setLastName(text);
+              validateLastName(text);
+            }}
+            onFocus={() => handleFocus(lastNameRef)}
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current?.focus()}
+          />
+          {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+
+          <TextInput
+            ref={emailRef}
+            style={styles.input}
+            placeholder="E-mail"
+            placeholderTextColor="#9CA3AF"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              validateEmail(text);
+            }}
+            onFocus={() => handleFocus(emailRef)}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            returnKeyType="next"
+            onSubmitEditing={() => phoneRef.current?.focus()}
+          />
+          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
+          <TextInput
+            ref={phoneRef}
+            style={styles.input}
+            placeholder="Telefone (ex: (12) 93456-7890)"
+            placeholderTextColor="#9CA3AF"
+            value={phone}
+            onChangeText={handlePhoneChange}
+            onFocus={() => handleFocus(phoneRef)}
+            keyboardType="phone-pad"
+            maxLength={15}
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+          />
+          {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+
+          <TextInput
+            ref={passwordRef}
+            style={styles.input}
+            placeholder="Senha"
+            placeholderTextColor="#9CA3AF"
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => handleFocus(passwordRef)}
+            secureTextEntry
+            autoCapitalize="none"
+            returnKeyType="done"
+          />
+          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+          {password && (
+            <Text
+              style={[
+                styles.strengthText,
+                {
+                  color:
+                    passwordStrength === "Forte"
+                      ? "#22C55E"
+                      : passwordStrength === "Média"
+                      ? "#F59E0B"
+                      : "#EF4444",
+                },
+              ]}
+            >
+              Força da senha: {passwordStrength}
+            </Text>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={handleRegister}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.registerButtonText}>Cadastrar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => navigation.navigate("Login")}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.loginButtonText}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <Text style={styles.footer}>Made by Innocode Solutions</Text>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+};
+
+const scaleFont = (size: number, factor: number, min: number, max: number) => {
+  const scaled = size * factor;
+  return Math.min(Math.max(scaled, min), max);
+};
+
+const scaleSpacing = (size: number, factor: number, min: number, max: number) => {
+  const scaled = size * factor;
+  return Math.min(Math.max(scaled, min), max);
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#1E3A8A",
+    width: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: Platform.select({
+      web: scaleSpacing(width * 0.05, 1, 20, 40),
+      native: scaleSpacing(width * 0.05, 1, 15, 30),
+    }),
+    paddingBottom: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 15, 30),
+      native: scaleSpacing(height * 0.02, 1, 20, 40),
+    }),
+  },
+  logo: {
+    width: Platform.select({
+      web: scaleSpacing(width * 0.1, 1, 60, 80),
+      native: scaleSpacing(width * 0.15, 1, 50, 70),
+    }),
+    height: Platform.select({
+      web: scaleSpacing(width * 0.1, 1, 60, 80),
+      native: scaleSpacing(width * 0.15, 1, 50, 70),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.02, 1, 15, 30),
+      native: scaleSpacing(height * 0.02, 1, 20, 40),
+    }),
+    resizeMode: "contain",
+  },
+  box: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
+    padding: Platform.select({
+      web: scaleSpacing(width * 0.05, 1, 20, 40),
+      native: scaleSpacing(width * 0.06, 1, 15, 30),
+    }),
+    width: Platform.select({
+      web: scaleSpacing(width * 0.5, 1, 300, 400),
+      native: width > 600 ? scaleSpacing(width * 0.5, 1, 300, 400) : scaleSpacing(width * 0.85, 1, 250, 350),
+    }),
+    alignItems: "center",
+  },
+  title: {
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.05, 1, 24, 28),
+      native: scaleFont(width * 0.06, 1, 20, 26),
+    }),
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.03, 1, 20, 40),
+      native: scaleSpacing(height * 0.03, 1, 15, 30),
+    }),
+    fontWeight: "bold",
+  },
+  input: {
+    width: "100%",
+    backgroundColor: "#D1D5DB",
+    padding: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 10, 14),
+      native: scaleSpacing(height * 0.015, 1, 12, 16),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.015, 1, 10, 20),
+      native: scaleSpacing(height * 0.015, 1, 8, 15),
+    }),
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 14, 16),
+      native: scaleFont(width * 0.04, 1, 14, 16),
+    }),
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  errorText: {
+    color: "#fff",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 12, 14),
+      native: scaleFont(width * 0.035, 1, 12, 14),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.015, 1, 10, 20),
+      native: scaleSpacing(height * 0.015, 1, 8, 15),
+    }),
+    textAlign: "left",
+    width: "100%",
+  },
+  strengthText: {
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 12, 14),
+      native: scaleFont(width * 0.035, 1, 12, 14),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.015, 1, 10, 20),
+      native: scaleSpacing(height * 0.015, 1, 8, 15),
+    }),
+    textAlign: "left",
+    width: "100%",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: Platform.select({
+      web: scaleSpacing(height * 0.02, 1, 15, 30),
+      native: scaleSpacing(height * 0.02, 1, 15, 25),
+    }),
+  },
+  registerButton: {
+    flex: 1,
+    backgroundColor: "#3B82F6",
+    paddingVertical: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 10, 14),
+      native: scaleSpacing(height * 0.015, 1, 12, 16),
+    }),
+    borderRadius: 20,
+    marginRight: Platform.select({
+      web: scaleSpacing(width * 0.03, 1, 10, 20),
+      native: scaleSpacing(width * 0.04, 1, 15, 20),
+    }),
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  registerButtonText: {
+    color: "#fff",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 14, 16),
+      native: scaleFont(width * 0.04, 1, 14, 16),
+    }),
+    fontWeight: "bold",
+  },
+  loginButton: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingVertical: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 10, 14),
+      native: scaleSpacing(height * 0.015, 1, 12, 16),
+    }),
+    borderRadius: 20,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  loginButtonText: {
+    color: "#1E3A8A",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 14, 16),
+      native: scaleFont(width * 0.04, 1, 14, 16),
+    }),
+    fontWeight: "bold",
+  },
+  footer: {
+    color: "#fff",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.02, 1, 10, 12),
+      native: scaleFont(width * 0.03, 1, 10, 12),
+    }),
+    marginTop: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 15, 30),
+      native: scaleSpacing(height * 0.02, 1, 15, 30),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.01, 1, 15, 30),
+      native: scaleSpacing(height * 0.02, 1, 20, 40),
+    }),
   },
 });
 
