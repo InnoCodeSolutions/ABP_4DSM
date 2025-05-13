@@ -12,6 +12,9 @@ import gpsRoutes from './routes/gpsRoutes';
 // Caminho absoluto do config.json
 const configPath = path.resolve(__dirname, 'config', 'config.json');
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Verifica se o config.json existe; se não, executa o script para gerar
 if (!fs.existsSync(configPath)) {
   console.log('⚙️  Gerando config.json via generateConfig.js...');
@@ -55,8 +58,8 @@ const start = async () => {
     process.exit(1);
   }
 
-  const PORT = process.env.PORT || config.backend?.port || 3000;
-  const HOST = '0.0.0.0';
+  const PORT = process.env.PORT || config.backend?.port || 4000;
+  const HOST = 'localhost';
   
   app.listen(PORT, HOST, () => {
     console.log(`🚀 Server online em http://${HOST}:${PORT}`);

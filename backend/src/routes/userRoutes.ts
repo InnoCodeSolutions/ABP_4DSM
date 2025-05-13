@@ -15,18 +15,17 @@ router.get('/:id', authenticateToken, async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, email, lastname, password, phone } = req.body; // Adicione phone
+  const { name, email, lastname, password, phone } = req.body;
   try {
     const user = await userService.createUser(name, email, lastname, password, phone);
     res.status(201).json(user);
   } catch (error: any) {
-    console.error('Erro ao criar usuário:', error.message);
     res.status(400).json({ message: error.message || 'Erro ao cadastrar usuário' });
   }
 });
 
 router.put('/:id', authenticateToken, async (req, res) => {
-  const { name, lastname, email, password, phone } = req.body; // Adicione phone aqui também, se quiser suportar atualização
+  const { name, lastname, email, password, phone } = req.body;
   const updated = await userService.updateUser(Number(req.params.id), name, lastname, email, password, phone);
   updated ? res.json(updated) : res.status(404).json({ message: 'Usuário não encontrado' });
 });
@@ -34,6 +33,28 @@ router.put('/:id', authenticateToken, async (req, res) => {
 router.delete('/:id', authenticateToken, async (req, res) => {
   await userService.deleteUser(Number(req.params.id));
   res.status(204).send();
+});
+
+// 🚨 NOVAS ROTAS
+
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await userService.sendRecoveryEmail(email);
+    res.json(result);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    await userService.resetPassword(token, newPassword);
+    res.json({ message: 'Senha redefinida com sucesso' });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 export default router;
