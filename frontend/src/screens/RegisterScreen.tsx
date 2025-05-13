@@ -30,6 +30,7 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [passwordStrength, setPasswordStrength] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>(""); // Added success message state
 
   // Refs for each TextInput and ScrollView
   const fullNameRef = useRef<RNTextInput>(null);
@@ -172,42 +173,46 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
   const handleRegister = async () => {
     if (!validateInputs()) {
-      Alert.alert("Erro", "Corrija os erros nos campos antes de continuar.");
+      if (Platform.OS !== "web") {
+        Alert.alert("Erro", "Corrija os erros nos campos antes de continuar.");
+      }
       return;
     }
 
     try {
-      const response = await register(fullName, lastName, email, rawPhone, password);
-      console.log("Resposta do backend:", response);
-      Alert.alert("Bem-vindo!", "Cadastro realizado com sucesso!");
-      navigation.navigate("Login");
+      await register(fullName, lastName, email, rawPhone, password);
+      setSuccessMessage("Bem-vindo! Cadastro realizado com sucesso!");
+      setTimeout(() => {
+        setSuccessMessage("");
+        navigation.navigate("Login");
+      }, 2000); // Show message for 2 seconds before navigating
     } catch (error: any) {
-      console.log("Erro ao fazer cadastro:", error.message);
-      if (error.response) {
-        console.log("Resposta do servidor:", error.response.data);
-        Alert.alert("Erro no cadastro", error.response?.data?.message || "Não foi possível cadastrar o usuário.");
-      } else if (error.request) {
-        console.log("Nenhuma resposta recebida:", error.request);
-        Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
+      console.log("Full Error Response:", JSON.stringify(error.response, null, 2));
+      if (error.response?.status === 400) {
+        setErrors((prev) => ({ ...prev, email: "E-mail já cadastrado." }));
       } else {
-        console.log("Erro:", error.message);
-        Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
+        const serverMessage = (error.response?.data?.message || error.message || "Erro ao cadastrar usuário").toLowerCase().trim();
+        const displayMessage = serverMessage.includes("erro ao cadastrar") ? "Erro ao cadastrar usuário" : serverMessage;
+        if (Platform.OS !== "web") {
+          Alert.alert("Erro no cadastro", displayMessage);
+        } else {
+          setErrors((prev) => ({ ...prev, email: displayMessage }));
+        }
       }
     }
   };
 
-  // Fixed scroll to focused input
   const handleFocus = (ref: React.RefObject<RNTextInput>) => {
     if (scrollViewRef.current && ref.current) {
       ref.current.measureLayout(
         scrollViewRef.current as any,
         (x, y) => {
           const keyboardHeight = Platform.select({
-            ios: 300, // Approximate iOS keyboard height
-            android: 250, // Approximate Android keyboard height
+            ios: 300,
+            android: 250,
             default: 0,
           });
-          const offset = y - (height - keyboardHeight - 40); // Adjusted buffer for better visibility
+          const offset = y - (height - keyboardHeight - 40);
           if (offset > 0) {
             scrollViewRef.current?.scrollTo({ y: offset, animated: true });
           }
@@ -218,141 +223,147 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      enabled={Platform.OS === "ios" || Platform.OS === "android"}
-      keyboardVerticalOffset={Platform.select({ ios: 60, android: 80, default: 0 })}
+  <KeyboardAvoidingView
+    style={styles.container}
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    enabled={Platform.OS === "ios" || Platform.OS === "android"}
+    keyboardVerticalOffset={Platform.select({ ios: 60, android: 80, default: 0 })}
+  >
+    <ScrollView
+      ref={scrollViewRef}
+      contentContainerStyle={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Image source={require("../assets/icon.png")} style={styles.logo} />
-        <View style={styles.box}>
-          <Text style={styles.title}>Cadastrar</Text>
-
-          <TextInput
-            ref={fullNameRef}
-            style={styles.input}
-            placeholder="Nome"
-            placeholderTextColor="#9CA3AF"
-            value={fullName}
-            onChangeText={(text) => {
-              setFullName(text);
-              validateFullName(text);
-            }}
-            onFocus={() => handleFocus(fullNameRef)}
-            autoCapitalize="words"
-            returnKeyType="next"
-            onSubmitEditing={() => lastNameRef.current?.focus()}
-          />
-          {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
-
-          <TextInput
-            ref={lastNameRef}
-            style={styles.input}
-            placeholder="Sobrenome"
-            placeholderTextColor="#9CA3AF"
-            value={lastName}
-            onChangeText={(text) => {
-              setLastName(text);
-              validateLastName(text);
-            }}
-            onFocus={() => handleFocus(lastNameRef)}
-            autoCapitalize="words"
-            returnKeyType="next"
-            onSubmitEditing={() => emailRef.current?.focus()}
-          />
-          {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
-
-          <TextInput
-            ref={emailRef}
-            style={styles.input}
-            placeholder="E-mail"
-            placeholderTextColor="#9CA3AF"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              validateEmail(text);
-            }}
-            onFocus={() => handleFocus(emailRef)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            returnKeyType="next"
-            onSubmitEditing={() => phoneRef.current?.focus()}
-          />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-
-          <TextInput
-            ref={phoneRef}
-            style={styles.input}
-            placeholder="Telefone (ex: (12) 93456-7890)"
-            placeholderTextColor="#9CA3AF"
-            value={phone}
-            onChangeText={handlePhoneChange}
-            onFocus={() => handleFocus(phoneRef)}
-            keyboardType="phone-pad"
-            maxLength={15}
-            returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current?.focus()}
-          />
-          {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
-
-          <TextInput
-            ref={passwordRef}
-            style={styles.input}
-            placeholder="Senha"
-            placeholderTextColor="#9CA3AF"
-            value={password}
-            onChangeText={setPassword}
-            onFocus={() => handleFocus(passwordRef)}
-            secureTextEntry
-            autoCapitalize="none"
-            returnKeyType="done"
-          />
-          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-          {password && (
-            <Text
-              style={[
-                styles.strengthText,
-                {
-                  color:
-                    passwordStrength === "Forte"
-                      ? "#22C55E"
-                      : passwordStrength === "Média"
-                      ? "#F59E0B"
-                      : "#EF4444",
-                },
-              ]}
-            >
-              Força da senha: {passwordStrength}
-            </Text>
-          )}
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.registerButton}
-              onPress={handleRegister}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.registerButtonText}>Cadastrar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={() => navigation.navigate("Login")}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.loginButtonText}>Login</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Logo */}
+      <Image source={require("../assets/icon.png")} style={styles.logo} />
+      {/* Form Container */}
+      <View style={styles.box}>
+        <Text style={styles.title}>Cadastrar</Text>
+        {successMessage && <Text style={styles.successText}>{successMessage}</Text>}
+        {/* Full Name Input */}
+        <TextInput
+          ref={fullNameRef}
+          style={styles.input}
+          placeholder="Nome"
+          placeholderTextColor="#9CA3AF"
+          value={fullName}
+          onChangeText={(text) => {
+            setFullName(text);
+            validateFullName(text);
+          }}
+          onFocus={() => handleFocus(fullNameRef)}
+          autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => lastNameRef.current?.focus()}
+        />
+        {errors.fullName && <Text style={styles.errorText}>{errors.fullName}</Text>}
+        {/* Last Name Input */}
+        <TextInput
+          ref={lastNameRef}
+          style={styles.input}
+          placeholder="Sobrenome"
+          placeholderTextColor="#9CA3AF"
+          value={lastName}
+          onChangeText={(text) => {
+            setLastName(text);
+            validateLastName(text);
+          }}
+          onFocus={() => handleFocus(lastNameRef)}
+          autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => emailRef.current?.focus()}
+        />
+        {errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+        {/* Email Input */}
+        <TextInput
+          ref={emailRef}
+          style={styles.input}
+          placeholder="E-mail"
+          placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            validateEmail(text);
+          }}
+          onFocus={() => handleFocus(emailRef)}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          returnKeyType="next"
+          onSubmitEditing={() => phoneRef.current?.focus()}
+        />
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+        {/* Phone Input */}
+        <TextInput
+          ref={phoneRef}
+          style={styles.input}
+          placeholder="Telefone (ex: (12) 93456-7890)"
+          placeholderTextColor="#9CA3AF"
+          value={phone}
+          onChangeText={handlePhoneChange}
+          onFocus={() => handleFocus(phoneRef)}
+          keyboardType="phone-pad"
+          maxLength={15}
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+        />
+        {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
+        {/* Password Input */}
+        <TextInput
+          ref={passwordRef}
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#9CA3AF"
+          value={password}
+          onChangeText={setPassword}
+          onFocus={() => handleFocus(passwordRef)}
+          secureTextEntry
+          autoCapitalize="none"
+          returnKeyType="done"
+        />
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+        {password && (
+          <Text
+            style={[
+              styles.strengthText,
+              {
+                color:
+                  passwordStrength === "Forte"
+                    ? "#22C55E"
+                    : passwordStrength === "Média"
+                    ? "#F59E0B"
+                    : "#EF4444",
+              },
+            ]}
+          >
+            Força da senha: {passwordStrength}
+          </Text>
+        )}
+        {/* Buttons */}
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleRegister}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.registerButtonText}>Cadastrar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => navigation.navigate("Login")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
         </View>
+      </View>
+      {/* Footer */}
+      <View>
         <Text style={styles.footer}>Made by Innocode Solutions</Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
-  );
+      </View>
+    </ScrollView>
+  </KeyboardAvoidingView>
+);
 };
 
 const scaleFont = (size: number, factor: number, min: number, max: number) => {
@@ -424,6 +435,19 @@ const styles = StyleSheet.create({
       native: scaleSpacing(height * 0.03, 1, 15, 30),
     }),
     fontWeight: "bold",
+  },
+  successText: { // Added style for success message
+    color: "#22C55E",
+    fontSize: Platform.select({
+      web: scaleFont(width * 0.03, 1, 12, 14),
+      native: scaleFont(width * 0.035, 1, 12, 14),
+    }),
+    marginBottom: Platform.select({
+      web: scaleSpacing(height * 0.015, 1, 10, 20),
+      native: scaleSpacing(height * 0.015, 1, 8, 15),
+    }),
+    textAlign: "center",
+    width: "100%",
   },
   input: {
     width: "100%",

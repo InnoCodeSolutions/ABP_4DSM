@@ -21,7 +21,11 @@ router.post('/', async (req, res) => {
     res.status(201).json(user);
   } catch (error: any) {
     console.error('Erro ao criar usuário:', error.message);
-    res.status(400).json({ message: error.message || 'Erro ao cadastrar usuário' });
+    if (error.message === 'E-mail já cadastrado.') {
+      res.status(400).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: 'Erro ao cadastrar usuário' });
+    }
   }
 });
 

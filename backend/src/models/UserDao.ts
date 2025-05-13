@@ -13,6 +13,7 @@ export class UserDao {
   deleteUser(id: number) {
     throw new Error('Method not implemented.');
   }
+
   async getAllUsers(): Promise<User[]> {
     const res = await pool.query('SELECT * FROM login.users');
     return res.rows;
@@ -28,7 +29,16 @@ export class UserDao {
     return res.rows[0] || null;
   }
 
+  async checkEmailExists(email: string): Promise<boolean> {
+    const user = await this.getUserByEmail(email);
+    return !!user; // Returns true if email exists, false otherwise
+  }
+
   async createUser(name: string, email: string, lastname: string, password: string, phone?: string): Promise<User> {
+    const emailExists = await this.checkEmailExists(email);
+    if (emailExists) {
+      throw new Error("E-mail já cadastrado.");
+    }
     const res = await pool.query(
       'INSERT INTO login.users (name, email, lastname, password, phone) VALUES ($1, $2, $3, $4, $5) RETURNING *',
       [name, email, lastname, password, phone || null] // phone é opcional

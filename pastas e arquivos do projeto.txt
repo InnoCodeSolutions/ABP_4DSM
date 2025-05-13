@@ -46,6 +46,7 @@ frontend\src\components\ui\IconSymbol.ios.tsx
 frontend\src\components\ui\IconSymbol.tsx
 frontend\src\components\ui\TabBarBackground.ios.tsx
 frontend\src\components\ui\TabBarBackground.tsx
+frontend\src\config\config.json
 frontend\src\constants\Colors.ts
 frontend\src\hooks\useColorScheme.ts
 frontend\src\hooks\useColorScheme.web.ts
