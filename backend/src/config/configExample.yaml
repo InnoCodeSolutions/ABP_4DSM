@@ -1,10 +1,15 @@
 database:
-  host: shuttle.proxy.rlwy.net (usamos railway)
-  port: porta do projeto
+  host: shuttle.proxy.rlwy.net # usamos railway
+  port: # porta do projeto
   user: postgres
-  password: senho do projeto
+  password: # senha do projeto
   database: bdAbp
 
 backend:
-  host: 192.168.15.4 // colocar o IP do localhosta aqui
+  host: # colocar o IP do localhost aqui
   port: 3000
+
+twilio:
+  accountSid: # insira seu accountSid do Twilio
+  authToken: # insira seu authToken do Twilio
+  fromNumber: # insira o número do Twilio (ex: whatsapp:+1234567890)
