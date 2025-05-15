@@ -1,35 +1,56 @@
-/*import React, { useEffect } from "react";
-
-// Só importa se estiver no web
-if (typeof document === "undefined") {
-  // evita qualquer erro de execução no mobile
-  throw new Error("LeafletMap só pode ser usado na web");
-}
-
+// src/components/LeafletMap.tsx
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-const LeafletMap: React.FC = () => {
-  useEffect(() => {
-    const map = L.map("map").setView([-22.9068, -43.1729], 13);
+// Importe os ícones manualmente
+import icon from "../assets/leaflet/marker-icon.png";
+import icon2x from "../assets/leaflet/marker-icon-2x.png";
+import shadow from "../assets/leaflet/marker-shadow.png";
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
+type Props = {
+  device: {
+    name: string;
+    latitude: number;
+    longitude: number;
+  };
+};
 
-    L.marker([-22.9068, -43.1729])
-      .addTo(map)
-      .bindPopup("Você está aqui!")
-      .openPopup();
-  }, []);
+// Corrige os ícones do Leaflet para o React (Expo Web)
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: icon2x,
+  iconUrl: icon,
+  shadowUrl: shadow,
+});
 
+const LeafletMap: React.FC<Props> = ({ device }) => {
   return (
     <div
-      id="map"
-      style={{ height: "100%", width: "100%", borderRadius: "10px" }}
-    />
+      style={{
+        height: 300,
+        width: "90%",
+        borderRadius: 10,
+        overflow: "hidden",
+      }}
+    >
+      <MapContainer
+        center={[device.latitude, device.longitude]}
+        zoom={13}
+        scrollWheelZoom={true}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap contributors"
+        />
+        <Marker position={[device.latitude, device.longitude]}>
+          <Popup>{device.name}</Popup>
+        </Marker>
+      </MapContainer>
+    </div>
   );
 };
 
 export default LeafletMap;
-*/
