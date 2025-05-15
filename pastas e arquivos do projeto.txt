@@ -18,9 +18,11 @@ backend\src\routes\gpsRoutes.ts
 backend\src\routes\userRoutes.ts
 backend\src\service\authService.ts
 backend\src\service\gpsService.ts
+backend\src\service\passwordResetService.ts
 backend\src\service\userService.ts
 backend\src\setupDatabase.ts
 backend\src\types\GPSData.ts
+backend\src\utils\email.ts
 backend\src\utils\hash.ts
 backend\tsconfig.json
 frontend\.expo\devices.json

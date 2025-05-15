@@ -15,6 +15,11 @@ export const setupDatabase = async () => {
   await client.connect();
 
   try {
+    // Remove a tabela verification_codes existente
+    await client.query(`
+      DROP TABLE IF EXISTS login.verification_codes;
+    `);
+
     // Cria schema
     await client.query(`
       CREATE SCHEMA IF NOT EXISTS login;
@@ -66,11 +71,11 @@ export const setupDatabase = async () => {
       ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
     `);
 
-    // Cria tabela verification_codes para códigos de verificação
+    // Cria nova tabela verification_codes com email
     await client.query(`
       CREATE TABLE IF NOT EXISTS login.verification_codes (
         id SERIAL PRIMARY KEY,
-        phone VARCHAR(20) NOT NULL,
+        email VARCHAR(150) NOT NULL,
         code VARCHAR(6) NOT NULL,
         type VARCHAR(20) NOT NULL,
         expires_at TIMESTAMP NOT NULL,
