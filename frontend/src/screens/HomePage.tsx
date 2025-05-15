@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
 
   const derivadores = [
     { latitude: -22.9068, longitude: -43.1729, title: "Derivador 1" },
-    { latitude: -22.9000, longitude: -43.1800, title: "Derivador 2" },
+    { latitude: -22.9, longitude: -43.18, title: "Derivador 2" },
   ];
 
   const handleLogout = () => {
@@ -76,12 +76,21 @@ const HomePage: React.FC = () => {
           <Text style={styles.buttonText}>Dispositivos</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/grafico.png")} style={styles.icon} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Dashboard" as never)}
+        >
+          <Image
+            source={require("../assets/grafico.png")}
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Dashboard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Map" as never)}
+        >
           <Image source={require("../assets/mapa.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Mapa</Text>
         </TouchableOpacity>

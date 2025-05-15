@@ -1,12 +1,13 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import HomePage from "../screens/HomePage";
 import NotFoundScreen from "../screens/NotFoundScreen";
-import ViewDevice from "../screens/ViewDevice"; // Importe o componente ViewDevice
-import DashboardScreen from "screens/DashboardScreen";
-import MapView from "components/MapView";
+import ViewDevice from "../screens/ViewDevice";
+import DashboardScreen from "../screens/DashboardScreen";
+import MapView from "../components/MapView";
 
 export type RootStackParamList = {
   Login: undefined;
@@ -14,13 +15,13 @@ export type RootStackParamList = {
   Home: undefined;
   ViewDevice: { device: { id: string; name: string } };
   Map: undefined;
-  Dashboard: { device: { id: string; name: string } };
+  Dashboard: undefined;
   NotFound: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-const AppNavigator: React.FC = () => {
+const AppNavigation: React.FC = () => {
   return (
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen
@@ -43,25 +44,23 @@ const AppNavigator: React.FC = () => {
         component={NotFoundScreen}
         options={{ headerShown: false }}
       />
-      {/* Adicionando a tela ViewDevice */}
       <Stack.Screen
         name="ViewDevice"
         component={ViewDevice}
-        options={{ headerShown: false }} // Seguindo o padrão das outras telas
+        options={{ headerShown: false }}
       />
-      {/* Placeholder screens para futuras implementações */}
       <Stack.Screen
         name="Map"
         component={MapView}
-        options={{ title: 'Map' }}
+        options={{ title: "Mapa" }}
       />
       <Stack.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{ title: 'Dashboard' }}
+        options={{ title: "Dashboard" }}
       />
     </Stack.Navigator>
   );
 };
 
-export default AppNavigator;
+export default AppNavigation;

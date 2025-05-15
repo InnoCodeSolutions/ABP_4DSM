@@ -1,34 +1,47 @@
-import React, { useState } from 'react';
-import { View, Text, Modal, ScrollView, StyleSheet, TouchableOpacity, Dimensions, Platform } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import CustomMapView from '../components/MapView';
-import { Derivador } from '../service/deviceService';
-const { width, height } = Dimensions.get('window');
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  Platform,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import CustomMapView from "../components/MapView";
+import { Derivador } from "../service/deviceService";
+
+const { width, height } = Dimensions.get("window");
 
 interface DeviceHistoryPopupProps {
   visible: boolean;
   onClose: () => void;
-  history: Derivador[] | undefined;
+  history?: Derivador[]; // opcional para manter compatibilidade
+  customList: Derivador[]; // novo
   deviceId: string;
   selectedLocation: { latitude: number; longitude: number } | null;
   onSelectLocation: (location: { latitude: number; longitude: number }) => void;
+  onDeviceSelect: (device: Derivador) => void; // novo
 }
 
 const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
   visible,
   onClose,
   history,
+  customList,
   deviceId,
   selectedLocation,
   onSelectLocation,
+  onDeviceSelect,
 }) => {
   const [isMapMaximized, setIsMapMaximized] = useState(false);
   const [isFullScreenMap, setIsFullScreenMap] = useState(false);
 
   const toggleMapSize = () => {
-    console.log("Toggling map size, current state:", isMapMaximized);
     if (!isFullScreenMap) {
-      setIsMapMaximized(prev => !prev);
+      setIsMapMaximized((prev) => !prev);
     }
   };
 
@@ -38,7 +51,7 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
 
   const closeFullScreenMap = () => {
     setIsFullScreenMap(false);
-    setIsMapMaximized(false); // Return to small size when closing full-screen
+    setIsMapMaximized(false);
   };
 
   const mapHeight = isMapMaximized
@@ -55,35 +68,43 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
       <View style={styles.modalContainer}>
         <View style={[styles.popup, isMapMaximized && styles.popupMaximized]}>
           <View style={styles.header}>
-            <Text style={styles.headerText}>Histórico de {deviceId}</Text>
+            <Text style={styles.headerText}>Dispositivos</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Icon name="close" size={24} color="#000" />
             </TouchableOpacity>
           </View>
-          <ScrollView style={[styles.scrollContainer, isMapMaximized && styles.scrollContainerMaximized]}>
-            {history && history.length > 0 ? (
-              history.map((entry, index) => (
-                <View key={index} style={styles.historyEntry}>
-                  <Text style={styles.entryText}>Data: {new Date(entry.timestamp || '').toLocaleString()}</Text>
-                  <Text style={styles.entryText}>Latitude: {entry.latitude?.toFixed(6) || 'N/A'}</Text>
-                  <Text style={styles.entryText}>Longitude: {entry.longitude?.toFixed(6) || 'N/A'}</Text>
-                  <Text style={styles.entryText}>Altitude: {entry.altitude ?? 'N/A'}</Text>
-                  <Text style={styles.entryText}>Velocidade: {entry.speed ?? 'N/A'}</Text>
-                  <Text style={styles.entryText}>Curso: {entry.course ?? 'N/A'}</Text>
-                  <Text style={styles.entryText}>Satélites: {entry.satellites ?? 'N/A'}</Text>
-                  <Text style={styles.entryText}>HDOP: {entry.hdop ?? 'N/A'}</Text>
-                  <TouchableOpacity
-                    style={styles.mapButton}
-                    onPress={() => onSelectLocation({ latitude: entry.latitude || 0, longitude: entry.longitude || 0 })}
-                  >
-                    <Text style={styles.mapButtonText}>Ver no Mapa</Text>
-                  </TouchableOpacity>
-                </View>
+
+          {/* Lista de dispositivos recebida via customList */}
+          <ScrollView
+            style={[
+              styles.scrollContainer,
+              isMapMaximized && styles.scrollContainerMaximized,
+            ]}
+          >
+            {customList && customList.length > 0 ? (
+              customList.map((device, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.historyEntry}
+                  onPress={() => onDeviceSelect(device)}
+                >
+                  <Text style={styles.entryText}>ID: {device.device_id}</Text>
+                  <Text style={styles.entryText}>
+                    Última Latitude: {device.latitude?.toFixed(6) || "N/A"}
+                  </Text>
+                  <Text style={styles.entryText}>
+                    Última Longitude: {device.longitude?.toFixed(6) || "N/A"}
+                  </Text>
+                </TouchableOpacity>
               ))
             ) : (
-              <Text style={styles.entryText}>Nenhum histórico disponível.</Text>
+              <Text style={styles.entryText}>
+                Nenhum dispositivo disponível.
+              </Text>
             )}
           </ScrollView>
+
+          {/* Mapa */}
           {selectedLocation && (
             <View style={[styles.mapContainer, { height: mapHeight }]}>
               <CustomMapView
@@ -93,29 +114,33 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
                   latitudeDelta: 0.01,
                   longitudeDelta: 0.01,
                 }}
-                markers={[{
-                  latitude: selectedLocation.latitude,
-                  longitude: selectedLocation.longitude,
-                  title: deviceId,
-                }]}
+                markers={[
+                  {
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
+                    title: deviceId,
+                  },
+                ]}
                 style={styles.map}
               />
-             <TouchableOpacity
-  style={styles.maximizeButton}
-  onPress={isMapMaximized ? closeFullScreenMap : openFullScreenMap}
->
-  <Icon
-    name={isMapMaximized ? "fullscreen-exit" : "fullscreen"}
-    size={32}
-    color="#fff"
-  />
-</TouchableOpacity>
+              <TouchableOpacity
+                style={styles.maximizeButton}
+                onPress={
+                  isMapMaximized ? closeFullScreenMap : openFullScreenMap
+                }
+              >
+                <Icon
+                  name={isMapMaximized ? "fullscreen-exit" : "fullscreen"}
+                  size={32}
+                  color="#fff"
+                />
+              </TouchableOpacity>
             </View>
           )}
         </View>
       </View>
 
-      {/* Full-screen map modal */}
+      {/* Fullscreen map */}
       <Modal
         animationType="fade"
         transparent={false}
@@ -130,14 +155,23 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
               latitudeDelta: 0.01,
               longitudeDelta: 0.01,
             }}
-            markers={selectedLocation ? [{
-              latitude: selectedLocation.latitude,
-              longitude: selectedLocation.longitude,
-              title: deviceId,
-            }] : []}
+            markers={
+              selectedLocation
+                ? [
+                    {
+                      latitude: selectedLocation.latitude,
+                      longitude: selectedLocation.longitude,
+                      title: deviceId,
+                    },
+                  ]
+                : []
+            }
             style={styles.fullScreenMap}
           />
-          <TouchableOpacity style={styles.fullScreenCloseButton} onPress={closeFullScreenMap}>
+          <TouchableOpacity
+            style={styles.fullScreenCloseButton}
+            onPress={closeFullScreenMap}
+          >
             <Icon name="close" size={32} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -149,9 +183,9 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
 const styles = StyleSheet.create({
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   popup: {
     width: Platform.select({
@@ -159,7 +193,7 @@ const styles = StyleSheet.create({
       native: width * 0.95,
     }),
     maxHeight: height * 0.8,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
   },
@@ -171,17 +205,17 @@ const styles = StyleSheet.create({
     maxHeight: height * 0.98,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: "#ccc",
   },
   headerText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
   },
   closeButton: {
     padding: 5,
@@ -195,56 +229,45 @@ const styles = StyleSheet.create({
   historyEntry: {
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: "#eee",
   },
   entryText: {
     fontSize: 14,
-    color: '#333',
+    color: "#333",
     marginBottom: 5,
-  },
-  mapButton: {
-    backgroundColor: '#041635',
-    padding: 8,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 5,
-  },
-  mapButtonText: {
-    color: '#fff',
-    fontSize: 14,
   },
   mapContainer: {
     marginTop: 10,
-    position: 'relative',
+    position: "relative",
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   map: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
   },
   maximizeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 15,
     right: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
     borderRadius: 20,
     padding: 12,
     zIndex: 1000,
   },
   fullScreenContainer: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   fullScreenMap: {
     flex: 1,
   },
   fullScreenCloseButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
     borderRadius: 20,
     padding: 10,
     zIndex: 1000,
