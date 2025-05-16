@@ -1,22 +1,11 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  Dimensions,
-} from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions,} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native"; // Import corrigido
-// import { RouteProp } from "@react-navigation/core"; // Import removido
+import { useNavigation } from "@react-navigation/native"; 
 import { Derivador, fetchDerivadores } from "../service/deviceService";
-import MovementChart from "../components/MovementChart"; // componente com o gráfico
-import DeviceHistoryPopup from "../components/DeviceHistoryPopup"; // popup já usado
+import MovementChart from "../components/MovementChart"; 
+import DeviceHistoryPopup from "../components/DeviceHistoryPopup"; 
 
-const { width } = Dimensions.get("window");
-
-// Definição do tipo para route
 type DashboardRouteProp = {
   params: { device?: Derivador } | undefined;
 };
@@ -31,7 +20,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
     route.params?.device || null
   );
   const [popupVisible, setPopupVisible] = useState(false);
-  const navigation = useNavigation<NavigationProp<ParamListBase>>(); // Tipagem do navigation
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     fetchDerivadores().then(setDerivadores).catch(console.error);

@@ -114,12 +114,13 @@ const ViewDevice: React.FC = () => {
           setSelectedDevice(null);
           setDeviceHistory([]);
           setSelectedLocation(null);
-        }}
+        } }
         history={deviceHistory}
         deviceId={selectedDevice || ''}
         selectedLocation={selectedLocation}
-        onSelectLocation={(location) => setSelectedLocation(location)}
-      />
+        onSelectLocation={(location) => setSelectedLocation(location)} customList={[]} onDeviceSelect={function (device: Derivador): void {
+          throw new Error("Function not implemented.");
+        } }      />
 
       {/* Botão de saída */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
