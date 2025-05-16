@@ -15,11 +15,6 @@ export const setupDatabase = async () => {
   await client.connect();
 
   try {
-    // Remove a tabela verification_codes existente
-    await client.query(`
-      DROP TABLE IF EXISTS login.verification_codes;
-    `);
-
     // Cria schema
     await client.query(`
       CREATE SCHEMA IF NOT EXISTS login;
