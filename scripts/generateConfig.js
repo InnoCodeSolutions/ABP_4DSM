@@ -5,7 +5,6 @@ const path = require('path');
 // Caminho do arquivo YAML original
 const yamlPath = path.resolve(__dirname, '../backend/src/config/config.yaml');
 console.log('Caminho do arquivo YAML:', yamlPath);
-
 // Caminhos de saída para config.json
 const backendJsonPath = path.resolve(__dirname, '../backend/src/config/config.json');
 const frontendJsonPath = path.resolve(__dirname, '../frontend/src/config/config.json');

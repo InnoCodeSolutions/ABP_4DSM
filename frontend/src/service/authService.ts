@@ -90,6 +90,7 @@ export const resetPassword = async (email: string, code: string, newPassword: st
       code,
       newPassword,
     });
+    
     return response.data;
   } catch (error: any) {
     throw error;

@@ -82,6 +82,7 @@ const ViewDevice: React.FC = () => {
             style={styles.deviceButton}
             onPress={() => loadDeviceHistory(derivador.device_id)}
           >
+            
             <View style={styles.deviceRow}>
               {/* Ícone do dispositivo */}
               <Image

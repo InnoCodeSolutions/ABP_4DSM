@@ -9,6 +9,7 @@ const transporter = nodemailer.createTransport({
     user: config.email?.user || 'your-email@gmail.com', // Substitua pelo seu e-mail
     pass: config.email?.pass || 'your-password', // Substitua pela sua senha ou app password
   },
+  
 });
 
 export const sendVerificationCode = async (email: string, code: string) => {

@@ -27,7 +27,7 @@ export const createDatabaseIfNotExists = async () => {
       console.log(`📦 Banco '${dbName}' já existe.`);
     }
   } catch (err) {
-    console.error('❌ Erro ao criar banco de dados:', err);
+        console.error('❌ Erro ao criar banco de dados:', err);
   } finally {
     await client.end();
   }

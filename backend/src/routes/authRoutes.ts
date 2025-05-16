@@ -3,7 +3,6 @@ import { loginUser } from '../service/authService';
 import { requestPasswordReset, resetPassword } from '../service/passwordResetService';
 
 const router = express.Router();
-
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {

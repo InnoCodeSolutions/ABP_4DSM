@@ -44,7 +44,6 @@ export const fetchDerivadores = async (): Promise<Derivador[]> => {
     throw error;
   }
 };
-
 export const fetchDeviceHistory = async (deviceId: string): Promise<Derivador[]> => {
   try {
     const token = await getToken();
