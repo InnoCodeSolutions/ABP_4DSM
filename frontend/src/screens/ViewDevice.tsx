@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"; // Revertido para importação padrão
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
@@ -76,7 +76,7 @@ const ViewDevice: React.FC = () => {
           onPress={() => navigation.navigate("Home")}
           style={styles.iconButton}
         >
-          <Icon name="home" size={28} color="#fff" /> {/* Usando Icon tipado */}
+          <Icon name="home" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 
@@ -125,13 +125,11 @@ const ViewDevice: React.FC = () => {
         deviceId={selectedDevice || ''}
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
-        customList={derivadores}
-        onDeviceSelect={(deviceId) => setSelectedDevice(deviceId.device_id)}
       />
 
       {/* Botão de saída */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Icon name="logout" size={28} color="#fff" /> {/* Usando Icon tipado */}
+        <Icon name="logout" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
   );
