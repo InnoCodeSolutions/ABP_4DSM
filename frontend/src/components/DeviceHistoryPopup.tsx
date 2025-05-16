@@ -9,9 +9,12 @@ import {
   Dimensions,
   Platform,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomMapView from "../components/MapView";
 import { Derivador } from "../service/deviceService";
+
+// Usar 'any' temporariamente para evitar conflitos de tipagem
+const Icon: any = MaterialCommunityIcons;
 
 const { width, height } = Dimensions.get("window");
 

@@ -15,8 +15,11 @@ import {
 import { StackScreenProps } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { login, requestPasswordReset } from "../service/authService";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ResetPasswordPopup from "../components/ResetPasswordPopup";
+
+// Usar 'any' para evitar conflitos de tipagem com Icon
+const Icon: any = MaterialCommunityIcons;
 
 const { width, height } = Dimensions.get("window");
 
@@ -95,16 +98,16 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           accessibilityLabel="E-mail"
         />
         <TextInput
-  style={styles.input}
-  placeholder="Senha"
-  placeholderTextColor="#9CA3AF"
-  value={password}
-  onChangeText={setPassword}
-  secureTextEntry
-  accessibilityLabel="Senha"
-  onSubmitEditing={handleLogin}
-  returnKeyType="go"
-/>
+          style={styles.input}
+          placeholder="Senha"
+          placeholderTextColor="#9CA3AF"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          accessibilityLabel="Senha"
+          onSubmitEditing={handleLogin}
+          returnKeyType="go"
+        />
 
         <TouchableOpacity
           style={styles.forgotButton}

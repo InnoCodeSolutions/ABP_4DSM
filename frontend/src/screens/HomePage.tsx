@@ -11,7 +11,10 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import MapView from "../components/MapView";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+
+// Usar 'any' para evitar conflitos de tipagem com Icon
+const Icon: any = MaterialCommunityIcons;
 
 const { width, height } = Dimensions.get("window");
 

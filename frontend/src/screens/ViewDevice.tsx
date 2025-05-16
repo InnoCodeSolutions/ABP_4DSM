@@ -2,10 +2,16 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"; // Revertido para importação padrão
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
+
+// Tipagem explícita para MaterialCommunityIcons
+import { IconProps } from "react-native-vector-icons/Icon";
+import { ComponentType } from "react";
+
+const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any; // Contorna erro de tipagem
 
 const { width, height } = Dimensions.get("window");
 
@@ -70,7 +76,7 @@ const ViewDevice: React.FC = () => {
           onPress={() => navigation.navigate("Home")}
           style={styles.iconButton}
         >
-          <Icon name="home" size={28} color="#fff" />
+          <Icon name="home" size={28} color="#fff" /> {/* Usando Icon tipado */}
         </TouchableOpacity>
       </View>
 
@@ -82,7 +88,6 @@ const ViewDevice: React.FC = () => {
             style={styles.deviceButton}
             onPress={() => loadDeviceHistory(derivador.device_id)}
           >
-            
             <View style={styles.deviceRow}>
               {/* Ícone do dispositivo */}
               <Image
@@ -110,23 +115,23 @@ const ViewDevice: React.FC = () => {
 
       {/* Popup com histórico */}
       <DeviceHistoryPopup
-  visible={!!selectedDevice}
-  onClose={() => {
-    setSelectedDevice(null);
-    setDeviceHistory([]);
-    setSelectedLocation(null);
-  }}
-  history={deviceHistory}
-  deviceId={selectedDevice || ''}
-  selectedLocation={selectedLocation}
-  onSelectLocation={(location) => setSelectedLocation(location)}
-  customList={derivadores}
-  onDeviceSelect={(deviceId) => setSelectedDevice(deviceId.device_id)} // Correção aqui
-/>
+        visible={!!selectedDevice}
+        onClose={() => {
+          setSelectedDevice(null);
+          setDeviceHistory([]);
+          setSelectedLocation(null);
+        }}
+        history={deviceHistory}
+        deviceId={selectedDevice || ''}
+        selectedLocation={selectedLocation}
+        onSelectLocation={(location) => setSelectedLocation(location)}
+        customList={derivadores}
+        onDeviceSelect={(deviceId) => setSelectedDevice(deviceId.device_id)}
+      />
 
       {/* Botão de saída */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Icon name="logout" size={28} color="#fff" />
+        <Icon name="logout" size={28} color="#fff" /> {/* Usando Icon tipado */}
       </TouchableOpacity>
     </View>
   );

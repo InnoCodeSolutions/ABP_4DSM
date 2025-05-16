@@ -7,14 +7,26 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useNavigation, NavigationProp, ParamListBase } from "@react-navigation/native"; // Import corrigido
-// import { RouteProp } from "@react-navigation/core"; // Import removido
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Derivador, fetchDerivadores } from "../service/deviceService";
-import MovementChart from "../components/MovementChart"; // componente com o gráfico
-import DeviceHistoryPopup from "../components/DeviceHistoryPopup"; // popup já usado
+import MovementChart from "../components/MovementChart";
+import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
+
+// Usar 'any' para evitar conflitos de tipagem com Icon
+const Icon: any = MaterialCommunityIcons;
 
 const { width } = Dimensions.get("window");
+
+// Definição do tipo para as rotas
+type RootStackParamList = {
+  Home: undefined;
+  Dashboard: { device?: Derivador };
+};
+
+// Tipagem para navigation
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 // Definição do tipo para route
 type DashboardRouteProp = {
@@ -22,7 +34,7 @@ type DashboardRouteProp = {
 };
 
 type Props = {
-  route: DashboardRouteProp; // Usando a definição de tipo correta
+  route: DashboardRouteProp;
 };
 
 const DashboardScreen: React.FC<Props> = ({ route }) => {
@@ -31,7 +43,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
     route.params?.device || null
   );
   const [popupVisible, setPopupVisible] = useState(false);
-  const navigation = useNavigation<NavigationProp<ParamListBase>>(); // Tipagem do navigation
+  const navigation = useNavigation<NavigationProp>();
 
   useEffect(() => {
     fetchDerivadores().then(setDerivadores).catch(console.error);
@@ -87,7 +99,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
       <DeviceHistoryPopup
         visible={popupVisible}
         onClose={() => setPopupVisible(false)}
-        history={[]} // não precisa histórico
+        history={[]}
         deviceId=""
         selectedLocation={null}
         onSelectLocation={() => {}}
