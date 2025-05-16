@@ -154,7 +154,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
     } else if (!phoneRegex.test(rawPhone)) {
       newErrors.phone = "Telefone inválido (use 10 ou 11 dígitos).";
     }
-
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*]{8,}$/;
     if (!password) {
       newErrors.password = "Senha é obrigatória.";

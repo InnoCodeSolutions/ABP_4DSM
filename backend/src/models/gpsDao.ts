@@ -8,7 +8,6 @@ export const insertGPSData = async (data: GPSData): Promise<void> => {
   const {
     device_id, latitude, longitude, altitude, speed, course, satellites, hdop
   } = data;
-
   await pool.query(`
     INSERT INTO login.gps_data (
       device_id, latitude, longitude, altitude, speed, course, satellites, hdop

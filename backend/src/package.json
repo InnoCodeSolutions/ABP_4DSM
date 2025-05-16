@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "npx ts-node ./index.ts",
+    "predev": "node ../../scripts/generateConfig.js",
     "dev": "ts-node-dev --respawn --transpile-only ./index.ts",
-    "prestart": "node ../scripts/generateConfig.js"
+    "prestart": "node ../../scripts/generateConfig.js"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +17,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.3",
     "pg": "^8.14.1",
-    "yaml": "^2.7.0"
+    "yaml": "^2.8.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -26,6 +29,7 @@
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.14",
+    "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.11.11",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

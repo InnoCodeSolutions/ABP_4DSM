@@ -9,7 +9,9 @@ backend:
   host: # colocar o IP do localhost aqui
   port: 3000
 
-twilio:
-  accountSid: # insira seu accountSid do Twilio
-  authToken: # insira seu authToken do Twilio
-  fromNumber: # insira o número do Twilio (ex: whatsapp:+1234567890)
+email:
+  host: smtp.gmail.com
+  port: 587
+  user: colocar o seu email 
+  pass: https://myaccount.google.com/apppasswords   // acessar o link e gerar a senha de acesso 
+  

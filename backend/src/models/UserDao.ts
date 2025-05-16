@@ -57,4 +57,31 @@ export class UserDao {
   async dropUser(id: number): Promise<void> {
     await pool.query('DELETE FROM login.users WHERE id = $1', [id]);
   }
+
+  // Novo método para criar um código de verificação
+  async createVerificationCode(email: string, code: string, type: string, expiresAt: Date): Promise<any> {
+    try {
+      const res = await pool.query(
+        'INSERT INTO login.verification_codes (email, code, type, expires_at) VALUES ($1, $2, $3, $4) RETURNING *',
+        [email, code, type, expiresAt]
+      );
+      return res.rows[0];
+    } catch (error: any) {
+      throw new Error(`Erro ao criar código de verificação: ${error.message}`);
+    }
+  }
+
+  // Novo método para buscar um código de verificação válido (ajustado para fuso horário)
+  async getVerificationCode(code: string): Promise<any | null> {
+    const res = await pool.query(
+      'SELECT * FROM login.verification_codes WHERE code = $1 AND type = $2 AND expires_at > NOW() AT TIME ZONE \'America/Sao_Paulo\'',
+      [code, 'password_reset']
+    );
+    return res.rows[0] || null;
+  }
+
+  // Novo método para deletar um código de verificação
+  async deleteVerificationCode(code: string): Promise<void> {
+    await pool.query('DELETE FROM login.verification_codes WHERE code = $1', [code]);
+  }
 }

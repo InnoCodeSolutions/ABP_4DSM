@@ -8,7 +8,6 @@ export const saveGPSData = async (data: GPSData) => {
 export const fetchGPSData = async () => {
   return await getAllGPSData();
 };
-
 export const modifyGPSData = async (id: number, data: Partial<GPSData>) => {
   await updateGPSData(id, data);
 };

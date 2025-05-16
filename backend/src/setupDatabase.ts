@@ -66,11 +66,11 @@ export const setupDatabase = async () => {
       ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
     `);
 
-    // Cria tabela verification_codes para códigos de verificação
+    // Cria nova tabela verification_codes com email
     await client.query(`
       CREATE TABLE IF NOT EXISTS login.verification_codes (
         id SERIAL PRIMARY KEY,
-        phone VARCHAR(20) NOT NULL,
+        email VARCHAR(150) NOT NULL,
         code VARCHAR(6) NOT NULL,
         type VARCHAR(20) NOT NULL,
         expires_at TIMESTAMP NOT NULL,

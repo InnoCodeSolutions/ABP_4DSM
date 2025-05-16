@@ -82,6 +82,7 @@ const ViewDevice: React.FC = () => {
             style={styles.deviceButton}
             onPress={() => loadDeviceHistory(derivador.device_id)}
           >
+            
             <View style={styles.deviceRow}>
               {/* Ícone do dispositivo */}
               <Image
@@ -109,17 +110,19 @@ const ViewDevice: React.FC = () => {
 
       {/* Popup com histórico */}
       <DeviceHistoryPopup
-        visible={!!selectedDevice}
-        onClose={() => {
-          setSelectedDevice(null);
-          setDeviceHistory([]);
-          setSelectedLocation(null);
-        }}
-        history={deviceHistory}
-        deviceId={selectedDevice || ''}
-        selectedLocation={selectedLocation}
-        onSelectLocation={(location) => setSelectedLocation(location)}
-      />
+  visible={!!selectedDevice}
+  onClose={() => {
+    setSelectedDevice(null);
+    setDeviceHistory([]);
+    setSelectedLocation(null);
+  }}
+  history={deviceHistory}
+  deviceId={selectedDevice || ''}
+  selectedLocation={selectedLocation}
+  onSelectLocation={(location) => setSelectedLocation(location)}
+  customList={derivadores}
+  onDeviceSelect={(deviceId) => setSelectedDevice(deviceId.device_id)} // Correção aqui
+/>
 
       {/* Botão de saída */}
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>

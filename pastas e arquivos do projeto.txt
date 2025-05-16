@@ -1,4 +1,4 @@
-﻿Esqueleto Simplificado do Projeto: C:\Users\André\4dsm\ABP\ABP_4DSMerge
+﻿Esqueleto Simplificado do Projeto: C:\Users\André\4dsm\ABP\ABP_4DSMNEW\ABP_4DSM
 --------------------------------------------------
 .expo\settings.json
 backend\package-lock.json
@@ -18,14 +18,14 @@ backend\src\routes\gpsRoutes.ts
 backend\src\routes\userRoutes.ts
 backend\src\service\authService.ts
 backend\src\service\gpsService.ts
+backend\src\service\passwordResetService.ts
 backend\src\service\userService.ts
 backend\src\setupDatabase.ts
 backend\src\types\GPSData.ts
+backend\src\utils\email.ts
 backend\src\utils\hash.ts
 backend\tsconfig.json
 frontend\.expo\devices.json
-frontend\.expo\packager-info.json
-frontend\.expo\settings.json
 frontend\app.json
 frontend\declarations.d.ts
 frontend\index.ts

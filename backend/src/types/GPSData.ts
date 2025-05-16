@@ -9,5 +9,6 @@ export interface GPSData {
     course?: number;
     satellites?: number;
     hdop?: number;
+    
   }
   
