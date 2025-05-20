@@ -30,7 +30,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState<string>("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [passwordStrength, setPasswordStrength] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState<string>(""); // Added success message state
 
   // Refs for each TextInput and ScrollView
   const fullNameRef = useRef<RNTextInput>(null);
@@ -180,15 +179,22 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
 
     try {
       await register(fullName, lastName, email, rawPhone, password);
-      setSuccessMessage("Bem-vindo! Cadastro realizado com sucesso!");
-      setTimeout(() => {
-        setSuccessMessage("");
-        navigation.navigate("Login");
-      }, 2000); // Show message for 2 seconds before navigating
+      Alert.alert(
+        "Bem-vindo!",
+        "Cadastro realizado com sucesso!",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("Login"),
+          },
+        ],
+        { cancelable: false }
+      );
     } catch (error: any) {
       console.log("Full Error Response:", JSON.stringify(error.response, null, 2));
       if (error.response?.status === 400) {
         setErrors((prev) => ({ ...prev, email: "E-mail já cadastrado." }));
+        Alert.alert("Erro no cadastro", "E-mail já cadastrado.");
       } else {
         const serverMessage = (error.response?.data?.message || error.message || "Erro ao cadastrar usuário").toLowerCase().trim();
         const displayMessage = serverMessage.includes("erro ao cadastrar") ? "Erro ao cadastrar usuário" : serverMessage;
@@ -239,7 +245,6 @@ const RegisterScreen: React.FC<Props> = ({ navigation }) => {
       {/* Form Container */}
       <View style={styles.box}>
         <Text style={styles.title}>Cadastrar</Text>
-        {successMessage && <Text style={styles.successText}>{successMessage}</Text>}
         {/* Full Name Input */}
         <TextInput
           ref={fullNameRef}
@@ -434,19 +439,6 @@ const styles = StyleSheet.create({
       native: scaleSpacing(height * 0.03, 1, 15, 30),
     }),
     fontWeight: "bold",
-  },
-  successText: { // Added style for success message
-    color: "#22C55E",
-    fontSize: Platform.select({
-      web: scaleFont(width * 0.03, 1, 12, 14),
-      native: scaleFont(width * 0.035, 1, 12, 14),
-    }),
-    marginBottom: Platform.select({
-      web: scaleSpacing(height * 0.015, 1, 10, 20),
-      native: scaleSpacing(height * 0.015, 1, 8, 15),
-    }),
-    textAlign: "center",
-    width: "100%",
   },
   input: {
     width: "100%",
