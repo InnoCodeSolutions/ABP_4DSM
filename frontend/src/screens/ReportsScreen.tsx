@@ -6,6 +6,22 @@ import { jsPDF } from 'jspdf';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { fetchDerivadores, fetchDeviceHistoryForReport } from '../service/deviceService';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { IconProps } from 'react-native-vector-icons/Icon';
+import { ComponentType } from 'react';
+
+// Definir tipos de navegação
+type RootStackParamList = {
+  Home: undefined;
+  Reports: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+// Tipagem para o ícone
+const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any;
 
 // Define device data interface to match Derivador
 interface DeviceData {
@@ -18,6 +34,7 @@ interface DeviceData {
 const { width, height } = Dimensions.get('window');
 
 const ReportsScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
@@ -164,7 +181,12 @@ const ReportsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Relatórios</Text>
+      <View style={styles.headerContainer}>
+  <Text style={styles.headerText}>Relatórios</Text>
+  <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconButton}>
+    <Icon name="home" size={28} color="#fff" />
+  </TouchableOpacity>
+</View>
       <FlatList
         data={devices}
         renderItem={renderDeviceItem}
@@ -213,12 +235,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
   },
-  header: {
-    fontSize: 26,
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
+  headerContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: Platform.select({
+    web: 800,
+    native: width * 0.9,
+  }),
+  paddingHorizontal: 10,
+  paddingVertical: 10,
+},
+iconButton: {
+  padding: 6,
+  borderRadius: 20,
+},
+headerText: {
+  fontSize: 26,
+  color: '#fff',
+  fontWeight: 'bold',
+},
   list: {
     paddingBottom: 20,
   },
