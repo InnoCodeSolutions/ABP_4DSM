@@ -5,13 +5,10 @@ import { GPSData } from '../types/GPSData';
 const pool = new Pool(config.database);
 
 export const insertGPSData = async (data: GPSData): Promise<void> => {
-  const {
-    device_id, latitude, longitude, altitude, speed, course, satellites, hdop
-  } = data;
+  const { device_id, latitude, longitude, altitude, speed, course, satellites, hdop } = data;
   await pool.query(`
-    INSERT INTO login.gps_data (
-      device_id, latitude, longitude, altitude, speed, course, satellites, hdop
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO login.gps_data (device_id, latitude, longitude, altitude, speed, course, satellites, hdop)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
   `, [device_id, latitude, longitude, altitude, speed, course, satellites, hdop]);
 };
 
@@ -29,13 +26,66 @@ export const getDevices = async (): Promise<{ device_id: string, latitude: numbe
   return result.rows;
 };
 
-// Nova função para buscar o histórico de um dispositivo
-export const getDeviceHistory = async (deviceId: string): Promise<GPSData[]> => {
-  const result = await pool.query(`
+// Updated to support time range filtering
+export const getDeviceHistory = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
+  let query = `
     SELECT * FROM login.gps_data
     WHERE device_id = $1
-    ORDER BY timestamp DESC
-  `, [deviceId]);
+  `;
+  const params: any[] = [deviceId];
+
+  if (timeRange) {
+    let startDate: Date;
+    const endDate = new Date();
+    if (timeRange === 'last7days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+    } else if (timeRange === 'last30days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 30);
+    } else {
+      const [start, end] = timeRange.split('/'); // e.g., "2025-05-01/2025-05-20"
+      startDate = new Date(start);
+      endDate.setTime(Date.parse(end) || endDate.getTime());
+    }
+    query += ` AND timestamp BETWEEN $2 AND $3`;
+    params.push(startDate, endDate);
+  }
+
+  query += ` ORDER BY timestamp DESC`;
+  const result = await pool.query(query, params);
+  return result.rows;
+};
+
+// New function for Activity Summary
+export const getActivitySummaryData = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
+  let query = `
+    SELECT latitude, longitude, speed, timestamp
+    FROM login.gps_data
+    WHERE device_id = $1
+  `;
+  const params: any[] = [deviceId];
+
+  if (timeRange) {
+    let startDate: Date;
+    const endDate = new Date();
+    if (timeRange === 'last7days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+    } else if (timeRange === 'last30days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 30);
+    } else {
+      const [start, end] = timeRange.split('/');
+      startDate = new Date(start);
+      endDate.setTime(Date.parse(end) || endDate.getTime());
+    }
+    query += ` AND timestamp BETWEEN $2 AND $3`;
+    params.push(startDate, endDate);
+  }
+
+  query += ` ORDER BY timestamp ASC`; // Ascending for distance calculation
+  const result = await pool.query(query, params);
   return result.rows;
 };
 

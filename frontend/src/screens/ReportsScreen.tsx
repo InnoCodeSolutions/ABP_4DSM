@@ -1,0 +1,281 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform, Alert, Dimensions } from 'react-native';
+import Modal from 'react-native-modal';
+import Papa from 'papaparse';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import { jsPDF } from 'jspdf'; // Import jsPDF for web PDF generation
+import { fetchDerivadores, fetchDeviceHistoryForReport } from '../service/deviceService';
+
+// Define device data interface to match Derivador
+interface DeviceData {
+  device_id: string;
+  latitude?: number;
+  longitude?: number;
+  timestamp?: string;
+}
+
+const { width, height } = Dimensions.get('window');
+
+const ReportsScreen: React.FC = () => {
+  const [devices, setDevices] = useState<DeviceData[]>([]);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+
+  // Fetch all devices with their latest data
+  useEffect(() => {
+    const loadDevices = async () => {
+      try {
+        const derivadores = await fetchDerivadores();
+        setDevices(derivadores);
+      } catch (error: any) {
+        console.error('Erro ao carregar dispositivos:', error);
+        Alert.alert('Erro', 'Falha ao carregar dispositivos do banco de dados');
+      }
+    };
+    loadDevices();
+  }, []);
+
+  // Open modal to select export format
+  const openExportModal = (deviceId: string) => {
+    setSelectedDevice(deviceId);
+    setModalVisible(true);
+  };
+
+  // Generate report based on format
+  const generateReport = async (deviceId: string, format: 'csv' | 'pdf') => {
+    try {
+      const data = await fetchDeviceHistoryForReport(deviceId); // Fetch all history
+      if (format === 'csv') {
+        generateCSV(data, deviceId);
+      } else {
+        generatePDF(data, deviceId);
+      }
+    } catch (error: any) {
+      Alert.alert('Erro', 'Falha ao gerar o relatório: ' + error.message);
+    }
+  };
+
+  // Generate CSV file
+  const generateCSV = (data: any[], deviceId: string) => {
+    const csv = Papa.unparse(data.map(item => ({
+      device_id: item.device_id,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      timestamp: item.timestamp,
+    })));
+    const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.csv`;
+
+    if (Platform.OS === 'web') {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    } else {
+      Alert.alert('Sucesso', `CSV gerado: ${fileName} (Implementar armazenamento nativo)`);
+      // For mobile, consider react-native-fs for file saving
+    }
+  };
+
+  // Generate PDF file
+  const generatePDF = async (data: any[], deviceId: string) => {
+    if (Platform.OS === 'web') {
+      // Use jsPDF for web
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text(`Relatório do Dispositivo ${deviceId}`, 10, 10);
+      doc.setFontSize(12);
+      doc.text('Dispositivo | Latitude | Longitude | Data/Hora', 10, 20);
+
+      let yPosition = 30;
+      data.forEach((item, index) => {
+        const row = `${item.device_id} | ${item.latitude || 'N/A'} | ${item.longitude || 'N/A'} | ${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}`;
+        doc.text(row, 10, yPosition);
+        yPosition += 10;
+        // Add new page if content exceeds page height
+        if (yPosition > 270 && index < data.length - 1) {
+          doc.addPage();
+          yPosition = 10;
+        }
+      });
+
+      // Generate and trigger download
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } else {
+      // Use react-native-html-to-pdf for mobile
+      let htmlContent = `
+        <h1>Relatório do Dispositivo ${deviceId}</h1>
+        <table border="1">
+          <tr>
+            <th>Dispositivo</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Data/Hora</th>
+          </tr>
+      `;
+      data.forEach(item => {
+        htmlContent += `
+          <tr>
+            <td>${item.device_id}</td>
+            <td>${item.latitude || 'N/A'}</td>
+            <td>${item.longitude || 'N/A'}</td>
+            <td>${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}</td>
+          </tr>
+        `;
+      });
+      htmlContent += '</table>';
+
+      const options = {
+        html: htmlContent,
+        fileName: `relatorio-${deviceId}-${new Date().toISOString()}`,
+        directory: 'Documents',
+      };
+
+      try {
+        const file = await RNHTMLtoPDF.convert(options);
+        Alert.alert('Sucesso', `PDF gerado em: ${file.filePath}`);
+      } catch (error: any) {
+        Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
+      }
+    }
+  };
+
+  // Render each device item
+  const renderDeviceItem = ({ item }: { item: DeviceData }) => (
+    <TouchableOpacity style={styles.deviceCard} onPress={() => openExportModal(item.device_id)}>
+      <Text style={styles.deviceId}>{item.device_id}</Text>
+      <Text style={styles.dataText}>
+        Latitude: {item.latitude !== undefined ? item.latitude.toFixed(4) : 'N/A'}
+      </Text>
+      <Text style={styles.dataText}>
+        Longitude: {item.longitude !== undefined ? item.longitude.toFixed(4) : 'N/A'}
+      </Text>
+      <Text style={styles.dataText}>
+        Última Atualização: {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
+      </Text>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Relatórios</Text>
+      <FlatList
+        data={devices}
+        renderItem={renderDeviceItem}
+        keyExtractor={(item) => item.device_id}
+        contentContainerStyle={styles.list}
+        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>}
+      />
+
+      {/* Modal for selecting export format */}
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Exportar Relatório</Text>
+          <TouchableOpacity
+            style={styles.modalButton}
+            onPress={() => {
+              if (selectedDevice) {
+                generateReport(selectedDevice, 'csv');
+                setModalVisible(false);
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Exportar CSV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.modalButton, { backgroundColor: '#1E90FF' }]}
+            onPress={() => {
+              if (selectedDevice) {
+                generateReport(selectedDevice, 'pdf');
+                setModalVisible(false);
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Exportar PDF</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#041635',
+    paddingTop: Platform.select({ web: 30, native: 50 }),
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  header: {
+    fontSize: 26,
+    color: '#fff',
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  list: {
+    paddingBottom: 20,
+  },
+  deviceCard: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 15,
+    marginVertical: 10,
+    width: Platform.select({ web: 400, native: width * 0.9 }),
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  deviceId: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#041635',
+    marginBottom: 10,
+  },
+  dataText: {
+    fontSize: 14,
+    color: '#041635',
+    marginBottom: 5,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    width: Platform.select({ web: 300, native: width * 0.8 }),
+    alignSelf: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#041635',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#3B82F6',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  emptyText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+});
+
+export default ReportsScreen;

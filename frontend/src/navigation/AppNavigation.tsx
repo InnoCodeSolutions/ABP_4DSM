@@ -5,6 +5,9 @@ import axios from 'axios';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import config from '@config/config.json';
 
+// Import the ReportsScreen component
+import ReportsScreen from '../screens/ReportsScreen';
+
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomePage from '../screens/HomePage';
@@ -21,6 +24,7 @@ export type RootStackParamList = {
   Map: undefined;
   Dashboard: undefined;
   NotFound: undefined;
+  Reports: undefined; // Add this line
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -59,7 +63,7 @@ const AppNavigation: React.FC = () => {
           response: error.response?.data,
           status: error.response?.status,
           url: `${BASE_URL}/auth/verify-token`,
-          token: AsyncStorage.getItem('authToken') || "Nenhum token",
+          token: await AsyncStorage.getItem('authToken') || "Nenhum token",
         });
         await AsyncStorage.removeItem('authToken');
         console.log("Token removido devido a erro, navegando para Login");
@@ -112,6 +116,11 @@ const AppNavigation: React.FC = () => {
         name="Dashboard"
         component={DashboardScreen}
         options={{ title: 'Dashboard' }}
+      />
+      <Stack.Screen
+        name="Reports"
+        component={ReportsScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

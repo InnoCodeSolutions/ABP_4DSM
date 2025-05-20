@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -10,9 +10,32 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import MapView from "../components/MapView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Adicionar import
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchDerivadores } from '../service/deviceService';
+
+// Define navigation types
+type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Home: undefined;
+  ViewDevice: { device: { id: string; name: string } };
+  Map: undefined;
+  Dashboard: undefined;
+  NotFound: undefined;
+  Reports: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+
+// Define marker type
+interface Marker {
+  latitude: number;
+  longitude: number;
+  title: string;
+}
 
 // Usar 'any' para evitar conflitos de tipagem com Icon
 const Icon: any = MaterialCommunityIcons;
@@ -20,22 +43,37 @@ const Icon: any = MaterialCommunityIcons;
 const { width, height } = Dimensions.get("window");
 
 const HomePage: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
+  const [derivadores, setDerivadores] = useState<Marker[]>([]);
 
-  const derivadores = [
-    { latitude: -22.9068, longitude: -43.1729, title: "Derivador 1" },
-    { latitude: -22.9, longitude: -43.18, title: "Derivador 2" },
-  ];
+  // Fetch derivadores from the database
+  useEffect(() => {
+    const loadDerivadores = async () => {
+      try {
+        const devices = await fetchDerivadores();
+        const markers = devices.map(device => ({
+          latitude: device.latitude || 0,
+          longitude: device.longitude || 0,
+          title: device.device_id,
+        }));
+        setDerivadores(markers);
+      } catch (error: any) {
+        console.error('Erro ao carregar derivadores:', error);
+        Alert.alert('Erro', 'Falha ao carregar dispositivos do banco de dados');
+      }
+    };
+    loadDerivadores();
+  }, []);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('authToken'); // Remover token
-    console.log("Token removido ao fazer logout"); // Log para depuração
+    await AsyncStorage.removeItem('authToken');
+    console.log("Token removido ao fazer logout");
     if (Platform.OS === "web") {
       window.alert("Você foi desconectado com sucesso!");
-      navigation.navigate("Login" as never);
+      navigation.navigate("Login");
     } else {
       Alert.alert("Sair", "Você foi desconectado com sucesso!", [
-        { text: "OK", onPress: () => navigation.navigate("Login" as never) },
+        { text: "OK", onPress: () => navigation.navigate("Login") },
       ]);
     }
   };
@@ -73,7 +111,7 @@ const HomePage: React.FC = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ViewDevice" as never)}
+          onPress={() => navigation.navigate("ViewDevice")}
         >
           <Image
             source={require("../assets/dispositivo.png")}
@@ -84,7 +122,7 @@ const HomePage: React.FC = () => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("Dashboard" as never)}
+          onPress={() => navigation.navigate("Dashboard")}
         >
           <Image
             source={require("../assets/grafico.png")}
@@ -95,15 +133,18 @@ const HomePage: React.FC = () => {
 
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("Map" as never)}
+          onPress={() => navigation.navigate("Map")}
         >
           <Image source={require("../assets/mapa.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Mapa</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Reports")}
+        >
           <Image source={require("../assets/duvida.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>A definir</Text>
+          <Text style={styles.buttonText}>Relatórios</Text>
         </TouchableOpacity>
       </View>
     </View>

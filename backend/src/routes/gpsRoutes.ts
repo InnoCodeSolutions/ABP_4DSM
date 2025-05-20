@@ -1,5 +1,5 @@
 import express, { RequestHandler } from 'express';
-import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData, getDeviceList, getDeviceHistoryList } from '../service/gpsService';
+import { fetchGPSData, saveGPSData, modifyGPSData, removeGPSData, getDeviceList, getDeviceHistoryList, getDeviceQuantities, getDeviceHistoryForReport, getDeviceRoutes, getActivitySummary } from '../service/gpsService';
 import { GPSData } from '../types/GPSData';
 import { authenticateToken } from '../middlewares/authMiddleware';
 
@@ -44,6 +44,7 @@ router.get('/devices/:deviceId/history', async (req, res) => {
   }
 });
 
+
 // PUT - atualiza dado por ID
 router.put('/gps/:id', authenticateToken, async (req: any, res: any) => {
   const id = parseInt(req.params.id);
@@ -63,6 +64,54 @@ router.delete('/gps/:id', authenticateToken, async (req: any, res: any) => {
 
   await removeGPSData(id);
   res.status(200).json({ message: 'Removido com sucesso' });
+});
+
+// New Report Endpoints
+
+// GET - Quantities of Devices
+router.get('/reports/device-quantities', async (req, res) => {
+  try {
+    const quantities = await getDeviceQuantities();
+    res.status(200).json({ totalDevices: quantities });
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar quantidade de dispositivos' });
+  }
+});
+
+// GET - Device History for Report
+router.get('/reports/device-history/:deviceId', async (req, res) => {
+  try {
+    const deviceId = req.params.deviceId;
+    const timeRange = req.query.timeRange as string; // e.g., "last7days" or ISO date range
+    const history = await getDeviceHistoryForReport(deviceId, timeRange);
+    res.status(200).json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar histórico para relatório' });
+  }
+});
+
+// GET - Device Routes for Report
+router.get('/reports/device-routes/:deviceId', async (req, res) => {
+  try {
+    const deviceId = req.params.deviceId;
+    const timeRange = req.query.timeRange as string;
+    const routes = await getDeviceRoutes(deviceId, timeRange);
+    res.status(200).json(routes);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar rotas para relatório' });
+  }
+});
+
+// GET - Activity Summary Report
+router.get('/reports/activity-summary/:deviceId', async (req, res) => {
+  try {
+    const deviceId = req.params.deviceId;
+    const timeRange = req.query.timeRange as string;
+    const summary = await getActivitySummary(deviceId, timeRange);
+    res.status(200).json(summary);
+  } catch (error) {
+    res.status(500).json({ error: 'Erro ao buscar resumo de atividades' });
+  }
 });
 
 export default router;
