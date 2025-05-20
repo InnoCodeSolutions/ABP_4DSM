@@ -117,7 +117,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
       {/* Gráfico somente se um dispositivo estiver selecionado */}
       {selectedDevice && (
         <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>MOVIMENTAÇÕES / DIA</Text>
+          //<Text style={styles.chartTitle}>MOVIMENTAÇÕES / DIA</Text>
           <MovementChart deviceId={selectedDevice.device_id} />
         </View>
       )}

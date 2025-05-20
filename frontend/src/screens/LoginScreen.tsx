@@ -17,7 +17,7 @@ import { RootStackParamList } from "../navigation/AppNavigation";
 import { login, requestPasswordReset } from "../service/authService";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ResetPasswordPopup from "../components/ResetPasswordPopup";
-
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Adicionar import
 // Usar 'any' para evitar conflitos de tipagem com Icon
 const Icon: any = MaterialCommunityIcons;
 
@@ -40,24 +40,36 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
     try {
       const response = await login(email, password);
-      console.log("Resposta do backend:", response);
+      console.log("Resposta completa do login:", response); // Debug log
+      const token = response?.token || response; // Extract token or fallback to response
+      if (!token || typeof token !== 'string') {
+        throw new Error("Token inválido recebido: " + JSON.stringify(token));
+      }
+      await AsyncStorage.setItem('authToken', token);
+      console.log("Token recebido do backend:", token);
+      const savedToken = await AsyncStorage.getItem('authToken');
+      console.log("Token salvo no AsyncStorage:", savedToken);
+      if (savedToken !== token) {
+        throw new Error("Token salvo incorretamente no AsyncStorage");
+      }
       Alert.alert("Bem-vindo!", "Login realizado com sucesso!");
       navigation.navigate("Home");
     } catch (error: any) {
-      console.log("Erro ao fazer login:", error.message);
+      console.error("Erro ao fazer login:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
       if (error.response) {
-        console.log("Resposta do servidor:", error.response.data);
         Alert.alert("Erro no login", error.response?.data?.message || "E-mail ou senha incorretos.");
       } else if (error.request) {
         console.log("Nenhuma resposta recebida:", error.request);
         Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
       } else {
-        console.log("Erro:", error.message);
-        Alert.alert("Erro inesperado", "Algo deu errado. Tente novamente.");
+        Alert.alert("Erro inesperado", error.message || "Algo deu errado. Tente novamente.");
       }
     }
   };
-
   const handlePasswordReset = async () => {
     if (!resetEmail) {
       Alert.alert("Campo obrigatório", "Por favor, insira um e-mail.");

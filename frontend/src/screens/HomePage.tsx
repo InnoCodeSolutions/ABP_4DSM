@@ -12,6 +12,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import MapView from "../components/MapView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Adicionar import
 
 // Usar 'any' para evitar conflitos de tipagem com Icon
 const Icon: any = MaterialCommunityIcons;
@@ -26,7 +27,9 @@ const HomePage: React.FC = () => {
     { latitude: -22.9, longitude: -43.18, title: "Derivador 2" },
   ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('authToken'); // Remover token
+    console.log("Token removido ao fazer logout"); // Log para depuração
     if (Platform.OS === "web") {
       window.alert("Você foi desconectado com sucesso!");
       navigation.navigate("Login" as never);

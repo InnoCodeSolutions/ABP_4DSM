@@ -1,5 +1,6 @@
 ﻿Esqueleto Simplificado do Projeto: C:\Users\André\4dsm\ABP\ABP_4DSMNEW\ABP_4DSM
 --------------------------------------------------
+.expo\devices.json
 .expo\settings.json
 backend\package-lock.json
 backend\src\config\config.json
@@ -32,16 +33,17 @@ frontend\index.ts
 frontend\jest.setup.js
 frontend\metro.config.js
 frontend\package.json
-frontend\package-lock.json
+frontend\scripts\copy-leaflet-icons.js
 frontend\src\App.tsx
 frontend\src\components\Collapsible.tsx
 frontend\src\components\DeviceHistoryPopup.tsx
 frontend\src\components\ExternalLink.tsx
 frontend\src\components\HapticTab.tsx
 frontend\src\components\HelloWave.tsx
-frontend\src\components\LeafletMap.tsx
 frontend\src\components\MapView.tsx
+frontend\src\components\MovementChart.tsx
 frontend\src\components\ParallaxScrollView.tsx
+frontend\src\components\ResetPasswordPopup.tsx
 frontend\src\components\ThemedText.tsx
 frontend\src\components\ThemedView.tsx
 frontend\src\components\ui\IconSymbol.ios.tsx
@@ -54,6 +56,7 @@ frontend\src\hooks\useColorScheme.ts
 frontend\src\hooks\useColorScheme.web.ts
 frontend\src\hooks\useThemeColor.ts
 frontend\src\navigation\AppNavigation.tsx
+frontend\src\screens\DashboardScreen.tsx
 frontend\src\screens\HomePage.tsx
 frontend\src\screens\index.tsx
 frontend\src\screens\LoginScreen.tsx
@@ -63,6 +66,7 @@ frontend\src\screens\ViewDevice.tsx
 frontend\src\service\authService.ts
 frontend\src\service\deviceService.ts
 frontend\src\tests\LoginScreen.test.tsx
+frontend\src\types\images.d.ts
 frontend\tsconfig.json
 package.json
 package-lock.json
