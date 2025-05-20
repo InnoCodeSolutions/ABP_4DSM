@@ -3422,6 +3422,11 @@ expo-constants@~17.0.5, expo-constants@~17.0.8:
     "@expo/config" "~10.0.11"
     "@expo/env" "~0.4.2"
 
+expo-file-system@^18.1.10:
+  version "18.1.10"
+  resolved "https://registry.npmjs.org/expo-file-system/-/expo-file-system-18.1.10.tgz"
+  integrity sha512-SyaWg+HitScLuyEeSG9gMSDT0hIxbM9jiZjSBP9l9zMnwZjmQwsusE6+7qGiddxJzdOhTP4YGUfvEzeeS0YL3Q==
+
 expo-file-system@~18.0.12:
   version "18.0.12"
   resolved "https://registry.npmjs.org/expo-file-system/-/expo-file-system-18.0.12.tgz"
@@ -3491,6 +3496,11 @@ expo-router@~4.0.21:
     schema-utils "^4.0.1"
     semver "~7.6.3"
     server-only "^0.0.1"
+
+expo-sharing@^13.1.5:
+  version "13.1.5"
+  resolved "https://registry.npmjs.org/expo-sharing/-/expo-sharing-13.1.5.tgz"
+  integrity sha512-X/5sAEiWXL2kdoGE3NO5KmbfcmaCWuWVZXHu8OQef7Yig4ZgHFkGD11HKJ5KqDrDg+SRZe4ISd6MxE7vGUgm4w==
 
 expo-status-bar@~2.0.1:
   version "2.0.1"
@@ -5616,11 +5626,6 @@ react-native-helmet-async@2.0.4:
     invariant "^2.2.4"
     react-fast-compare "^3.2.2"
     shallowequal "^1.1.0"
-
-react-native-html-to-pdf@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.npmjs.org/react-native-html-to-pdf/-/react-native-html-to-pdf-0.12.0.tgz"
-  integrity sha512-Yb5WO9SfF86s5Yv9PqXQ7fZDr9zZOJ+6jtweT9zFLraPNHWX7pSxe2dSkeg3cGiNrib65ZXGN6ksHymfYLFSSg==
 
 react-native-is-edge-to-edge@^1.1.6:
   version "1.1.7"

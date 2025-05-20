@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform, Alert, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import { jsPDF } from 'jspdf'; // Import jsPDF for web PDF generation
+import { jsPDF } from 'jspdf';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { fetchDerivadores, fetchDeviceHistoryForReport } from '../service/deviceService';
 
 // Define device data interface to match Derivador
@@ -46,9 +47,9 @@ const ReportsScreen: React.FC = () => {
     try {
       const data = await fetchDeviceHistoryForReport(deviceId); // Fetch all history
       if (format === 'csv') {
-        generateCSV(data, deviceId);
+        await generateCSV(data, deviceId);
       } else {
-        generatePDF(data, deviceId);
+        await generatePDF(data, deviceId);
       }
     } catch (error: any) {
       Alert.alert('Erro', 'Falha ao gerar o relatório: ' + error.message);
@@ -56,7 +57,7 @@ const ReportsScreen: React.FC = () => {
   };
 
   // Generate CSV file
-  const generateCSV = (data: any[], deviceId: string) => {
+  const generateCSV = async (data: any[], deviceId: string) => {
     const csv = Papa.unparse(data.map(item => ({
       device_id: item.device_id,
       latitude: item.latitude,
@@ -72,15 +73,28 @@ const ReportsScreen: React.FC = () => {
       link.download = fileName;
       link.click();
     } else {
-      Alert.alert('Sucesso', `CSV gerado: ${fileName} (Implementar armazenamento nativo)`);
-      // For mobile, consider react-native-fs for file saving
+      // Save CSV file on mobile using expo-file-system
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(fileUri, csv, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      // Share the file using expo-sharing
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'text/csv',
+          dialogTitle: 'Salvar ou compartilhar relatório CSV',
+        });
+      } else {
+        Alert.alert('Sucesso', `CSV salvo em: ${fileUri}`);
+      }
     }
   };
 
-  // Generate PDF file
+  // Generate PDF file using jsPDF
   const generatePDF = async (data: any[], deviceId: string) => {
-    if (Platform.OS === 'web') {
-      // Use jsPDF for web
+    try {
+      // Create PDF using jsPDF
       const doc = new jsPDF();
       doc.setFontSize(16);
       doc.text(`Relatório do Dispositivo ${deviceId}`, 10, 10);
@@ -92,57 +106,43 @@ const ReportsScreen: React.FC = () => {
         const row = `${item.device_id} | ${item.latitude || 'N/A'} | ${item.longitude || 'N/A'} | ${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}`;
         doc.text(row, 10, yPosition);
         yPosition += 10;
-        // Add new page if content exceeds page height
         if (yPosition > 270 && index < data.length - 1) {
           doc.addPage();
           yPosition = 10;
         }
       });
 
-      // Generate and trigger download
-      const pdfBlob = doc.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
-    } else {
-      // Use react-native-html-to-pdf for mobile
-      let htmlContent = `
-        <h1>Relatório do Dispositivo ${deviceId}</h1>
-        <table border="1">
-          <tr>
-            <th>Dispositivo</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
-            <th>Data/Hora</th>
-          </tr>
-      `;
-      data.forEach(item => {
-        htmlContent += `
-          <tr>
-            <td>${item.device_id}</td>
-            <td>${item.latitude || 'N/A'}</td>
-            <td>${item.longitude || 'N/A'}</td>
-            <td>${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}</td>
-          </tr>
-        `;
-      });
-      htmlContent += '</table>';
+      if (Platform.OS === 'web') {
+        // Download PDF on web
+        const pdfBlob = doc.output('blob');
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // Save and share PDF on mobile
+        const pdfBase64 = doc.output('datauristring').split(',')[1]; // Get base64 string
+        const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+        const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
-      const options = {
-        html: htmlContent,
-        fileName: `relatorio-${deviceId}-${new Date().toISOString()}`,
-        directory: 'Documents',
-      };
+        await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
 
-      try {
-        const file = await RNHTMLtoPDF.convert(options);
-        Alert.alert('Sucesso', `PDF gerado em: ${file.filePath}`);
-      } catch (error: any) {
-        Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
+        // Share the file using expo-sharing
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(fileUri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Salvar ou compartilhar relatório PDF',
+          });
+        } else {
+          Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
+        }
       }
+    } catch (error: any) {
+      Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
     }
   };
 
