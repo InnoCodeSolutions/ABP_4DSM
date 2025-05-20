@@ -143,7 +143,7 @@ const HomePage: React.FC = () => {
           style={styles.button}
           onPress={() => navigation.navigate("Reports")}
         >
-          <Image source={require("../assets/duvida.png")} style={styles.icon} />
+          <Image source={require("../assets/relatorios.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Relatórios</Text>
         </TouchableOpacity>
       </View>
