@@ -39,6 +39,19 @@ export interface ActivitySummary {
   movementData: { timestamp: string; speed: number }[];
 }
 
+// Interface for GeoJSON Route response
+export interface GeoJSONRoute {
+  type: 'FeatureCollection';
+  features: {
+    type: 'Feature';
+    geometry: {
+      type: 'LineString';
+      coordinates: [number, number][];
+    };
+    properties: Record<string, any>;
+  }[];
+}
+
 // Function to retrieve the authentication token based on platform
 const getToken = async (): Promise<string | null> => {
   if (Platform.OS === 'web') {
@@ -138,6 +151,20 @@ export const fetchActivitySummary = async (deviceId: string, timeRange?: string)
   try {
     const token = await getToken();
     const url = `${BASE_URL}/reports/activity-summary/${deviceId}${timeRange ? `?timeRange=${timeRange}` : ''}`;
+    const response = await axios.get(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Fetch device route as GeoJSON (with optional time range and maritime flag)
+export const fetchDeviceRoute = async (deviceId: string, timeRange?: string, isMaritime?: boolean): Promise<GeoJSONRoute> => {
+  try {
+    const token = await getToken();
+    const url = `${BASE_URL}/api/routes/device/${deviceId}/route${timeRange || isMaritime ? '?' : ''}${timeRange ? `timeRange=${timeRange}` : ''}${timeRange && isMaritime ? '&' : ''}${isMaritime ? `isMaritime=${isMaritime}` : ''}`;
     const response = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
