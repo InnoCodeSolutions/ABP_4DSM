@@ -65,6 +65,9 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "typescript": "^5.3.3"
   },
+  "resolutions": {
+  "@types/react": "18.3.21"
+},
   "jest": {
     "preset": "jest-expo",
     "transformIgnorePatterns": [
