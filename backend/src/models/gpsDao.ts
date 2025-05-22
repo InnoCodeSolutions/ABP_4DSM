@@ -26,7 +26,6 @@ export const getDevices = async (): Promise<{ device_id: string, latitude: numbe
   return result.rows;
 };
 
-// Updated to support time range filtering
 export const getDeviceHistory = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
   let query = `
     SELECT * FROM login.gps_data
@@ -54,10 +53,16 @@ export const getDeviceHistory = async (deviceId: string, timeRange?: string): Pr
 
   query += ` ORDER BY timestamp DESC`;
   const result = await pool.query(query, params);
-  return result.rows;
+  let points = result.rows;
+
+  // Sample to at most 500 points for performance
+  if (points.length > 500) {
+    points = points.slice(0, 500);
+  }
+
+  return points;
 };
 
-// New function for Activity Summary
 export const getActivitySummaryData = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
   let query = `
     SELECT latitude, longitude, speed, timestamp
@@ -84,7 +89,45 @@ export const getActivitySummaryData = async (deviceId: string, timeRange?: strin
     params.push(startDate, endDate);
   }
 
-  query += ` ORDER BY timestamp ASC`; // Ascending for distance calculation
+  query += ` ORDER BY timestamp ASC`;
+  const result = await pool.query(query, params);
+  return result.rows;
+};
+
+export const insertRoute = async (deviceId: string, routeGeojson: any, isMaritime: boolean): Promise<void> => {
+  await pool.query(`
+    INSERT INTO login.routes (device_id, route_geojson, is_maritime)
+    VALUES ($1, $2, $3)
+  `, [deviceId, routeGeojson, isMaritime]);
+};
+
+export const getRoutes = async (deviceId: string, timeRange?: string): Promise<any[]> => {
+  let query = `
+    SELECT route_geojson, is_maritime, created_at
+    FROM login.routes
+    WHERE device_id = $1
+  `;
+  const params: any[] = [deviceId];
+
+  if (timeRange) {
+    let startDate: Date;
+    const endDate = new Date();
+    if (timeRange === 'last7days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+    } else if (timeRange === 'last30days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 30);
+    } else {
+      const [start, end] = timeRange.split('/');
+      startDate = new Date(start);
+      endDate.setTime(Date.parse(end) || endDate.getTime());
+    }
+    query += ` AND created_at BETWEEN $2 AND $3`;
+    params.push(startDate, endDate);
+  }
+
+  query += ` ORDER BY created_at DESC`;
   const result = await pool.query(query, params);
   return result.rows;
 };
