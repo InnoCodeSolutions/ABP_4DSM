@@ -15,7 +15,7 @@ import MapView from "../components/MapView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchDerivadores } from '../service/deviceService';
-import NavBar from "@/components/Navbar";
+import NavBar from "../components/Navbar";
 
 // Define navigation types
 type RootStackParamList = {
