@@ -6,7 +6,7 @@
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["jest", "react", "react-native", "@testing-library/jest-native"],
+    "types": ["react", "react-native"], // ✅ removido "jest" e "@testing-library/jest-native"
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "allowSyntheticDefaultImports": true,
@@ -14,8 +14,9 @@
     "resolveJsonModule": true,
     "baseUrl": "src",
     "paths": {
-      "@/*": ["*"], // Adicionado para mapear @/ para src/
-      "@config/*": ["config/*"] // Mantido como estava
+      "@/*": ["*"],
+      "@config/*": ["config/*"]
     }
-  }
+  },
+  "include": ["src"]
 }
