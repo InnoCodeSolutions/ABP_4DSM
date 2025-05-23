@@ -84,6 +84,7 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
   }
 };
 
+
 const styles = StyleSheet.create({
   mapContainer: {
     width: "100%",

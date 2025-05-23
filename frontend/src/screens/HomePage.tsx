@@ -15,6 +15,7 @@ import MapView from "../components/MapView";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchDerivadores } from '../service/deviceService';
+import NavBar from "@/components/Navbar";
 
 // Define navigation types
 type RootStackParamList = {
@@ -147,11 +148,24 @@ const HomePage: React.FC = () => {
           <Text style={styles.buttonText}>Relatórios</Text>
         </TouchableOpacity>
       </View>
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected="home"
+      />
     </View>
   );
 };
 
 const scale = (size: number, max: number) => Math.min(size, max);
+
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -169,6 +183,7 @@ const styles = StyleSheet.create({
       native: width,
     }),
     alignSelf: "center",
+    paddingBottom: barHeight,
   },
   header: {
     flexDirection: "row",
