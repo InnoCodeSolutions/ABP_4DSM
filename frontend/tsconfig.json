@@ -1,28 +1,23 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "esnext",
-    "lib": ["dom", "esnext"],
-    "allowJs": true,
+    "strict": true,
     "jsx": "react-native",
     "noEmit": true,
-    "isolatedModules": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["jest", "react", "react-native", "@testing-library/jest-native"],
+    "types": ["react", "react-native"], // ✅ removido "jest" e "@testing-library/jest-native"
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["*"], // Adicionado para mapear @/ para src/
-      "@config/*": ["config/*"] // Mantido como estava
+      "@/*": ["*"],
+      "@config/*": ["config/*"]
     }
   },
+  
   "include": ["src"]
 }
