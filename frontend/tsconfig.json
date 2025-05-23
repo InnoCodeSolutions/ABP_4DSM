@@ -23,5 +23,6 @@
       "@/*": ["*"], // Adicionado para mapear @/ para src/
       "@config/*": ["config/*"] // Mantido como estava
     }
-  }
+  },
+  "include": ["src"]
 }

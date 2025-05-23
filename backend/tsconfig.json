@@ -10,4 +10,5 @@
     "types": ["node", "leaflet"] // ✅ Tipos que realmente serão usados
   },
   "include": ["src"]
+  
 }
