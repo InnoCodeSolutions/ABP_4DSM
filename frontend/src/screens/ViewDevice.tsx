@@ -6,7 +6,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
-import NavBar from "@/components/Navbar";
+import NavBar from "../components/Navbar";
 
 // Tipagem explícita para MaterialCommunityIcons
 import { IconProps } from "react-native-vector-icons/Icon";

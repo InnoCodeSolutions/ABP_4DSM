@@ -37,7 +37,7 @@ export const register = async (
 };*/
 
 import axios from "axios";
-import config from "@config/config.json";
+import config from "../config/config.json";
 
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 

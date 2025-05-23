@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
-import config from '@config/config.json';
+import config from '../config/config.json';
 
 // Import the ReportsScreen component
 import ReportsScreen from '../screens/ReportsScreen';
@@ -14,7 +14,7 @@ import HomePage from '../screens/HomePage';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import ViewDevice from '../screens/ViewDevice';
 import DashboardScreen from '../screens/DashboardScreen';
-import MapScreen from '@/screens/MapScreen';
+import MapScreen from '../screens/MapScreen';
 
 export type RootStackParamList = {
   Login: undefined;

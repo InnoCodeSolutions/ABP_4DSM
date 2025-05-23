@@ -2,8 +2,8 @@ import React from "react";
 import { View, StyleSheet, Dimensions, Platform } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import CustomMapView from "@/components/MapView";
-import NavBar from "@/components/Navbar";
+import CustomMapView from "../components/MapView";
+import NavBar from "../components/Navbar";
 
 // Defina o tipo das rotas conforme seu projeto
 type RootStackParamList = {
