@@ -14,7 +14,7 @@ import HomePage from '../screens/HomePage';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import ViewDevice from '../screens/ViewDevice';
 import DashboardScreen from '../screens/DashboardScreen';
-import MapView from '../components/MapView';
+import MapScreen from '@/screens/MapScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -109,7 +109,7 @@ const AppNavigation: React.FC = () => {
       />
       <Stack.Screen
         name="Map"
-        component={MapView}
+        component={MapScreen}
         options={{ title: 'Mapa' }}
       />
       <Stack.Screen

@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import CustomMapView from "../components/MapView";
+import CustomMapView from "./MapView";
 import { Derivador } from "../service/deviceService";
 
 // Tipagem explícita para MaterialCommunityIcons

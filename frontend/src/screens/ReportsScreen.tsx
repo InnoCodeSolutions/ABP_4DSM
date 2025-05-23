@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IconProps } from 'react-native-vector-icons/Icon';
 import { ComponentType } from 'react';
+import NavBar from '@/components/Navbar';
 
 // Definir tipos de navegação
 type RootStackParamList = {
@@ -182,11 +183,11 @@ const ReportsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-  <Text style={styles.headerText}>Relatórios</Text>
-  <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconButton}>
-    <Icon name="home" size={28} color="#fff" />
-  </TouchableOpacity>
-</View>
+        <Text style={styles.headerText}>Relatórios</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconButton}>
+          <Icon name="home" size={28} color="#fff" />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={devices}
         renderItem={renderDeviceItem}
@@ -223,9 +224,22 @@ const ReportsScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected=""
+      />
     </View>
   );
 };
+
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -234,27 +248,28 @@ const styles = StyleSheet.create({
     paddingTop: Platform.select({ web: 30, native: 50 }),
     alignItems: 'center',
     paddingHorizontal: 10,
+    paddingBottom: barHeight,
   },
   headerContainer: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  width: Platform.select({
-    web: 800,
-    native: width * 0.9,
-  }),
-  paddingHorizontal: 10,
-  paddingVertical: 10,
-},
-iconButton: {
-  padding: 6,
-  borderRadius: 20,
-},
-headerText: {
-  fontSize: 26,
-  color: '#fff',
-  fontWeight: 'bold',
-},
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: Platform.select({
+      web: 800,
+      native: width * 0.9,
+    }),
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
+  iconButton: {
+    padding: 6,
+    borderRadius: 20,
+  },
+  headerText: {
+    fontSize: 26,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   list: {
     paddingBottom: 20,
   },

@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import MovementChart from "../components/MovementChart";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
+import NavBar from "@/components/Navbar";
 
 const Icon: any = MaterialCommunityIcons;
 
@@ -197,9 +198,22 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
       />
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected="dashboard"
+      />
     </View>
   );
 };
+
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -207,6 +221,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#041635",
     paddingTop: Platform.select({ ios: 50, android: 40, default: 30 }),
     alignItems: "center",
+    paddingBottom: barHeight,
   },
   header: {
     width: "90%",

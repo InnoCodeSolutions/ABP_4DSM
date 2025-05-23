@@ -6,6 +6,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { RootStackParamList } from "../navigation/AppNavigation";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
+import NavBar from "@/components/Navbar";
 
 // Tipagem explícita para MaterialCommunityIcons
 import { IconProps } from "react-native-vector-icons/Icon";
@@ -131,9 +132,22 @@ const ViewDevice: React.FC = () => {
       <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
         <Icon name="logout" size={28} color="#fff" />
       </TouchableOpacity>
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected=""
+      />
     </View>
   );
 };
+
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+})
 
 const styles = StyleSheet.create({
   container: {
@@ -151,6 +165,7 @@ const styles = StyleSheet.create({
       native: width,
     }),
     alignSelf: "center",
+    paddingBottom: barHeight,
   },
   header: {
     flexDirection: "row",
