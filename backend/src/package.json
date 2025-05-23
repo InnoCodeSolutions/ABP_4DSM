@@ -21,6 +21,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.3",
     "pg": "^8.14.1",
+    "react-native-maps": "^1.23.8",
     "yaml": "^2.8.0"
   },
   "devDependencies": {
