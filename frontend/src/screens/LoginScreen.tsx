@@ -1,3 +1,4 @@
+// ... (importações mantidas)
 import React, { useState } from "react";
 import {
   View,
@@ -17,8 +18,7 @@ import { RootStackParamList } from "../navigation/AppNavigation";
 import { login, requestPasswordReset } from "../service/authService";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ResetPasswordPopup from "../components/ResetPasswordPopup";
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Adicionar import
-// Usar 'any' para evitar conflitos de tipagem com Icon
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Icon: any = MaterialCommunityIcons;
 
 const { width, height } = Dimensions.get("window");
@@ -28,6 +28,7 @@ type Props = StackScreenProps<RootStackParamList, "Login">;
 const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetPopupVisible, setIsResetPopupVisible] = useState(false);
@@ -40,36 +41,28 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
 
     try {
       const response = await login(email, password);
-      console.log("Resposta completa do login:", response); // Debug log
-      const token = response?.token || response; // Extract token or fallback to response
+      const token = response?.token || response;
       if (!token || typeof token !== 'string') {
         throw new Error("Token inválido recebido: " + JSON.stringify(token));
       }
       await AsyncStorage.setItem('authToken', token);
-      console.log("Token recebido do backend:", token);
       const savedToken = await AsyncStorage.getItem('authToken');
-      console.log("Token salvo no AsyncStorage:", savedToken);
       if (savedToken !== token) {
         throw new Error("Token salvo incorretamente no AsyncStorage");
       }
       Alert.alert("Bem-vindo!", "Login realizado com sucesso!");
       navigation.navigate("Home");
     } catch (error: any) {
-      console.error("Erro ao fazer login:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
       if (error.response) {
         Alert.alert("Erro no login", error.response?.data?.message || "E-mail ou senha incorretos.");
       } else if (error.request) {
-        console.log("Nenhuma resposta recebida:", error.request);
         Alert.alert("Erro de conexão", "Não foi possível conectar ao servidor. Verifique sua rede.");
       } else {
         Alert.alert("Erro inesperado", error.message || "Algo deu errado. Tente novamente.");
       }
     }
   };
+
   const handlePasswordReset = async () => {
     if (!resetEmail) {
       Alert.alert("Campo obrigatório", "Por favor, insira um e-mail.");
@@ -82,7 +75,6 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       setIsModalVisible(false);
       setIsResetPopupVisible(true);
     } catch (error: any) {
-      console.log("Erro ao solicitar redefinição:", error.message);
       const message = error.response?.status === 404
         ? "Serviço de redefinição de senha não encontrado. Verifique se o servidor está ativo."
         : error.response?.data?.message || "Não foi possível enviar o código. Tente novamente.";
@@ -109,17 +101,31 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
           keyboardType="email-address"
           accessibilityLabel="E-mail"
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Senha"
-          placeholderTextColor="#9CA3AF"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          accessibilityLabel="Senha"
-          onSubmitEditing={handleLogin}
-          returnKeyType="go"
-        />
+
+        {/* Campo de senha com botão de mostrar/ocultar */}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1, marginBottom: 0 }]}
+            placeholder="Senha"
+            placeholderTextColor="#9CA3AF"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            accessibilityLabel="Senha"
+            onSubmitEditing={handleLogin}
+            returnKeyType="go"
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            style={styles.eyeIcon}
+          >
+            <Icon
+              name={showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="#6B7280"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.forgotButton}
@@ -274,6 +280,20 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
+  passwordContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: Platform.select({
+      web: scale(height * 0.015, 15),
+      native: height * 0.02,
+    }),
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 12,
+    padding: 8,
+  },
   forgotButton: {
     alignSelf: "flex-end",
     padding: Platform.select({
@@ -293,59 +313,29 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
-    marginTop: Platform.select({
-      web: scale(height * 0.02, 20),
-      native: height * 0.03,
-    }),
+    marginTop: 10,
   },
   registerButton: {
+    backgroundColor: "#E5E7EB",
+    padding: 10,
+    borderRadius: 10,
     flex: 1,
-    backgroundColor: "#fff",
-    paddingVertical: Platform.select({
-      web: scale(height * 0.01, 12),
-      native: height * 0.015,
-    }),
-    borderRadius: 20,
-    marginRight: Platform.select({
-      web: scale(width * 0.03, 15),
-      native: width * 0.04,
-    }),
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
+    marginRight: 10,
   },
   registerButtonText: {
+    textAlign: "center",
     color: "#1E3A8A",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: width * 0.04,
-    }),
     fontWeight: "bold",
   },
   loginButton: {
+    backgroundColor: "#2563EB",
+    padding: 10,
+    borderRadius: 10,
     flex: 1,
-    backgroundColor: "#3B82F6",
-    paddingVertical: Platform.select({
-      web: scale(height * 0.01, 12),
-      native: height * 0.015,
-    }),
-    borderRadius: 20,
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
   },
   loginButtonText: {
+    textAlign: "center",
     color: "#fff",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: width * 0.04,
-    }),
     fontWeight: "bold",
   },
   modalContainer: {
@@ -356,130 +346,50 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: "#fff",
-    width: Platform.select({
-      web: scale(width * 0.5, 400),
-      native: width > 600 ? width * 0.5 : width * 0.9,
-    }),
     borderRadius: 20,
-    padding: Platform.select({
-      web: scale(width * 0.05, 30),
-      native: width * 0.08,
-    }),
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    padding: 20,
+    width: "80%",
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: Platform.select({
-      web: scale(height * 0.02, 20),
-      native: height * 0.02,
-    }),
+    marginBottom: 15,
   },
   modalTitle: {
-    fontSize: Platform.select({
-      web: scale(width * 0.04, 20),
-      native: width * 0.05,
-    }),
+    fontSize: 18,
     fontWeight: "bold",
-    color: "#1E3A8A",
   },
   modalInput: {
-    width: "100%",
     backgroundColor: "#D1D5DB",
-    padding: Platform.select({
-      web: scale(height * 0.01, 12),
-      native: height * 0.015,
-    }),
-    marginBottom: Platform.select({
-      web: scale(height * 0.015, 15),
-      native: height * 0.02,
-    }),
+    padding: 10,
     borderRadius: 10,
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: width * 0.04,
-    }),
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
+    marginBottom: 15,
   },
   modalButtonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: Platform.select({
-      web: scale(height * 0.02, 20),
-      native: height * 0.03,
-    }),
+    justifyContent: "flex-end",
   },
   modalCancelButton: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingVertical: Platform.select({
-      web: scale(height * 0.01, 12),
-      native: height * 0.015,
-    }),
-    borderRadius: 20,
-    marginRight: Platform.select({
-      web: scale(width * 0.03, 15),
-      native: width * 0.04,
-    }),
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
+    marginRight: 10,
   },
   modalCancelText: {
-    color: "#1E3A8A",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: width * 0.04,
-    }),
+    color: "#6B7280",
     fontWeight: "bold",
   },
   modalSendButton: {
-    flex: 1,
-    backgroundColor: "#3B82F6",
-    paddingVertical: Platform.select({
-      web: scale(height * 0.01, 12),
-      native: height * 0.015,
-    }),
-    borderRadius: 20,
-    alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
+    backgroundColor: "#2563EB",
+    padding: 10,
+    borderRadius: 10,
   },
   modalSendText: {
     color: "#fff",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 16),
-      native: width * 0.04,
-    }),
     fontWeight: "bold",
   },
   footer: {
-    position: "absolute",
-    bottom: Platform.select({
-      web: scale(height * 0.01, 20),
-      native: height * 0.02,
-    }),
-    color: "#fff",
-    fontSize: Platform.select({
-      web: scale(width * 0.02, 12),
-      native: width * 0.03,
-    }),
+    marginTop: 30,
+    color: "#9CA3AF",
+    fontSize: 12,
+    textAlign: "center",
   },
 });
 
