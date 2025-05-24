@@ -6,15 +6,9 @@ const config = getDefaultConfig(__dirname);
 // Suporte para arquivos .json
 config.resolver.assetExts.push("json");
 
-// Configuração para react-native-maps no web
-config.resolver.resolveRequest = (context, moduleName, platform) => {
-  if (platform === "web" && moduleName === "react-native-maps") {
-    return {
-      type: "empty",
-    };
-  }
-  return context.resolveRequest(context, moduleName, platform);
-};
+// A convenção de nomenclatura de arquivos (e.g., .web.tsx) já lida com a resolução específica de plataforma.
+// Não precisamos mais do `resolveRequest` para 'react-native-maps' no web,
+// pois o MapView.web.tsx será usado para a web.
 
 // Suporte ao alias @config
 config.resolver.sourceExts = [...config.resolver.sourceExts, "ts", "tsx"];
