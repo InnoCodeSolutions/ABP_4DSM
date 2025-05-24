@@ -11,7 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { IconProps } from 'react-native-vector-icons/Icon';
 import { ComponentType } from 'react';
-import NavBar from '@/components/Navbar';
+import NavBar from '../components/Navbar';
 
 // Definir tipos de navegação
 type RootStackParamList = {

@@ -8,7 +8,7 @@ import { setupDatabase } from './setupDatabase';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
 import gpsRoutes from './routes/gpsRoutes';
-
+import routeRoutes from './routes/routeRoutes';
 
 // Caminho absoluto do config.json
 const configPath = path.resolve(__dirname, 'config', 'config.json');
@@ -49,7 +49,7 @@ const start = async () => {
   app.use('/users', userRoutes);
   app.use('/auth', authRoutes);
   app.use('/', gpsRoutes);
-  
+  app.use('/api/routes', routeRoutes);
 
   // Usar config.database em vez de config.backend
   if (!config.database) {
@@ -59,11 +59,10 @@ const start = async () => {
 
   const PORT = process.env.PORT || config.backend?.port || 3000;
   const HOST = '0.0.0.0';
-  
+ 
   app.listen(PORT, HOST, () => {
     console.log(`🚀 Server online em http://${HOST}:${PORT}`);
   });
-  
 };
 
 start().catch((e) => {

@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
 import MovementChart from "../components/MovementChart";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
-import NavBar from "@/components/Navbar";
+import NavBar from "../components/Navbar";
 
 const Icon: any = MaterialCommunityIcons;
 

@@ -1,38 +1,20 @@
 {
-    "expo": {
-      "name": "Meu Projeto",
-      "slug": "meu-projeto",
-      "version": "1.0.0",
-      "orientation": "portrait",
-      "icon": "./src/assets/icon.png",
-      "splash": {
-        "image": "./src/assets/splash-icon.png",
-        "resizeMode": "contain",
+  "expo": {
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.abpteste"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "updates": {
-        "fallbackToCacheTimeout": 0
-      },
-      "assetBundlePatterns": ["**/*"],
-      "ios": {
-        "supportsTablet": true,
-        "newArchEnabled": true
-      },
-      "android": {
-        "adaptiveIcon": {
-          "foregroundImage": "./src/assets/icon.png",
-          "backgroundColor": "#ffffff"
-        },
-        "newArchEnabled": true,
-        "usesCleartextTraffic": true,
-        "config": {
-          "googleMaps": {
-            "apiKey": "YOUR_GOOGLE_MAPS_API_KEY"
-          }
-        }
-      },
-      "web": {
-        "favicon": "./src/assets/favicon.png"
-      }
-    }
+      "package": "com.yourcompany.abpteste"
+    },
+    "plugins": [
+      "expo-build-properties",
+      "expo-router",
+      "expo-font"
+    ]
   }
+}
