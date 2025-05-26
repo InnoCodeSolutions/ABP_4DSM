@@ -40,10 +40,10 @@ const start = async () => {
 
   const app = express();
   app.use(cors({
-    origin: 'http://localhost:8081',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  }));
+  origin: '*', // permite qualquer origem
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+}));
+
   app.use(express.json());
 
   app.use('/users', userRoutes);
