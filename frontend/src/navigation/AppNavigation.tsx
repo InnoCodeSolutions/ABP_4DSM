@@ -15,6 +15,7 @@ import NotFoundScreen from '../screens/NotFoundScreen';
 import ViewDevice from '../screens/ViewDevice';
 import DashboardScreen from '../screens/DashboardScreen';
 import MapScreen from '@/screens/MapScreen';
+import Profile from '@/screens/Profile';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -120,6 +121,11 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="Reports"
         component={ReportsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={Profile}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

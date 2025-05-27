@@ -38,8 +38,28 @@ export const register = async (
 
 import axios from "axios";
 import config from "@config/config.json";
+import { jwtDecode } from "jwt-decode"
 
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
+
+export const getProfile = async (token: string) => {
+  try {
+    const decoded: any = jwtDecode(token);
+    const userId = decoded.id;
+
+    const response = await axios.get(`${BASE_URL}/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.name === 'InvalidTokenError') {
+      throw new Error('Token JWT inválido');
+    }
+    throw error;
+  }
+};
 
 export const login = async (email: string, password: string) => {
   try {
@@ -47,6 +67,7 @@ export const login = async (email: string, password: string) => {
       email,
       password,
     });
+    console.log('Resposta do backend no login:', response.data);
     return response.data;
   } catch (error: any) {
     throw error;
@@ -90,7 +111,7 @@ export const resetPassword = async (email: string, code: string, newPassword: st
       code,
       newPassword,
     });
-    
+
     return response.data;
   } catch (error: any) {
     throw error;
