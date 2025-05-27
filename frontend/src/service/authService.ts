@@ -1,11 +1,31 @@
+// authService.ts
+
 import axios from "axios";
 import config from "../config/config.json";
 
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
+// Função para decodificar o token JWT manualmente
+const jwtDecode = (token: string): { id: number; email: string } | null => {
+  try {
+    const payload = token.split('.')[1]; // Extrai o payload (segunda parte do token)
+    const decodedPayload = JSON.parse(atob(payload)); // Decodifica Base64 e parseia como JSON
+    return {
+      id: decodedPayload.id,
+      email: decodedPayload.email,
+    };
+  } catch (error) {
+    console.error('Erro ao decodificar o token:', error);
+    return null;
+  }
+};
+
 export const getProfile = async (token: string) => {
   try {
-    const decoded: any = jwtDecode(token);
+    const decoded = jwtDecode(token);
+    if (!decoded || !decoded.id) {
+      throw new Error('Não foi possível decodificar o token ou encontrar o ID do usuário');
+    }
     const userId = decoded.id;
 
     const response = await axios.get(`${BASE_URL}/users/${userId}`, {
@@ -15,7 +35,7 @@ export const getProfile = async (token: string) => {
     });
     return response.data;
   } catch (error: any) {
-    if (error.name === 'InvalidTokenError') {
+    if (error.message.includes('Não foi possível decodificar')) {
       throw new Error('Token JWT inválido');
     }
     throw error;
@@ -72,13 +92,8 @@ export const resetPassword = async (email: string, code: string, newPassword: st
       code,
       newPassword,
     });
-
     return response.data;
   } catch (error: any) {
     throw error;
   }
 };
-
-function jwtDecode(token: string): any {
-    throw new Error("Function not implemented.");
-}
