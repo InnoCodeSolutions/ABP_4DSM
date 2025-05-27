@@ -1,3 +1,4 @@
+// frontend/src/screens/DashboardScreen.tsx
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -41,7 +42,8 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
   const [selectedDevice, setSelectedDevice] = useState<Derivador | null>(
     route.params?.device || null
   );
-  const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
+  const [rawDeviceHistory, setRawDeviceHistory] = useState<Derivador[]>([]); // For DeviceHistoryPopup
+  const [formattedDeviceHistory, setFormattedDeviceHistory] = useState<{ date: string; count: number }[]>([]); // For MovementChart
   const [selectedLocation, setSelectedLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -69,10 +71,30 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
     try {
       setIsLoadingHistory(true);
       const history = await fetchDeviceHistory(deviceId);
-      setDeviceHistory(Array.isArray(history) ? history : []);
+      console.log("Raw history data from fetchDeviceHistory:", history);
+
+      // Store raw history for DeviceHistoryPopup
+      setRawDeviceHistory(Array.isArray(history) ? history : []);
+
+      // Format history for MovementChart
+      const formattedHistory = history
+        .filter((item: Derivador): item is Derivador & { timestamp: string } => {
+          if (typeof item.timestamp !== 'string') return false; // Ensure timestamp is a string
+          return !isNaN(Date.parse(item.timestamp)); // Check if timestamp is parseable
+        })
+        .map((item: Derivador & { timestamp: string }) => ({
+          date: new Date(item.timestamp).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          count: item.speed || 0, // Use 'speed' for movimentações
+        }));
+      console.log("Formatted history data:", formattedHistory);
+      setFormattedDeviceHistory(Array.isArray(formattedHistory) ? formattedHistory : []);
     } catch (error) {
       console.error("Erro ao buscar histórico:", error);
-      setDeviceHistory([]);
+      setRawDeviceHistory([]);
+      setFormattedDeviceHistory([]);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -118,8 +140,13 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
       {/* Gráfico somente se um dispositivo estiver selecionado */}
       {selectedDevice && (
         <View style={styles.chartContainer}>
-          //<Text style={styles.chartTitle}>MOVIMENTAÇÕES / DIA</Text>
-          <MovementChart deviceId={selectedDevice.device_id} />
+          {isLoadingHistory ? (
+            <Text>Carregando gráfico...</Text>
+          ) : formattedDeviceHistory.length === 0 ? (
+            <Text>Nenhum dado para exibir</Text>
+          ) : (
+            <MovementChart data={formattedDeviceHistory} />
+          )}
         </View>
       )}
 
@@ -139,7 +166,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
           disabled={!selectedDevice}
         >
           <Text style={styles.buttonValue}>
-            {selectedDevice ? deviceHistory.length : 0}
+            {selectedDevice ? rawDeviceHistory.length : 0}
           </Text>
           <Text style={styles.buttonLabel}>Movimentações</Text>
         </TouchableOpacity>
@@ -177,7 +204,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
                   >
                     <Text style={styles.deviceItemText}>{device.device_id}</Text>
                     <Text style={styles.deviceItemSubText}>
-                      Última atualização: {new Date(device.timestamp || '').toLocaleString()}
+                      Última atualização: {new Date(selectedDevice?.timestamp || '').toLocaleString()}
                     </Text>
                   </TouchableOpacity>
                 ))
@@ -193,7 +220,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
       <DeviceHistoryPopup
         visible={popupVisible}
         onClose={() => setPopupVisible(false)}
-        history={deviceHistory}
+        history={rawDeviceHistory}
         deviceId={selectedDevice?.device_id || ""}
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
