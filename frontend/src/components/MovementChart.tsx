@@ -1,57 +1,67 @@
-// src/components/MovementChart.tsx
 import React from "react";
 import { View, Text, Dimensions, StyleSheet } from "react-native";
 import { LineChart } from "react-native-chart-kit";
 
 interface MovementChartProps {
-  deviceId?: string; // Ainda opcional
+  data: { date: string; count: number }[];
 }
 
-const mockData = [
-  { date: "10/05", count: 2 },
-  { date: "11/05", count: 3 },
-  { date: "12/05", count: 5 },
-  { date: "13/05", count: 4 },
-  { date: "14/05", count: 6 },
-];
-
-const MovementChart: React.FC<MovementChartProps> = () => {
-  const values = mockData.map((d) => d.count);
-  const labels = mockData.map((d) => d.date);
+const MovementChart: React.FC<MovementChartProps> = ({ data }) => {
   const screenWidth = Dimensions.get("window").width;
+  const chartWidth = screenWidth * 0.85; // Reduced width to prevent overflow
+  const chartHeight = 240; // Increased height for better visibility
+
+  if (!data || data.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Nenhum dado para exibir</Text>
+      </View>
+    );
+  }
+
+  // Simplify labels to avoid overcrowding
+  const labels = data.map((d) => d.date);
+  const values = data.map((d) => d.count);
+  const labelInterval = Math.ceil(labels.length / 5); // Show ~5 labels max
+  const displayedLabels = labels.map((label, index) =>
+    index % labelInterval === 0 ? label : ""
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>MOVIMENTAÇÕES / DIA</Text>
       <LineChart
         data={{
-          labels: labels,
+          labels: displayedLabels,
           datasets: [{ data: values }],
         }}
-        width={screenWidth * 0.9}
-        height={220}
+        width={chartWidth}
+        height={chartHeight}
         yAxisLabel=""
-        yAxisSuffix=""
+        yAxisSuffix=" m/s"
         chartConfig={{
-          backgroundGradientFrom: "#ffffff",
+          backgroundGradientFrom: "#f7f7f7",
           backgroundGradientTo: "#ffffff",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
-          labelColor: () => "#000",
+          decimalPlaces: 1,
+          color: (opacity = 1) => `rgba(104, 82, 245, ${opacity})`,
+          labelColor: (opacity = 1) => `rgba(50, 50, 50, ${opacity})`,
           style: {
             borderRadius: 16,
           },
           propsForDots: {
-            r: "4",
+            r: "5",
             strokeWidth: "2",
-            stroke: "#8e44ad",
+            stroke: "#5a4af5",
+          },
+          propsForBackgroundLines: {
+            stroke: "#e0e0e0",
+            strokeDasharray: "",
           },
         }}
         bezier
-        style={{
-          marginVertical: 8,
-          borderRadius: 12,
-        }}
+        style={styles.chartStyle}
+        withInnerLines={true}
+        withOuterLines={true}
       />
     </View>
   );
@@ -60,18 +70,28 @@ const MovementChart: React.FC<MovementChartProps> = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 10,
-    width: "90%",
+    borderRadius: 16,
+    padding: 12,
+    width: "100%",
     alignSelf: "center",
-    marginVertical: 10,
+    marginVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2, // Corrected from shadowMode
+    elevation: 3,
   },
   title: {
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: 14,
-    color: "#000",
-    marginBottom: 8,
+    color: "#333",
+    marginBottom: 10,
+  },
+  chartStyle: {
+    marginVertical: 8,
+    borderRadius: 16,
+    paddingRight: 10, // Prevent label cutoff
   },
 });
 
