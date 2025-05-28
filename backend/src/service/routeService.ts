@@ -17,49 +17,51 @@ export class RouteService {
   }
 
   public static async getRoute(deviceId: string, timeRange?: string, isMaritime: boolean = false): Promise<any> {
-    // Fetch GPS points from gpsDao
-    const gpsData = await getDeviceHistory(deviceId, timeRange);
-    if (!gpsData || gpsData.length < 2) {
-      throw new Error('At least two GPS points are required for a route');
-    }
-
-    // Extract coordinates in [longitude, latitude] format
-    const coordinates: [number, number][] = gpsData.map((data: GPSData) => [
-      data.longitude,
-      data.latitude,
-    ]);
-
-    // Calculate total distance
-    let totalDistance = 0;
-    for (let i = 0; i < coordinates.length - 1; i++) {
-      totalDistance += this.haversineDistance(coordinates[i], coordinates[i + 1]);
-    }
-
-    // Estimate duration (60 km/h for terrestrial, 37 km/h for maritime)
-    const averageSpeedKmh = isMaritime ? 37 : 60;
-    const durationHours = totalDistance / averageSpeedKmh;
-    const durationSeconds = durationHours * 3600;
-
-    // Create GeoJSON
-    return {
-      type: 'FeatureCollection',
-      features: [
-        {
-          type: 'Feature',
-          geometry: {
-            type: 'LineString',
-            coordinates,
-          },
-          properties: {
-            deviceId,
-            distance: totalDistance, // in km
-            duration: durationSeconds, // in seconds
-            mode: isMaritime ? 'maritime' : 'terrestrial',
-          },
-        },
-      ],
-    };
+  // Fetch GPS points from gpsDao
+  const gpsData = await getDeviceHistory(deviceId, timeRange);
+  if (!gpsData || gpsData.length < 2) {
+    throw new Error('At least two GPS points are required for a route');
   }
+
+  // Extract coordinates and timestamps
+  const coordinates: [number, number][] = gpsData.map((data: GPSData) => [
+    data.longitude,
+    data.latitude,
+  ]);
+  const timestamps: string[] = gpsData.map((data: GPSData) => data.timestamp); // Assuming timestamp is a string
+
+  // Calculate total distance
+  let totalDistance = 0;
+  for (let i = 0; i < coordinates.length - 1; i++) {
+    totalDistance += this.haversineDistance(coordinates[i], coordinates[i + 1]);
+  }
+
+  // Estimate duration (60 km/h for terrestrial, 37 km/h for maritime)
+  const averageSpeedKmh = isMaritime ? 37 : 60;
+  const durationHours = totalDistance / averageSpeedKmh;
+  const durationSeconds = durationHours * 3600;
+
+  // Create GeoJSON
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates,
+        },
+        properties: {
+          deviceId,
+          distance: totalDistance, // in km
+          duration: durationSeconds, // in seconds
+          mode: isMaritime ? 'maritime' : 'terrestrial',
+          timestamps, // Add timestamps array
+        },
+      },
+    ],
+  };
+}
 
   public static async getMaritimeRoute(deviceId: string, timeRange?: string): Promise<any> {
     return await this.getRoute(deviceId, timeRange, true);

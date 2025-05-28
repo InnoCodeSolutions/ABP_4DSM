@@ -66,13 +66,22 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
 
   // Extract route coordinates for display
   const routeCoordinates = route && Array.isArray(route.features) && route.features[0]?.geometry.coordinates
-    ? route.features[0].geometry.coordinates.map(([lng, lat], index) => ({
-        latitude: lat,
-        longitude: lng,
-        timestamp: route.features[0].properties?.timestamps?.[index] || 'N/A',
-      }))
-    : [];
-
+  ? route.features[0].geometry.coordinates.map(([lng, lat], index) => ({
+      latitude: lat,
+      longitude: lng,
+      timestamp: route.features[0].properties?.timestamps?.[index]
+        ? new Date(route.features[0].properties.timestamps[index]).toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false, // Use 24-hour format
+          })
+        : 'N/A',
+    }))
+  : [];
   console.log("DeviceHistoryPopup: Route coordinates:", routeCoordinates);
 
   return (
