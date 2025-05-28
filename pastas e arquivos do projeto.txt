@@ -1,8 +1,7 @@
-﻿Esqueleto Simplificado do Projeto: C:\Users\André\4dsm\ABP\ABP_4DSMNEW\ABP_4DSM
+﻿Esqueleto Simplificado do Projeto: C:\Users\André\4dsm\ABP\ABP_4DSM
 --------------------------------------------------
 .expo\devices.json
 .expo\settings.json
-backend\package-lock.json
 backend\src\config\config.json
 backend\src\index.ts
 backend\src\initDatabase.ts
@@ -16,10 +15,12 @@ backend\src\package-lock.json
 backend\src\routes\authRoutes.ts
 backend\src\routes\configRoute.ts
 backend\src\routes\gpsRoutes.ts
+backend\src\routes\routeRoutes.ts
 backend\src\routes\userRoutes.ts
 backend\src\service\authService.ts
 backend\src\service\gpsService.ts
 backend\src\service\passwordResetService.ts
+backend\src\service\routeService.ts
 backend\src\service\userService.ts
 backend\src\setupDatabase.ts
 backend\src\types\GPSData.ts
@@ -27,6 +28,8 @@ backend\src\utils\email.ts
 backend\src\utils\hash.ts
 backend\tsconfig.json
 frontend\.expo\devices.json
+frontend\.expo\packager-info.json
+frontend\.expo\settings.json
 frontend\app.json
 frontend\declarations.d.ts
 frontend\index.ts
@@ -42,9 +45,12 @@ frontend\src\components\ExternalLink.tsx
 frontend\src\components\HapticTab.tsx
 frontend\src\components\HelloWave.tsx
 frontend\src\components\MapView.tsx
+frontend\src\components\MapView.web.tsx
 frontend\src\components\MovementChart.tsx
+frontend\src\components\Navbar.tsx
 frontend\src\components\ParallaxScrollView.tsx
 frontend\src\components\ResetPasswordPopup.tsx
+frontend\src\components\RouteSelectorPopup.tsx
 frontend\src\components\ThemedText.tsx
 frontend\src\components\ThemedView.tsx
 frontend\src\components\ui\IconSymbol.ios.tsx
@@ -61,14 +67,18 @@ frontend\src\screens\DashboardScreen.tsx
 frontend\src\screens\HomePage.tsx
 frontend\src\screens\index.tsx
 frontend\src\screens\LoginScreen.tsx
+frontend\src\screens\MapScreen.tsx
 frontend\src\screens\NotFoundScreen.tsx
+frontend\src\screens\Profile.tsx
 frontend\src\screens\RegisterScreen.tsx
 frontend\src\screens\ReportsScreen.tsx
 frontend\src\screens\ViewDevice.tsx
 frontend\src\service\authService.ts
 frontend\src\service\deviceService.ts
+frontend\src\service\getToken.ts
 frontend\src\tests\LoginScreen.test.tsx
 frontend\src\types\images.d.ts
+frontend\src\types\leaflet.d.ts
 frontend\tsconfig.json
 package.json
 package-lock.json
