@@ -130,11 +130,7 @@ const MapScreen: React.FC = () => {
           <>
             <Polyline
               positions={devicePath.map((p) => [p.latitude, p.longitude])}
-              pathOptions={{ color: "#00BFFF", weight: 4 }}
-            />
-            <Marker
-              position={[devicePath[0].latitude, devicePath[0].longitude]}
-              icon={createLabelWithIcon("Início")}
+              pathOptions={{ color: "#FF0000", weight: 4 }}
             />
             <Marker
               position={[
