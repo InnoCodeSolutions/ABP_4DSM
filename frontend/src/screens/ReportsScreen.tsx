@@ -159,6 +159,7 @@ const ReportsScreen: React.FC = () => {
           Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
         }
       }
+      
     } catch (error: any) {
       Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
     }
