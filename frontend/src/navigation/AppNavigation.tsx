@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, Alert, Platform, Text } from 'react-native'; // Explicitly import Text
 import config from '../config/config.json';
+import { RootStackParamList } from '../types/types';
 
-// Import the ReportsScreen component
+// Import screens
 import ReportsScreen from '../screens/ReportsScreen';
-
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomePage from '../screens/HomePage';
@@ -17,29 +17,19 @@ import DashboardScreen from '../screens/DashboardScreen';
 import MapScreen from '../screens/MapScreen';
 import Profile from '@/screens/Profile';
 
-export type RootStackParamList = {
-  Login: undefined;
-  Register: undefined;
-  Home: undefined;
-  ViewDevice: { device: { id: string; name: string } };
-  Map: undefined;
-  Dashboard: undefined;
-  NotFound: undefined;
-  Reports: undefined; // Add this line
-};
-
 const Stack = createStackNavigator<RootStackParamList>();
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
-// Tela de carregamento
+// Enhanced LoadingScreen with explicit Text import
 const LoadingScreen = () => (
   <View style={styles.loadingContainer}>
     <ActivityIndicator size="large" color="#3B82F6" />
+    <Text style={styles.loadingText}>Carregando...</Text>
   </View>
 );
 
 const AppNavigation: React.FC = () => {
-  const [initialRoute, setInitialRoute] = useState<string | null>(null);
+  const [initialRoute, setInitialRoute] = useState<keyof RootStackParamList | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -52,10 +42,8 @@ const AppNavigation: React.FC = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Resposta do servidor:", response.data);
-          console.log("Token válido, navegando para Home");
           setInitialRoute('Home');
         } else {
-          console.log("Nenhum token encontrado, navegando para Login");
           setInitialRoute('Login');
         }
       } catch (error: any) {
@@ -64,11 +52,15 @@ const AppNavigation: React.FC = () => {
           response: error.response?.data,
           status: error.response?.status,
           url: `${BASE_URL}/auth/verify-token`,
-          token: await AsyncStorage.getItem('authToken') || "Nenhum token",
         });
         await AsyncStorage.removeItem('authToken');
-        console.log("Token removido devido a erro, navegando para Login");
         setInitialRoute('Login');
+        // Show user feedback
+        if (Platform.OS !== 'web') {
+          Alert.alert('Erro', 'Sessão inválida. Por favor, faça login novamente.');
+        } else {
+          window.alert('Sessão inválida. Por favor, faça login novamente.');
+        }
       }
     };
 
@@ -82,7 +74,7 @@ const AppNavigation: React.FC = () => {
 
   console.log("Rota inicial definida:", initialRoute);
   return (
-    <Stack.Navigator initialRouteName={initialRoute as any}>
+    <Stack.Navigator initialRouteName={initialRoute}>
       <Stack.Screen
         name="Login"
         component={LoginScreen}
@@ -138,6 +130,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#1E3A8A',
+  },
+  loadingText: {
+    color: '#fff',
+    fontSize: 16,
+    marginTop: 10,
   },
 });
 

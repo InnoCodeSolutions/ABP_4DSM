@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   Dimensions,
+  ScrollView, // Adicionado
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -160,7 +161,11 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
           <Icon name="logout" size={28} color="#fff" />
@@ -173,7 +178,7 @@ const HomePage: React.FC = () => {
       <Text style={styles.greeting}>Olá, {userName}</Text>
 
       <View style={styles.mapContainer}>
-        <MapView markers={derivadores} />
+        <MapView markers={derivadores} scrollEnabled={false} />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -225,7 +230,7 @@ const HomePage: React.FC = () => {
         onPressProfile={() => navigation.navigate("Profile")}
         selected="home"
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -241,10 +246,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#041635",
     width: "100%",
+  },
+  contentContainer: {
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
+    minHeight: Dimensions.get("window").height, // Garante altura mínima
   },
   header: {
     flexDirection: "row",

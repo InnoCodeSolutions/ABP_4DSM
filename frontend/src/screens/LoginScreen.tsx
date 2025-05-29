@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { RootStackParamList } from "../navigation/AppNavigation";
+import { RootStackParamList } from "../types/types";
 import { login, requestPasswordReset } from "../service/authService";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import ResetPasswordPopup from "../components/ResetPasswordPopup";
