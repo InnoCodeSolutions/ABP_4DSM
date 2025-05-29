@@ -38,6 +38,7 @@ type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Home: undefined;
+  About: undefined;
   ViewDevice: { device: { id: string; name: string } };
   Map: undefined;
   Dashboard: undefined;
@@ -149,24 +150,20 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const handleAbout = () => {
-    const message =
-      "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento.";
-    if (Platform.OS === "web") {
-      window.alert(message);
-    } else {
-      Alert.alert("Sobre o App", message);
-    }
-  };
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
           <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAbout}>
-          <Text style={styles.headerText}>Sobre</Text>
+      </View>
+
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("About")}
+          style={styles.aboutButton}
+        >
+          <Text style={styles.aboutText}>Sobre</Text>
         </TouchableOpacity>
       </View>
 
@@ -300,6 +297,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     fontWeight: "600",
+  },
+  aboutButton: {
+    alignSelf: "flex-end",
+    backgroundColor: "transparent",
+  },
+  aboutText: {
+    fontSize: 16,
+    padding: 10,
+    borderRadius: 200,
+    color: "#fff",
+    fontWeight: "bold",
   },
   headerText: {
     color: "#fff",

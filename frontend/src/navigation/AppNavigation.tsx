@@ -16,11 +16,13 @@ import ViewDevice from '../screens/ViewDevice';
 import DashboardScreen from '../screens/DashboardScreen';
 import MapScreen from '../screens/MapScreen';
 import Profile from '@/screens/Profile';
+import AboutScreen from '../screens/AboutScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Home: undefined;
+  About: undefined;
   ViewDevice: { device: { id: string; name: string } };
   Map: undefined;
   Dashboard: undefined;
@@ -96,6 +98,11 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="Home"
         component={HomePage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="About"
+        component={AboutScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
