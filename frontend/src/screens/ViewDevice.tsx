@@ -1,35 +1,48 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Dimensions, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  Image,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { RootStackParamList } from "../navigation/AppNavigation";
-import { Derivador, fetchDerivadores, fetchDeviceHistory } from "../service/deviceService";
+import {
+  Derivador,
+  fetchDerivadores,
+  fetchDeviceHistory,
+} from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
 import NavBar from "../components/Navbar";
-
-// Tipagem explícita para MaterialCommunityIcons
 import { IconProps } from "react-native-vector-icons/Icon";
 import { ComponentType } from "react";
 
-const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any; // Contorna erro de tipagem
+const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any;
 
 const { width, height } = Dimensions.get("window");
 
-// Tipagem da navegação
-type ViewDeviceNavigationProp = NativeStackNavigationProp<RootStackParamList, "ViewDevice">;
+type ViewDeviceNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ViewDevice"
+>;
 
 const ViewDevice: React.FC = () => {
   const navigation = useNavigation<ViewDeviceNavigationProp>();
 
-  // Estado para armazenar os dados dos dispositivos
   const [derivadores, setDerivadores] = useState<Derivador[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // Função para buscar os dados da API
   const loadDerivadores = async () => {
     try {
       const data = await fetchDerivadores();
@@ -39,46 +52,40 @@ const ViewDevice: React.FC = () => {
     }
   };
 
-  // Função para buscar o histórico de um dispositivo
   const loadDeviceHistory = async (deviceId: string) => {
     try {
       setIsLoadingHistory(true);
-      console.log("Fetching history for deviceId:", deviceId); // Debug device ID
+      console.log("Fetching history for deviceId:", deviceId);
       const history = await fetchDeviceHistory(deviceId);
-      console.log("Device History Response:", history); // Debug API response
+      console.log("Device History Response:", history);
       setDeviceHistory(Array.isArray(history) ? history : []);
       setSelectedDevice(deviceId);
     } catch (error) {
       console.error("Erro ao buscar histórico:", error);
-      setDeviceHistory([]); // Fallback to empty array on error
+      setDeviceHistory([]);
     } finally {
       setIsLoadingHistory(false);
     }
   };
 
-  // Busca os dados ao carregar a tela
   useEffect(() => {
     loadDerivadores();
     const interval = setInterval(loadDerivadores, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Função para logout
-  const handleLogout = () => {
-    navigation.navigate("Login");
-  };
-
   return (
     <View style={styles.container}>
-      {/* Cabeçalho com título e botão Home */}
+      {/* Cabeçalho com seta de voltar e título */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Meus dispositivos</Text>
         <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
-          style={styles.iconButton}
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
         >
-          <Icon name="home" size={28} color="#fff" />
+          <Icon name="arrow-left" size={28} color="#000" />
         </TouchableOpacity>
+        <Text style={styles.headerTitle}>Meus dispositivos</Text>
+        <View style={{ width: 28 }} />
       </View>
 
       {/* Lista de dispositivos */}
@@ -90,23 +97,26 @@ const ViewDevice: React.FC = () => {
             onPress={() => loadDeviceHistory(derivador.device_id)}
           >
             <View style={styles.deviceRow}>
-              {/* Ícone do dispositivo */}
               <Image
                 source={require("../assets/derivador-1.png")}
                 style={styles.deviceIcon}
                 resizeMode="contain"
               />
-              {/* Informações do dispositivo */}
               <View style={styles.deviceInfo}>
                 <Text style={styles.deviceTitle}>{derivador.device_id}</Text>
                 <Text style={styles.deviceLocation}>
-                  Lat: {derivador.latitude?.toFixed(6) || 'N/A'}
+                  Lat: {derivador.latitude?.toFixed(6) || "N/A"}
                 </Text>
                 <Text style={styles.deviceLocation}>
-                  Long: {derivador.longitude?.toFixed(6) || 'N/A'}
+                  Long: {derivador.longitude?.toFixed(6) || "N/A"}
                 </Text>
-                <Text style={styles.deviceStatus} numberOfLines={1} ellipsizeMode="tail">
-                  Última atualização: {new Date(derivador.timestamp || '').toLocaleString()}
+                <Text
+                  style={styles.deviceStatus}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Última atualização:{" "}
+                  {new Date(derivador.timestamp || "").toLocaleString()}
                 </Text>
               </View>
             </View>
@@ -114,7 +124,6 @@ const ViewDevice: React.FC = () => {
         ))}
       </View>
 
-      {/* Popup com histórico */}
       <DeviceHistoryPopup
         visible={!!selectedDevice}
         onClose={() => {
@@ -123,15 +132,11 @@ const ViewDevice: React.FC = () => {
           setSelectedLocation(null);
         }}
         history={deviceHistory}
-        deviceId={selectedDevice || ''}
+        deviceId={selectedDevice || ""}
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
       />
 
-      {/* Botão de saída */}
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <Icon name="logout" size={28} color="#fff" />
-      </TouchableOpacity>
       <NavBar
         onPressHome={() => navigation.navigate("Home")}
         onPressDashboard={() => navigation.navigate("Dashboard")}
@@ -147,54 +152,40 @@ const barHeight = Platform.select({
   android: 54,
   web: 60,
   default: 54,
-})
+});
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#041635",
-    alignItems: "center",
-    paddingTop: Platform.select({
-      web: 30,
-      native: 50,
-    }),
     width: "100%",
-    minHeight: height,
-    maxWidth: Platform.select({
-      web: 1000,
-      native: width,
-    }),
-    alignSelf: "center",
+    alignItems: "center",
     paddingBottom: barHeight,
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    width: Platform.select({
-      web: 800,
-      native: width * 0.9,
-    }),
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    width: "100%",
   },
-  iconButton: {
-    padding: 6,
+  backButton: {
+    padding: 4,
     borderRadius: 20,
   },
-  headerText: {
-    color: "#fff",
+  headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#000",
   },
   deviceContainer: {
-    width: Platform.select({
-      web: 800,
-      native: width * 0.9,
-    }),
+    flex: 1,
+    width: "90%",
+    maxWidth: 800,
     marginTop: 20,
     gap: 10,
-    alignSelf: "center",
   },
   deviceButton: {
     backgroundColor: "#fff",
@@ -231,15 +222,6 @@ const styles = StyleSheet.create({
   deviceStatus: {
     fontSize: 14,
     color: "#666",
-  },
-  logoutButton: {
-    backgroundColor: "#FF0000",
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 20,
   },
 });
 
