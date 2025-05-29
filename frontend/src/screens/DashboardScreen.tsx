@@ -42,7 +42,9 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
     route.params?.device || null
   );
   const [rawDeviceHistory, setRawDeviceHistory] = useState<Derivador[]>([]);
-  const [formattedDeviceHistory, setFormattedDeviceHistory] = useState<{ date: string; count: number }[]>([]);
+  const [formattedDeviceHistory, setFormattedDeviceHistory] = useState<
+    { date: string; count: number }[]
+  >([]);
   const [selectedLocation, setSelectedLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -51,6 +53,15 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
   const [deviceListVisible, setDeviceListVisible] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const navigation = useNavigation<NavigationProp>();
+  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get("window"));
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      setWindowDimensions(Dimensions.get("window"));
+    };
+    const subscription = Dimensions.addEventListener("change", updateDimensions);
+    return () => subscription?.remove();
+  }, []);
 
   useEffect(() => {
     const loadDerivadores = async () => {
@@ -113,7 +124,11 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.contentContainer, { minHeight: windowDimensions.height }]}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
         <Text style={styles.headerText}>Dashboard</Text>
         <TouchableOpacity onPress={() => navigation.navigate("Home")}>
@@ -226,7 +241,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
         onPressProfile={() => navigation.navigate("Profile")}
         selected="dashboard"
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -241,8 +256,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#041635",
-    paddingTop: Platform.select({ ios: 50, android: 40, default: 30 }),
+    width: "100%",
+  },
+  contentContainer: {
     alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
   },
   header: {

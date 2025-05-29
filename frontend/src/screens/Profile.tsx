@@ -8,16 +8,16 @@ import {
     Platform,
     Dimensions,
     ActivityIndicator,
+    ScrollView, // Adicionado
 } from "react-native";
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigation';
+import { RootStackParamList } from '../types/types';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import NavBar from "@/components/Navbar";
 import { getProfile } from "@/service/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const { width, height } = Dimensions.get("window");
 const scale = (size: number, max: number): number => Math.min(size, max);
 
 type Props = StackScreenProps<RootStackParamList, 'Profile'>;
@@ -25,6 +25,15 @@ type Props = StackScreenProps<RootStackParamList, 'Profile'>;
 const Profile: React.FC<Props> = ({ navigation }) => {
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window')); // Estado para dimensões da tela
+
+    // Listener para mudanças na orientação da tela
+    useEffect(() => {
+        const subscription = Dimensions.addEventListener('change', ({ window }) => {
+            setWindowDimensions(window);
+        });
+        return () => subscription?.remove();
+    }, []);
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -48,22 +57,34 @@ const Profile: React.FC<Props> = ({ navigation }) => {
 
     if (loading) {
         return (
-            <View style={styles.container}>
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={true}
+            >
                 <ActivityIndicator size="large" color="#fff" />
-            </View>
+            </ScrollView>
         );
     }
 
     if (!user) {
         return (
-            <View style={styles.container}>
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={true}
+            >
                 <Text style={{ color: "#fff" }}>Não foi possível carregar o perfil.</Text>
-            </View>
+            </ScrollView>
         );
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+            showsVerticalScrollIndicator={true}
+        >
             <TouchableOpacity
                 style={styles.backButton}
                 onPress={() => navigation.navigate("Home" as never)}
@@ -79,8 +100,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                         borderRadius: 100,
                         padding: 8,
                         marginBottom: Platform.select({
-                            web: scale(height * 0.02, 20),
-                            native: height * 0.03,
+                            web: scale(windowDimensions.height * 0.02, 20),
+                            native: windowDimensions.height * 0.03,
                         }),
                         borderWidth: 2,
                         borderColor: "#fff",
@@ -89,8 +110,8 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     <MaterialIcons
                         name="person-pin"
                         size={Platform.select({
-                            web: scale(width * 0.13, 80),
-                            native: width * 0.25,
+                            web: scale(windowDimensions.width * 0.13, 80),
+                            native: windowDimensions.width * 0.25,
                         })}
                         color="#fff"
                     />
@@ -113,10 +134,9 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                 onPressProfile={() => navigation.navigate("Profile")}
                 selected="profile"
             />
-        </View>
+        </ScrollView>
     );
 };
-
 
 const barHeight = Platform.select({
     ios: 54,
@@ -128,16 +148,19 @@ const barHeight = Platform.select({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
         backgroundColor: "#1E3A8A",
-        paddingHorizontal: Platform.select({
-            web: scale(width * 0.05, 30),
-            native: width * 0.05,
-        }),
         width: "100%",
-        minHeight: height,
+    },
+    contentContainer: {
+        alignItems: "center",
+        justifyContent: "flex-start",
+        paddingTop: Platform.OS === "web" ? 20 : 50,
         paddingBottom: barHeight,
+        minHeight: Dimensions.get("window").height, // Garante altura mínima
+        paddingHorizontal: Platform.select({
+            web: scale(Dimensions.get("window").width * 0.05, 30),
+            native: Dimensions.get("window").width * 0.05,
+        }),
     },
     backButton: {
         position: "absolute",
@@ -150,16 +173,16 @@ const styles = StyleSheet.create({
     },
     logo: {
         width: Platform.select({
-            web: scale(width * 0.1, 80),
-            native: width * 0.2,
+            web: scale(Dimensions.get("window").width * 0.1, 80),
+            native: Dimensions.get("window").width * 0.2,
         }),
         height: Platform.select({
-            web: scale(width * 0.1, 80),
-            native: width * 0.2,
+            web: scale(Dimensions.get("window").width * 0.1, 80),
+            native: Dimensions.get("window").width * 0.2,
         }),
         marginBottom: Platform.select({
-            web: scale(height * 0.02, 20),
-            native: height * 0.03,
+            web: scale(Dimensions.get("window").height * 0.02, 20),
+            native: Dimensions.get("window").height * 0.03,
         }),
         resizeMode: "contain",
     },
@@ -167,25 +190,25 @@ const styles = StyleSheet.create({
         backgroundColor: "rgba(255, 255, 255, 0.1)",
         borderRadius: 20,
         padding: Platform.select({
-            web: scale(width * 0.05, 30),
-            native: width * 0.08,
+            web: scale(Dimensions.get("window").width * 0.05, 30),
+            native: Dimensions.get("window").width * 0.08,
         }),
         width: Platform.select({
-            web: scale(width * 0.5, 400),
-            native: width > 600 ? width * 0.5 : width * 0.9,
+            web: scale(Dimensions.get("window").width * 0.5, 400),
+            native: Dimensions.get("window").width > 600 ? Dimensions.get("window").width * 0.5 : Dimensions.get("window").width * 0.9,
         }),
         alignItems: "center",
     },
     title: {
         fontSize: Platform.select({
-            web: scale(width * 0.05, 28),
-            native: width * 0.07,
+            web: scale(Dimensions.get("window").width * 0.05, 28),
+            native: Dimensions.get("window").width * 0.07,
         }),
         color: "#fff",
         textAlign: "center",
         marginBottom: Platform.select({
-            web: scale(height * 0.03, 30),
-            native: height * 0.05,
+            web: scale(Dimensions.get("window").height * 0.03, 30),
+            native: Dimensions.get("window").height * 0.05,
         }),
         fontWeight: "bold",
     },
@@ -194,12 +217,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#D1D5DB",
         borderRadius: 10,
         padding: Platform.select({
-            web: scale(height * 0.01, 12),
-            native: height * 0.015,
+            web: scale(Dimensions.get("window").height * 0.01, 12),
+            native: Dimensions.get("window").height * 0.015,
         }),
         marginBottom: Platform.select({
-            web: scale(height * 0.015, 15),
-            native: height * 0.02,
+            web: scale(Dimensions.get("window").height * 0.015, 15),
+            native: Dimensions.get("window").height * 0.02,
         }),
         elevation: 2,
         shadowColor: "#000",
@@ -210,8 +233,8 @@ const styles = StyleSheet.create({
     label: {
         color: "#9CA3AF",
         fontSize: Platform.select({
-            web: scale(width * 0.03, 14),
-            native: width * 0.035,
+            web: scale(Dimensions.get("window").width * 0.03, 14),
+            native: Dimensions.get("window").width * 0.035,
         }),
         marginBottom: 2,
         fontWeight: "normal",
@@ -219,21 +242,20 @@ const styles = StyleSheet.create({
     value: {
         color: "#1E293B",
         fontSize: Platform.select({
-            web: scale(width * 0.03, 16),
-            native: width * 0.04,
+            web: scale(Dimensions.get("window").width * 0.03, 16),
+            native: Dimensions.get("window").width * 0.04,
         }),
         fontWeight: "normal",
     },
     footer: {
-        position: "absolute",
-        bottom: Platform.select({
-            web: scale(height * 0.01, 20),
-            native: height * 0.02,
+        marginTop: Platform.select({
+            web: scale(Dimensions.get("window").height * 0.01, 20),
+            native: Dimensions.get("window").height * 0.02,
         }),
         color: "#fff",
         fontSize: Platform.select({
-            web: scale(width * 0.02, 12),
-            native: width * 0.03,
+            web: scale(Dimensions.get("window").width * 0.02, 12),
+            native: Dimensions.get("window").width * 0.03,
         }),
     },
 });

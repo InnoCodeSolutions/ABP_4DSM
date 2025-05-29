@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Platform, Alert, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Alert,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
@@ -17,6 +26,8 @@ import NavBar from '../components/Navbar';
 type RootStackParamList = {
   Home: undefined;
   Reports: undefined;
+  Dashboard: undefined;
+  Profile: undefined;
 };
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -32,13 +43,12 @@ interface DeviceData {
   timestamp?: string;
 }
 
-const { width, height } = Dimensions.get('window');
-
 const ReportsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [devices, setDevices] = useState<DeviceData[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window')); // Estado para dimensões da tela
 
   // Fetch all devices with their latest data
   useEffect(() => {
@@ -52,6 +62,14 @@ const ReportsScreen: React.FC = () => {
       }
     };
     loadDevices();
+  }, []);
+
+  // Listener para mudanças na orientação da tela
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setWindowDimensions(window);
+    });
+    return () => subscription?.remove();
   }, []);
 
   // Open modal to select export format
@@ -112,7 +130,6 @@ const ReportsScreen: React.FC = () => {
   // Generate PDF file using jsPDF
   const generatePDF = async (data: any[], deviceId: string) => {
     try {
-      // Create PDF using jsPDF
       const doc = new jsPDF();
       doc.setFontSize(16);
       doc.text(`Relatório do Dispositivo ${deviceId}`, 10, 10);
@@ -149,7 +166,6 @@ const ReportsScreen: React.FC = () => {
           encoding: FileSystem.EncodingType.Base64,
         });
 
-        // Share the file using expo-sharing
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(fileUri, {
             mimeType: 'application/pdf',
@@ -159,15 +175,18 @@ const ReportsScreen: React.FC = () => {
           Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
         }
       }
-      
     } catch (error: any) {
       Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
     }
   };
 
   // Render each device item
-  const renderDeviceItem = ({ item }: { item: DeviceData }) => (
-    <TouchableOpacity style={styles.deviceCard} onPress={() => openExportModal(item.device_id)}>
+  const renderDeviceItem = (item: DeviceData) => (
+    <TouchableOpacity
+      style={styles.deviceCard}
+      onPress={() => openExportModal(item.device_id)}
+      key={item.device_id}
+    >
       <Text style={styles.deviceId}>{item.device_id}</Text>
       <Text style={styles.dataText}>
         Latitude: {item.latitude !== undefined ? item.latitude.toFixed(4) : 'N/A'}
@@ -182,20 +201,26 @@ const ReportsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Relatórios</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconButton}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Home')}
+          style={styles.iconButton}
+        >
           <Icon name="home" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
-      <FlatList
-        data={devices}
-        renderItem={renderDeviceItem}
-        keyExtractor={(item) => item.device_id}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>}
-      />
+
+      {devices.length === 0 ? (
+        <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
+      ) : (
+        devices.map((item) => renderDeviceItem(item))
+      )}
 
       {/* Modal for selecting export format */}
       <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
@@ -225,13 +250,14 @@ const ReportsScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
       <NavBar
         onPressHome={() => navigation.navigate("Home")}
         onPressDashboard={() => navigation.navigate("Dashboard")}
         onPressProfile={() => navigation.navigate("Profile")}
-        selected=""
+        selected="" // Alterado de "reports" para ""
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -246,19 +272,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#041635',
-    paddingTop: Platform.select({ web: 30, native: 50 }),
+    width: '100%',
+  },
+  contentContainer: {
     alignItems: 'center',
-    paddingHorizontal: 10,
+    justifyContent: 'flex-start',
+    paddingTop: Platform.OS === 'web' ? 20 : 50,
     paddingBottom: barHeight,
+    minHeight: Dimensions.get('window').height, // Garante altura mínima
   },
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: Platform.select({
-      web: 800,
-      native: width * 0.9,
-    }),
+    width: '90%',
     paddingHorizontal: 10,
     paddingVertical: 10,
   },
@@ -271,15 +298,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  list: {
-    paddingBottom: 20,
-  },
   deviceCard: {
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
-    width: Platform.select({ web: 400, native: width * 0.9 }),
+    width: Platform.select({ web: 400, native: Dimensions.get('window').width * 0.9 }),
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -301,7 +325,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
-    width: Platform.select({ web: 300, native: width * 0.8 }),
+    width: Platform.select({ web: 300, native: Dimensions.get('window').width * 0.8 }),
     alignSelf: 'center',
   },
   modalTitle: {

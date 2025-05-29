@@ -2,19 +2,40 @@ import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoginScreen from '../screens/LoginScreen';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-// Corrigindo o mock para o axios
+// Define navigation types
+type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Home: undefined;
+};
+
+// Define props type using NativeStackScreenProps
+type LoginScreenProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
+// Mock axios
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
-// Corrigindo o mock para Alert.alert
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(),
+  getItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
+
+// Mock Alert
 jest.spyOn(Alert, 'alert').mockImplementation(jest.fn());
 
-// Corrigindo o mock para navigation
+// Mock navigation and route
 const mockNavigation = {
   navigate: jest.fn(),
-};
+} as unknown as LoginScreenProps['navigation'];
+
+const mockRoute = {} as LoginScreenProps['route'];
 
 describe('LoginScreen', () => {
   beforeEach(() => {
@@ -23,20 +44,19 @@ describe('LoginScreen', () => {
 
   it('renderiza corretamente com inputs e botões', () => {
     const { getByPlaceholderText, getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
-    // Verifica se os componentes principais estão sendo renderizados
     expect(getByPlaceholderText('E-mail')).toBeTruthy();
     expect(getByPlaceholderText('Senha')).toBeTruthy();
     expect(getByText('Login')).toBeTruthy();
     expect(getByText('Cadastrar')).toBeTruthy();
     expect(getByText('floatData')).toBeTruthy();
   });
-});
+
   it('atualiza o estado ao digitar nos inputs', () => {
     const { getByPlaceholderText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     const emailInput = getByPlaceholderText('E-mail');
@@ -51,7 +71,7 @@ describe('LoginScreen', () => {
 
   it('exibe alerta quando os campos estão vazios', () => {
     const { getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     fireEvent.press(getByText('Login'));
@@ -62,7 +82,7 @@ describe('LoginScreen', () => {
 
   it('navega para a tela de registro ao clicar no botão cadastrar', () => {
     const { getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     fireEvent.press(getByText('Cadastrar'));
@@ -72,9 +92,10 @@ describe('LoginScreen', () => {
 
   it('faz login com sucesso e navega para Home', async () => {
     mockedAxios.post.mockResolvedValueOnce({ data: { token: 'fake-token' } });
+    (AsyncStorage.setItem as jest.Mock).mockResolvedValueOnce(undefined);
 
     const { getByPlaceholderText, getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     fireEvent.changeText(getByPlaceholderText('E-mail'), 'teste@example.com');
@@ -92,6 +113,7 @@ describe('LoginScreen', () => {
           password: 'senha123',
         }
       );
+      expect(AsyncStorage.setItem).toHaveBeenCalledWith('authToken', 'fake-token');
       expect(Alert.alert).toHaveBeenCalledWith('Sucesso', 'Login realizado com sucesso!');
       expect(mockNavigation.navigate).toHaveBeenCalledWith('Home');
     });
@@ -104,7 +126,7 @@ describe('LoginScreen', () => {
     });
 
     const { getByPlaceholderText, getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     fireEvent.changeText(getByPlaceholderText('E-mail'), 'teste@example.com');
@@ -128,12 +150,10 @@ describe('LoginScreen', () => {
   });
 
   it('exibe mensagem genérica quando o erro não tem formato esperado', async () => {
-    mockedAxios.post.mockRejectedValueOnce({
-      message: 'Network Error',
-    });
+    mockedAxios.post.mockRejectedValueOnce({ message: 'Network Error' });
 
     const { getByPlaceholderText, getByText } = render(
-      <LoginScreen navigation={mockNavigation as any} route={{} as any} />
+      <LoginScreen navigation={mockNavigation} route={mockRoute} />
     );
 
     fireEvent.changeText(getByPlaceholderText('E-mail'), 'teste@example.com');
@@ -147,5 +167,4 @@ describe('LoginScreen', () => {
       expect(Alert.alert).toHaveBeenCalledWith('Erro', 'Usuário ou senha incorretos.');
     });
   });
-
-  
+});

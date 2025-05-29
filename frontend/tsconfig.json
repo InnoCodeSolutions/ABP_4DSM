@@ -6,7 +6,6 @@
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["react", "react-native", "react-native-vector-icons"], // ✅ removido "jest" e "@testing-library/jest-native"
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "allowSyntheticDefaultImports": true,
@@ -16,8 +15,15 @@
     "paths": {
       "@/*": ["*"],
       "@config/*": ["config/*"]
-    }
+    },
+    "types": [
+      "jest", // Added for Jest globals
+      "@testing-library/react-native", // Added for testing library
+      "react",
+      "react-native",
+      "react-native-vector-icons"
+    ]
   },
-  
-  "include": ["src"]
+  "include": ["src/**/*", "tests/**/*"], // Added tests folder
+  "exclude": ["node_modules"]
 }
