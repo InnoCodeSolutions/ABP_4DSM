@@ -8,7 +8,7 @@ import {
   Alert,
   Platform,
   Dimensions,
-  ScrollView, // Adicionado
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -161,9 +161,6 @@ const HomePage: React.FC = () => {
         <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
           <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.navigate("About")}
           style={styles.aboutButton}
@@ -249,7 +246,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
-    minHeight: Dimensions.get("window").height, // Garante altura mínima
+    minHeight: Dimensions.get("window").height,
   },
   header: {
     flexDirection: "row",
@@ -307,13 +304,12 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   aboutButton: {
-    alignSelf: "flex-end",
+    padding: 8,
+    borderRadius: 20,
     backgroundColor: "transparent",
   },
   aboutText: {
-    fontSize: 16,
-    padding: 10,
-    borderRadius: 200,
+    fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
   },

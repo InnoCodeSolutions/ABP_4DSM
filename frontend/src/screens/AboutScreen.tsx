@@ -1,7 +1,7 @@
 import NavBar from '@/components/Navbar';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from 'navigation/AppNavigation';
+import { RootStackParamList } from '../types/types';
 import React from 'react';
 import { ScrollView, View, Text, Image, StyleSheet, Dimensions, Platform, Linking, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
