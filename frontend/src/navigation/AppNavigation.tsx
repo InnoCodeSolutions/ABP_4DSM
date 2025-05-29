@@ -16,6 +16,7 @@ import ViewDevice from '../screens/ViewDevice';
 import DashboardScreen from '../screens/DashboardScreen';
 import MapScreen from '../screens/MapScreen';
 import Profile from '@/screens/Profile';
+import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
@@ -88,6 +89,11 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="Home"
         component={HomePage}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="About"
+        component={AboutScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
