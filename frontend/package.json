@@ -77,7 +77,7 @@
       "/android/",
       "/ios/"
     ],
-    "collectCoverage": true,
+        "collectCoverage": true,
     "collectCoverageFrom": [
       "**/*.{ts,tsx}",
       "!**/coverage/**",
