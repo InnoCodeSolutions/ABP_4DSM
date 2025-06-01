@@ -7,7 +7,7 @@ import {
   Platform,
   Alert,
   Dimensions,
-  FlatList,
+  ScrollView,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
@@ -69,17 +69,17 @@ const ReportsScreen: React.FC = () => {
 
   // Custom wheel event listener for web scrolling
   useEffect(() => {
-    if (Platform.OS === "web") {
+    if (Platform.OS === 'web') {
       const handleWheel = (event: WheelEvent) => {
-        const flatList = document.querySelector(".reports-flatlist");
-        if (flatList && flatList.contains(event.target as Node)) {
-          // Allow scrolling within FlatList
+        const scrollView = document.querySelector('.reports-scrollview');
+        if (scrollView && scrollView.contains(event.target as Node)) {
+          // Allow scrolling within ScrollView
         } else {
           event.preventDefault();
         }
       };
-      window.addEventListener("wheel", handleWheel, { passive: false });
-      return () => window.removeEventListener("wheel", handleWheel);
+      window.addEventListener('wheel', handleWheel, { passive: false });
+      return () => window.removeEventListener('wheel', handleWheel);
     }
   }, []);
 
@@ -102,12 +102,14 @@ const ReportsScreen: React.FC = () => {
   };
 
   const generateCSV = async (data: any[], deviceId: string) => {
-    const csv = Papa.unparse(data.map(item => ({
-      device_id: item.device_id,
-      latitude: item.latitude,
-      longitude: item.longitude,
-      timestamp: item.timestamp,
-    })));
+    const csv = Papa.unparse(
+      data.map((item) => ({
+        device_id: item.device_id,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        timestamp: item.timestamp,
+      }))
+    );
     const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.csv`;
 
     if (Platform.OS === 'web') {
@@ -143,7 +145,9 @@ const ReportsScreen: React.FC = () => {
 
       let yPosition = 30;
       data.forEach((item, index) => {
-        const row = `${item.device_id} | ${item.latitude || 'N/A'} | ${item.longitude || 'N/A'} | ${item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}`;
+        const row = `${item.device_id} | ${item.latitude || 'N/A'} | ${item.longitude || 'N/A'} | ${
+          item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'
+        }`;
         doc.text(row, 10, yPosition);
         yPosition += 10;
         if (yPosition > 270 && index < data.length - 1) {
@@ -183,7 +187,7 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
-  const renderDeviceItem = ({ item }: { item: DeviceData }) => (
+  const renderDeviceItem = (item: DeviceData) => (
     <TouchableOpacity
       style={styles.deviceCard}
       onPress={() => openExportModal(item.device_id)}
@@ -203,34 +207,31 @@ const ReportsScreen: React.FC = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.contentContainer, { minHeight: windowDimensions.height }]}
+      showsVerticalScrollIndicator={true}
+      {...(Platform.OS === 'web' && {
+        className: 'reports-scrollview',
+      })}
+    >
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="arrow-left" size={28} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Relatórios</Text>
         <View style={{ width: 28 }} />
       </View>
-      <FlatList
-        data={devices}
-        renderItem={renderDeviceItem}
-        keyExtractor={(item) => item.device_id}
-        showsVerticalScrollIndicator={true}
-        {...(Platform.OS === "web" && {
-          nestedScrollEnabled: true,
-          className: "reports-flatlist", // For web scrolling detection
-        })}
-        style={styles.flatList}
-        contentContainerStyle={styles.flatListContent}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>}
-      />
-      <Modal
-        isVisible={isModalVisible}
-        onBackdropPress={() => setModalVisible(false)}
-      >
+
+      <View style={styles.deviceList}>
+        {devices.length > 0 ? (
+          devices.map((item) => renderDeviceItem(item))
+        ) : (
+          <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
+        )}
+      </View>
+
+      <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Exportar Relatório</Text>
           <TouchableOpacity
@@ -257,13 +258,14 @@ const ReportsScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Modal>
+
       <NavBar
         onPressHome={() => navigation.navigate('Home')}
         onPressDashboard={() => navigation.navigate('Dashboard')}
         onPressProfile={() => navigation.navigate('Profile')}
         selected=""
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -279,13 +281,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#041635',
     width: '100%',
-    alignItems: 'center',
-    paddingBottom: barHeight,
-    minHeight: Dimensions.get('window').height,
-    ...(Platform.OS === "web" && {
-      overflowY: "auto", // Enable vertical scrolling
-      WebkitOverflowScrolling: "touch",
+    ...(Platform.OS === 'web' && {
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
     }),
+  },
+  contentContainer: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: Platform.OS === 'web' ? 20 : 50,
+    paddingBottom: barHeight,
   },
   header: {
     flexDirection: 'row',
@@ -305,16 +310,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
-  flatList: {
-    width: '100%',
-    ...(Platform.OS === "web" && {
-      overflowY: "auto", // Enable vertical scrolling
-      WebkitOverflowScrolling: "touch",
-    }),
-  },
-  flatListContent: {
-    paddingBottom: 20, // Ensure content isn’t cut off
-    alignItems: 'center', // Center items horizontally
+  deviceList: {
+    width: '90%',
+    marginBottom: 20,
   },
   deviceCard: {
     backgroundColor: '#fff',
@@ -327,7 +325,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
-    alignSelf: 'center', // Center cards within FlatList
+    alignSelf: 'center',
   },
   deviceId: {
     fontSize: 18,
@@ -348,9 +346,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
-    ...(Platform.OS === "web" && {
-      overflowY: "auto", // Enable scrolling for modal content
-      WebkitOverflowScrolling: "touch",
+    ...(Platform.OS === 'web' && {
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
     }),
   },
   modalTitle: {
@@ -366,7 +364,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 10,
-    width: '100%', // Ensure buttons stretch to fit modal
+    width: '100%',
   },
   buttonText: {
     color: '#fff',
