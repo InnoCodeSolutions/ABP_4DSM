@@ -1,18 +1,34 @@
 {
   "expo": {
+    "name": "abpteste",
+    "slug": "abpteste",
+    "version": "1.0.0",
+    "sdkVersion": "52.0.0",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.abpteste"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.yourcompany.abpteste"
     },
     "plugins": [
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          },
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 34,
+            "buildToolsVersion": "34.0.0"
+          }
+        }
+      ],
       "expo-router",
       "expo-font"
     ]
