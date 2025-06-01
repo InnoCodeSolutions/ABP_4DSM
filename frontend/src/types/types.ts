@@ -8,4 +8,7 @@ export type RootStackParamList = {
   NotFound: undefined;
   Reports: undefined;
   Profile: undefined;
+
+  // Adicione essa linha:
+  About: undefined;
 };
