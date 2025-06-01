@@ -183,12 +183,16 @@ const ReportsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>Relatórios</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.iconButton}>
-          <Icon name="home" size={28} color="#fff" />
-        </TouchableOpacity>
-      </View>
+      <View style={styles.header}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.backButton}
+              >
+                <Icon name="arrow-left" size={28} color="#000" />
+              </TouchableOpacity>
+              <Text style={styles.headerTitle}>Relatórios</Text>
+              <View style={{ width: 28 }} />
+            </View>
       <FlatList
         data={devices}
         renderItem={renderDeviceItem}
@@ -245,87 +249,84 @@ const barHeight = Platform.select({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#041635',
-    paddingTop: Platform.select({ web: 30, native: 50 }),
-    alignItems: 'center',
-    paddingHorizontal: 10,
+    backgroundColor: "#041635",
+    width: "100%",
+    alignItems: "center",
     paddingBottom: barHeight,
   },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: Platform.select({
-      web: 800,
-      native: width * 0.9,
-    }),
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    width: "100%",
   },
-  iconButton: {
-    padding: 6,
+  backButton: {
+    padding: 4,
     borderRadius: 20,
   },
-  headerText: {
-    fontSize: 26,
-    color: '#fff',
-    fontWeight: 'bold',
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
   },
   list: {
     paddingBottom: 20,
   },
   deviceCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
     width: Platform.select({ web: 400, native: width * 0.9 }),
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
   },
   deviceId: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#041635',
+    fontWeight: "bold",
+    color: "#041635",
     marginBottom: 10,
   },
   dataText: {
     fontSize: 14,
-    color: '#041635',
+    color: "#041635",
     marginBottom: 5,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
     width: Platform.select({ web: 300, native: width * 0.8 }),
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#041635',
+    fontWeight: "bold",
+    color: "#041635",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   modalButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   emptyText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
   },
 });
