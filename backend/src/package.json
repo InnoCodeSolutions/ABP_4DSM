@@ -22,7 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "nodemailer": "^7.0.3",
-    "pg": "^8.14.1",
+    "pg": "^8.16.0",
     "react-native-maps": "^1.23.8",
     "yaml": "^2.8.0"
   },
@@ -41,3 +41,5 @@
     "typescript": "^5.8.2"
   }
 }
+
+

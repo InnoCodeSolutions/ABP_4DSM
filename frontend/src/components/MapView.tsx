@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Text, StyleProp, ViewStyle, Platform } from "react-native";
-import MapView, { Marker as MapMarker, Polyline } from "react-native-maps"; // REMOVIDO PROVIDER_GOOGLE
+import MapView, { Marker as MapMarker, Polyline } from "react-native-maps";
 import { GeoJSONRoute } from "../service/deviceService";
 
 // Define types for markers
@@ -22,6 +22,7 @@ interface MapViewProps {
   style?: StyleProp<ViewStyle>;
   route?: GeoJSONRoute | null | undefined;
   onMarkerPress?: (deviceId: string) => void;
+  scrollEnabled?: boolean; // Adicionado para suportar scrollEnabled
 }
 
 const defaultRegion = {
@@ -31,15 +32,22 @@ const defaultRegion = {
   longitudeDelta: 0.05,
 };
 
-const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = defaultRegion, style, route, onMarkerPress }) => {
+const CustomMapView: React.FC<MapViewProps> = ({
+  markers = [],
+  initialRegion = defaultRegion,
+  style,
+  route,
+  onMarkerPress,
+  scrollEnabled = true, // Valor padrão: true
+}) => {
   // Process markers with fallback to 0 for null/undefined
-  const validMarkers = markers.map(marker => ({
-    latitude: marker.latitude || 0,
-    longitude: marker.longitude || 0,
-    title: marker.title || "Unknown",
-  })).filter(
-    marker => !isNaN(marker.latitude) && !isNaN(marker.longitude)
-  );
+  const validMarkers = markers
+    .map((marker) => ({
+      latitude: marker.latitude || 0,
+      longitude: marker.longitude || 0,
+      title: marker.title || "Unknown",
+    }))
+    .filter((marker) => !isNaN(marker.latitude) && !isNaN(marker.longitude));
 
   const computedRegion = validMarkers.length > 0
     ? {
@@ -59,11 +67,11 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
   try {
     return (
       <MapView
-        // REMOVIDO: provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         style={[styles.map, style]}
         initialRegion={computedRegion}
-        showsUserLocation={true} // Opcional: mostra a localização do usuário
-        followsUserLocation={true} // Opcional: a câmera segue a localização do usuário
+        showsUserLocation={true}
+        followsUserLocation={true}
+        scrollEnabled={scrollEnabled} // Passa a propriedade scrollEnabled
       >
         {validMarkers.map((marker, index) => (
           <MapMarker
@@ -73,7 +81,7 @@ const CustomMapView: React.FC<MapViewProps> = ({ markers = [], initialRegion = d
               longitude: marker.longitude,
             }}
             title={marker.title}
-            pinColor="#FF0000" // Cor do pino
+            pinColor="#FF0000"
             onPress={() => {
               console.log("MapView (Mobile): Marker clicked:", marker.title);
               onMarkerPress && onMarkerPress(marker.title);

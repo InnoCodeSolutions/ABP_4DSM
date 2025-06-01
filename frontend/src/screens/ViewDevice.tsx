@@ -7,11 +7,12 @@ import {
   Platform,
   Dimensions,
   Image,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import { RootStackParamList } from "../navigation/AppNavigation";
+import { RootStackParamList } from "../types/types";
 import {
   Derivador,
   fetchDerivadores,
@@ -24,16 +25,20 @@ import { ComponentType } from "react";
 
 const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any;
 
-const { width, height } = Dimensions.get("window");
-
 type ViewDeviceNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "ViewDevice"
 >;
 
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
+
 const ViewDevice: React.FC = () => {
   const navigation = useNavigation<ViewDeviceNavigationProp>();
-
   const [derivadores, setDerivadores] = useState<Derivador[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
@@ -42,6 +47,17 @@ const ViewDevice: React.FC = () => {
     longitude: number;
   } | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get("window"));
+
+  // Handle orientation changes
+  useEffect(() => {
+    const updateDimensions = () => {
+      setWindowDimensions(Dimensions.get("window"));
+    };
+
+    const subscription = Dimensions.addEventListener("change", updateDimensions);
+    return () => subscription?.remove();
+  }, []);
 
   const loadDerivadores = async () => {
     try {
@@ -75,8 +91,14 @@ const ViewDevice: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {/* Cabeçalho com seta de voltar e título */}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { minHeight: windowDimensions.height },
+      ]}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -88,7 +110,6 @@ const ViewDevice: React.FC = () => {
         <View style={{ width: 28 }} />
       </View>
 
-      {/* Lista de dispositivos */}
       <View style={styles.deviceContainer}>
         {derivadores.map((derivador, index) => (
           <TouchableOpacity
@@ -143,23 +164,20 @@ const ViewDevice: React.FC = () => {
         onPressProfile={() => navigation.navigate("Profile")}
         selected=""
       />
-    </View>
+    </ScrollView>
   );
 };
-
-const barHeight = Platform.select({
-  ios: 54,
-  android: 54,
-  web: 60,
-  default: 54,
-});
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#041635",
     width: "100%",
+  },
+  contentContainer: {
     alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
   },
   header: {
@@ -181,7 +199,6 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   deviceContainer: {
-    flex: 1,
     width: "90%",
     maxWidth: 800,
     marginTop: 20,

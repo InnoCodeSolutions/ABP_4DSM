@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -38,6 +39,7 @@ type RootStackParamList = {
   Login: undefined;
   Register: undefined;
   Home: undefined;
+  About: undefined;
   ViewDevice: { device: { id: string; name: string } };
   Map: undefined;
   Dashboard: undefined;
@@ -149,31 +151,28 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const handleAbout = () => {
-    const message =
-      "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento.";
-    if (Platform.OS === "web") {
-      window.alert(message);
-    } else {
-      Alert.alert("Sobre o App", message);
-    }
-  };
-
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
           <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAbout}>
-          <Text style={styles.headerText}>Sobre</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("About")}
+          style={styles.aboutButton}
+        >
+          <Text style={styles.aboutText}>Sobre</Text>
         </TouchableOpacity>
       </View>
 
       <Text style={styles.greeting}>Olá, {userName}</Text>
 
       <View style={styles.mapContainer}>
-        <MapView markers={derivadores} />
+        <MapView markers={derivadores} scrollEnabled={false} />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -225,7 +224,7 @@ const HomePage: React.FC = () => {
         onPressProfile={() => navigation.navigate("Profile")}
         selected="home"
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -241,10 +240,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#041635",
     width: "100%",
+  },
+  contentContainer: {
     alignItems: "center",
     justifyContent: "flex-start",
     paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
+    minHeight: Dimensions.get("window").height,
   },
   header: {
     flexDirection: "row",
@@ -300,6 +302,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
     fontWeight: "600",
+  },
+  aboutButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "transparent",
+  },
+  aboutText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
   },
   headerText: {
     color: "#fff",

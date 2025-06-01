@@ -15,7 +15,7 @@ import {
   findNodeHandle, // <<< Adicionar a importação
 } from "react-native";
 import { StackScreenProps } from "@react-navigation/stack";
-import { RootStackParamList } from "../navigation/AppNavigation";
+import { RootStackParamList } from "../types/types";
 import { register } from "../service/authService";
 
 const { width, height } = Dimensions.get("window"); // 'height' aqui é a altura da janela
