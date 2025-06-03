@@ -12,6 +12,7 @@ import {
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { fetchDerivadores, fetchDeviceHistoryForReport } from '../service/deviceService';
@@ -136,56 +137,68 @@ const ReportsScreen: React.FC = () => {
   };
 
   const generatePDF = async (data: any[], deviceId: string) => {
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(16);
-      doc.text(`Relatório do Dispositivo ${deviceId}`, 10, 10);
-      doc.setFontSize(12);
-      doc.text('Dispositivo | Latitude | Longitude | Data/Hora', 10, 20);
+  try {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.setTextColor(0, 102, 204); // Blue title
+    doc.text(`Relatório do Dispositivo ${deviceId}`, 105, 15, { align: 'center' });
 
-      let yPosition = 30;
-      data.forEach((item, index) => {
-        const row = `${item.device_id} | ${item.latitude || 'N/A'} | ${item.longitude || 'N/A'} | ${
-          item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'
-        }`;
-        doc.text(row, 10, yPosition);
-        yPosition += 10;
-        if (yPosition > 270 && index < data.length - 1) {
-          doc.addPage();
-          yPosition = 10;
-        }
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0); // Black text
+    const headers = [['Dispositivo', 'Latitude', 'Longitude', 'Data/Hora']];
+    const rows = data.map(item => [
+      item.device_id,
+      item.latitude?.toFixed(4) || 'N/A',
+      item.longitude?.toFixed(4) || 'N/A',
+      item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'
+    ]);
+
+    autoTable(doc, {
+      head: headers,
+      body: rows,
+      startY: 25,
+      theme: 'grid',
+      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255], fontSize: 12 },
+      bodyStyles: { textColor: [0, 0, 0], fontSize: 10 },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 40 },
+        2: { cellWidth: 40 },
+        3: { cellWidth: 65 },
+      },
+      margin: { top: 20 },
+    });
+
+    if (Platform.OS === 'web') {
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } else {
+      const pdfBase64 = doc.output('datauristring').split(',')[1];
+      const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
+        encoding: FileSystem.EncodingType.Base64,
       });
 
-      if (Platform.OS === 'web') {
-        const pdfBlob = doc.output('blob');
-        const url = URL.createObjectURL(pdfBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
-        link.click();
-        URL.revokeObjectURL(url);
-      } else {
-        const pdfBase64 = doc.output('datauristring').split(',')[1];
-        const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
-        const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
-        await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
-          encoding: FileSystem.EncodingType.Base64,
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Salvar ou compartilhar relatório PDF',
         });
-
-        if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(fileUri, {
-            mimeType: 'application/pdf',
-            dialogTitle: 'Salvar ou compartilhar relatório PDF',
-          });
-        } else {
-          Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
-        }
+      } else {
+        Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
       }
-    } catch (error: any) {
-      Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
     }
-  };
+  } catch (error: any) {
+    Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
+  }
+};
 
   const renderDeviceItem = (item: DeviceData) => (
     <TouchableOpacity
