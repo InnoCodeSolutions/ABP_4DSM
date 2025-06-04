@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
-  ScrollView,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -158,58 +157,63 @@ const HomePage: React.FC = () => {
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={true}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
-          <Icon name="logout" size={28} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("About")}
-          style={styles.aboutButton}
-        >
-          <Text style={styles.aboutText}>Sobre</Text>
-        </TouchableOpacity>
+      <View>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+            <Icon name="logout" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("About")}
+            style={styles.aboutButton}
+          >
+            <Text style={styles.aboutText}>Sobre</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.greeting}>Olá, {userName}</Text>
+
+        <View style={styles.mapContainer}>
+          <MapView markers={derivadores} scrollEnabled={false} />
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("ViewDevice" as never)}
+          >
+            <Image
+              source={require("../assets/dispositivo.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Dispositivos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Dashboard")}
+          >
+            <Image
+              source={require("../assets/grafico.png")}
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Dashboard</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate("Map")}
+          >
+            <Image source={require("../assets/mapa.png")} style={styles.icon} />
+            <Text style={styles.buttonText}>Mapa</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.button}>
+            <Image source={require("../assets/duvida.png")} style={styles.icon} />
+            <Text style={styles.buttonText}>A definir</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-      <Text style={styles.greeting}>Olá, Usuário</Text>
-
-      <View style={styles.mapContainer}>
-        <MapView markers={derivadores} scrollEnabled={false} />
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("ViewDevice" as never)}
-        >
-          <Image
-            source={require("../assets/dispositivo.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Dispositivos</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Dashboard")}
-        >
-          <Image
-            source={require("../assets/grafico.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Dashboard</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/mapa.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>Mapa</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/duvida.png")} style={styles.icon} />
-          <Text style={styles.buttonText}>A definir</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    </ScrollView>
   );
 };
 
