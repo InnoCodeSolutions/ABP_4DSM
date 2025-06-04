@@ -20,6 +20,7 @@ import NavBar from "../components/Navbar";
 import axios from "axios";
 import config from "../config/config.json";
 
+
 // Função para decodificar o token JWT manualmente
 const decodeToken = (token: string): { id: number; email: string } | null => {
   try {
@@ -35,6 +36,7 @@ const decodeToken = (token: string): { id: number; email: string } | null => {
   }
 };
 
+
 type RootStackParamList = {
   Login: undefined;
   Register: undefined;
@@ -47,13 +49,16 @@ type RootStackParamList = {
   Reports: undefined;
 };
 
+
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+
 
 interface Marker {
   latitude: number;
   longitude: number;
   title: string;
 }
+
 
 interface UserProfile {
   id: number;
@@ -65,12 +70,15 @@ interface UserProfile {
   criado_em: string;
 }
 
+
 const Icon: any = MaterialCommunityIcons;
+
 
 const HomePage: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
   const [derivadores, setDerivadores] = useState<Marker[]>([]);
   const [userName, setUserName] = useState<string>("");
+
 
   useEffect(() => {
     const loadDerivadores = async () => {
@@ -88,19 +96,23 @@ const HomePage: React.FC = () => {
       }
     };
 
+
     const loadUserProfile = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
         if (!token) throw new Error("Nenhum token de autenticação encontrado");
 
+
         const decoded = decodeToken(token);
         if (!decoded || !decoded.id)
           throw new Error("Não foi possível decodificar o token");
+
 
         const API_URL = `http://${config.backend.host}:${config.backend.port}`;
         const response = await axios.get(`${API_URL}/users/${decoded.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
 
         const userData: UserProfile = response.data;
         setUserName(userData.name || "Usuário");
@@ -114,9 +126,11 @@ const HomePage: React.FC = () => {
       }
     };
 
+
     loadDerivadores();
     loadUserProfile();
   }, []);
+
 
   const handleLogout = () => {
     if (Platform.OS === "web") {
@@ -151,71 +165,91 @@ const HomePage: React.FC = () => {
     }
   };
 
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={true}
     >
-      <View>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
-            <Icon name="logout" size={28} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("About")}
-            style={styles.aboutButton}
-          >
-            <Text style={styles.aboutText}>Sobre</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.greeting}>Olá, {userName}</Text>
-
-        <View style={styles.mapContainer}>
-          <MapView markers={derivadores} scrollEnabled={false} />
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("ViewDevice" as never)}
-          >
-            <Image
-              source={require("../assets/dispositivo.png")}
-              style={styles.icon}
-            />
-            <Text style={styles.buttonText}>Dispositivos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Dashboard")}
-          >
-            <Image
-              source={require("../assets/grafico.png")}
-              style={styles.icon}
-            />
-            <Text style={styles.buttonText}>Dashboard</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate("Map")}
-          >
-            <Image source={require("../assets/mapa.png")} style={styles.icon} />
-            <Text style={styles.buttonText}>Mapa</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.button}>
-            <Image source={require("../assets/duvida.png")} style={styles.icon} />
-            <Text style={styles.buttonText}>A definir</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+          <Icon name="logout" size={28} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("About")}
+          style={styles.aboutButton}
+        >
+          <Text style={styles.aboutText}>Sobre</Text>
+        </TouchableOpacity>
       </View>
+
+
+      <Text style={styles.greeting}>Olá, {userName}</Text>
+
+
+      <View style={styles.mapContainer}>
+        <MapView markers={derivadores} scrollEnabled={false} />
+      </View>
+
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("ViewDevice")}
+        >
+          <Image
+            source={require("../assets/dispositivo.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.buttonText}>Dispositivos</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Dashboard")}
+        >
+          <Image
+            source={require("../assets/grafico.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.buttonText}>Dashboard</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Map")}
+        >
+          <Image source={require("../assets/mapa.png")} style={styles.icon} />
+          <Text style={styles.buttonText}>Mapa</Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Reports")}
+        >
+          <Image
+            source={require("../assets/relatorios.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.buttonText}>Relatórios</Text>
+        </TouchableOpacity>
+      </View>
+
+
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected="home"
+      />
     </ScrollView>
   );
 };
+
 
 const barHeight = Platform.select({
   ios: 54,
@@ -224,11 +258,8 @@ const barHeight = Platform.select({
   default: 54,
 });
 
+
 const styles = StyleSheet.create({
-  scrollContent: {
-    paddingBottom: 80,
-    flexGrow: 1,
-  },
   container: {
     flex: 1,
     backgroundColor: "#041635",
@@ -317,4 +348,6 @@ const styles = StyleSheet.create({
   },
 });
 
+
 export default HomePage;
+
