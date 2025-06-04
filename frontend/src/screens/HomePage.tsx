@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   View,
+  ScrollView,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -169,7 +170,7 @@ const HomePage: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.greeting}>Olá, {userName}</Text>
+      <Text style={styles.greeting}>Olá, Usuário</Text>
 
       <View style={styles.mapContainer}>
         <MapView markers={derivadores} scrollEnabled={false} />
@@ -178,7 +179,7 @@ const HomePage: React.FC = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate("ViewDevice")}
+          onPress={() => navigation.navigate("ViewDevice" as never)}
         >
           <Image
             source={require("../assets/dispositivo.png")}
@@ -198,33 +199,17 @@ const HomePage: React.FC = () => {
           <Text style={styles.buttonText}>Dashboard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Map")}
-        >
+        <TouchableOpacity style={styles.button}>
           <Image source={require("../assets/mapa.png")} style={styles.icon} />
           <Text style={styles.buttonText}>Mapa</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => navigation.navigate("Reports")}
-        >
-          <Image
-            source={require("../assets/relatorios.png")}
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Relatórios</Text>
+        <TouchableOpacity style={styles.button}>
+          <Image source={require("../assets/duvida.png")} style={styles.icon} />
+          <Text style={styles.buttonText}>A definir</Text>
         </TouchableOpacity>
       </View>
-
-      <NavBar
-        onPressHome={() => navigation.navigate("Home")}
-        onPressDashboard={() => navigation.navigate("Dashboard")}
-        onPressProfile={() => navigation.navigate("Profile")}
-        selected="home"
-      />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -236,6 +221,10 @@ const barHeight = Platform.select({
 });
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 80,
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: "#041635",
