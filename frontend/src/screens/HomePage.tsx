@@ -20,7 +20,7 @@ import NavBar from "../components/Navbar";
 import axios from "axios";
 import config from "../config/config.json";
 
-// Função para decodificar o token JWT manualmente
+
 const decodeToken = (token: string): { id: number; email: string } | null => {
   try {
     const payload = token.split(".")[1];
@@ -158,14 +158,14 @@ const HomePage: React.FC = () => {
       showsVerticalScrollIndicator={true}
     >
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
-          <Icon name="logout" size={28} color="#fff" />
-        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("About")}
           style={styles.aboutButton}
         >
           <Text style={styles.aboutText}>Sobre</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+          <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 

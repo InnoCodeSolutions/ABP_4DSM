@@ -94,7 +94,7 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="About"
         component={AboutScreen}
-        options={{ title: 'Informações' }}
+        options={{ title: 'Sobre a Aplicação' }}
       />
       <Stack.Screen
         name="NotFound"

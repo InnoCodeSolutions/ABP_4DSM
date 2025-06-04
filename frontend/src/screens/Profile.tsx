@@ -85,13 +85,6 @@ const Profile: React.FC<Props> = ({ navigation }) => {
             contentContainerStyle={styles.contentContainer}
             showsVerticalScrollIndicator={true}
         >
-            <TouchableOpacity
-                style={styles.backButton}
-                onPress={() => navigation.navigate("Home" as never)}
-            >
-                <MaterialCommunityIcons name="arrow-left" size={28} color="#fff" />
-            </TouchableOpacity>
-
             <Image source={require("../assets/icon.png")} style={styles.logo} />
             <View style={styles.box}>
                 <View

@@ -16,16 +16,7 @@ const AboutScreen: React.FC = () => {
   const navigation = useNavigation<ViewDeviceNavigationProp>();
   return (
      <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Sobre a Aplicação</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Home")}
-          style={styles.iconButton}>
-          <Icon name="home" size={28} color="#fff" />
-        </TouchableOpacity>
-      </View>
     <ScrollView style={{ width: '100%' }} contentContainerStyle={{ ...styles.scrollContent, flexGrow: 1 }}>
-
       <Image
         source={require('../assets/icon.png')}
         style={styles.logo}
@@ -141,21 +132,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#3B82F6",
     borderRadius: 12,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    width: "90%",
-    paddingVertical: 10,
-  },
   iconButton: {
     padding: 6,
     borderRadius: 20,
-  },
-  headerText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
   },
   scrollContent: {
   width:'100%',
