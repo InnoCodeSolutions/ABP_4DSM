@@ -47,7 +47,9 @@ const ViewDevice: React.FC = () => {
     longitude: number;
   } | null>(null);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
-  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get("window"));
+  const [windowDimensions, setWindowDimensions] = useState(
+    Dimensions.get("window")
+  );
 
   // Handle orientation changes
   useEffect(() => {
@@ -55,7 +57,10 @@ const ViewDevice: React.FC = () => {
       setWindowDimensions(Dimensions.get("window"));
     };
 
-    const subscription = Dimensions.addEventListener("change", updateDimensions);
+    const subscription = Dimensions.addEventListener(
+      "change",
+      updateDimensions
+    );
     return () => subscription?.remove();
   }, []);
 
@@ -99,17 +104,6 @@ const ViewDevice: React.FC = () => {
       ]}
       showsVerticalScrollIndicator={true}
     >
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Icon name="arrow-left" size={28} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Meus dispositivos</Text>
-        <View style={{ width: 28 }} />
-      </View>
-
       <View style={styles.deviceContainer}>
         {derivadores.map((derivador, index) => (
           <TouchableOpacity
@@ -179,24 +173,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#fff",
-    width: "100%",
-  },
-  backButton: {
-    padding: 4,
-    borderRadius: 20,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
   },
   deviceContainer: {
     width: "90%",

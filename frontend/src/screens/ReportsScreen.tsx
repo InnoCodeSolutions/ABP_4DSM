@@ -208,21 +208,13 @@ const ReportsScreen: React.FC = () => {
 
   return (
     <ScrollView
-      style={styles.container}
-      contentContainerStyle={[styles.contentContainer, { minHeight: windowDimensions.height }]}
-      showsVerticalScrollIndicator={true}
-      {...(Platform.OS === 'web' && {
-        className: 'reports-scrollview',
-      })}
-    >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Icon name="arrow-left" size={28} color="#000" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Relatórios</Text>
-        <View style={{ width: 28 }} />
-      </View>
-
+          style={styles.container}
+          contentContainerStyle={[
+            styles.contentContainer,
+            { minHeight: windowDimensions.height },
+          ]}
+          showsVerticalScrollIndicator={true}
+        >
       <View style={styles.deviceList}>
         {devices.length > 0 ? (
           devices.map((item) => renderDeviceItem(item))
@@ -279,101 +271,84 @@ const barHeight = Platform.select({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#041635',
-    width: '100%',
-    ...(Platform.OS === 'web' && {
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
-    }),
+    backgroundColor: "#041635",
+    width: "100%",
   },
   contentContainer: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: Platform.OS === 'web' ? 20 : 50,
+    alignItems: "center",
+    justifyContent: "flex-start",
     paddingBottom: barHeight,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: '#fff',
-    width: '100%',
-  },
-  backButton: {
-    padding: 4,
-    borderRadius: 20,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
-  },
   deviceList: {
-    width: '90%',
+    width: "90%",
     marginBottom: 20,
   },
   deviceCard: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
     marginVertical: 10,
-    width: Platform.select({ web: 400, native: Dimensions.get('window').width * 0.9 }),
+    width: Platform.select({
+      web: 400,
+      native: Dimensions.get("window").width * 0.9,
+    }),
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
   deviceId: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#041635',
+    fontWeight: "bold",
+    color: "#041635",
     marginBottom: 10,
   },
   dataText: {
     fontSize: 14,
-    color: '#041635',
+    color: "#041635",
     marginBottom: 5,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
     borderRadius: 10,
-    width: Platform.select({ web: 300, native: Dimensions.get('window').width * 0.8 }),
-    alignSelf: 'center',
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...(Platform.OS === 'web' && {
-      overflowY: 'auto',
-      WebkitOverflowScrolling: 'touch',
+    width: Platform.select({
+      web: 300,
+      native: Dimensions.get("window").width * 0.8,
+    }),
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    ...(Platform.OS === "web" && {
+      overflowY: "auto",
+      WebkitOverflowScrolling: "touch",
     }),
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#041635',
+    fontWeight: "bold",
+    color: "#041635",
     marginBottom: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   modalButton: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 15,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
-    width: '100%',
+    width: "100%",
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   emptyText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 20,
   },
 });

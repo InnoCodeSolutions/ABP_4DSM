@@ -129,13 +129,6 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
       contentContainerStyle={[styles.contentContainer, { minHeight: windowDimensions.height }]}
       showsVerticalScrollIndicator={true}
     >
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Dashboard</Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
-          <Icon name="home" size={28} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
       {selectedDevice ? (
         <View style={styles.deviceInfoContainer}>
           <Text style={styles.deviceInfoText}>Dispositivo: {selectedDevice.device_id}</Text>
@@ -270,10 +263,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 10,
   },
-  headerText: {
-    color: "#fff",
+  backButton: {
+    padding: 4,
+    borderRadius: 20,
+  },
+  headerTitle: {
     fontSize: 20,
     fontWeight: "bold",
+    color: "#000",
   },
   deviceInfoContainer: {
     width: "90%",
@@ -333,8 +330,14 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   deviceListPopup: {
-    width: Platform.select({ web: Math.min(width * 0.9, 800), native: width * 0.95 }),
-    maxHeight: Platform.select({ web: 600, native: Dimensions.get("window").height * 0.8 }),
+    width: Platform.select({
+      web: Math.min(width * 0.9, 800),
+      native: width * 0.95,
+    }),
+    maxHeight: Platform.select({
+      web: 600,
+      native: Dimensions.get("window").height * 0.8,
+    }),
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
@@ -353,7 +356,10 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   deviceList: {
-    maxHeight: Platform.select({ web: 500, native: Dimensions.get("window").height * 0.6 }),
+    maxHeight: Platform.select({
+      web: 500,
+      native: Dimensions.get("window").height * 0.6,
+    }),
   },
   deviceItem: {
     padding: 10,

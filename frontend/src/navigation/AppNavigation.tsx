@@ -94,7 +94,7 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="About"
         component={AboutScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'Informações' }}
       />
       <Stack.Screen
         name="NotFound"
@@ -104,7 +104,7 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="ViewDevice"
         component={ViewDevice}
-        options={{ headerShown: false }}
+        options={{ title: 'Dispositivos' }}
       />
       <Stack.Screen
         name="Map"
@@ -119,12 +119,12 @@ const AppNavigation: React.FC = () => {
       <Stack.Screen
         name="Reports"
         component={ReportsScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'Relatórios' }}
       />
       <Stack.Screen
         name="Profile"
         component={Profile}
-        options={{ headerShown: false }}
+        options={{ title: 'Perfil' }}
       />
     </Stack.Navigator>
   );

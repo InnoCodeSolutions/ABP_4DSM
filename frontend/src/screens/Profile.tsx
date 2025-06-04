@@ -146,118 +146,121 @@ const barHeight = Platform.select({
 });
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#1E3A8A",
-        width: "100%",
-    },
-    contentContainer: {
-        alignItems: "center",
-        justifyContent: "flex-start",
-        paddingTop: Platform.OS === "web" ? 20 : 50,
-        paddingBottom: barHeight,
-        minHeight: Dimensions.get("window").height, // Garante altura mínima
-        paddingHorizontal: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.05, 30),
-            native: Dimensions.get("window").width * 0.05,
-        }),
-    },
-    backButton: {
-        position: "absolute",
-        top: Platform.OS === "android" ? 48 : 64,
-        left: 24,
-        zIndex: 10,
-        backgroundColor: "rgba(30, 58, 138, 0.7)",
-        padding: 8,
-        borderRadius: 20,
-    },
-    logo: {
-        width: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.1, 80),
-            native: Dimensions.get("window").width * 0.2,
-        }),
-        height: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.1, 80),
-            native: Dimensions.get("window").width * 0.2,
-        }),
-        marginBottom: Platform.select({
-            web: scale(Dimensions.get("window").height * 0.02, 20),
-            native: Dimensions.get("window").height * 0.03,
-        }),
-        resizeMode: "contain",
-    },
-    box: {
-        backgroundColor: "rgba(255, 255, 255, 0.1)",
-        borderRadius: 20,
-        padding: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.05, 30),
-            native: Dimensions.get("window").width * 0.08,
-        }),
-        width: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.5, 400),
-            native: Dimensions.get("window").width > 600 ? Dimensions.get("window").width * 0.5 : Dimensions.get("window").width * 0.9,
-        }),
-        alignItems: "center",
-    },
-    title: {
-        fontSize: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.05, 28),
-            native: Dimensions.get("window").width * 0.07,
-        }),
-        color: "#fff",
-        textAlign: "center",
-        marginBottom: Platform.select({
-            web: scale(Dimensions.get("window").height * 0.03, 30),
-            native: Dimensions.get("window").height * 0.05,
-        }),
-        fontWeight: "bold",
-    },
-    field: {
-        width: "100%",
-        backgroundColor: "#D1D5DB",
-        borderRadius: 10,
-        padding: Platform.select({
-            web: scale(Dimensions.get("window").height * 0.01, 12),
-            native: Dimensions.get("window").height * 0.015,
-        }),
-        marginBottom: Platform.select({
-            web: scale(Dimensions.get("window").height * 0.015, 15),
-            native: Dimensions.get("window").height * 0.02,
-        }),
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1.5,
-    },
-    label: {
-        color: "#9CA3AF",
-        fontSize: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.03, 14),
-            native: Dimensions.get("window").width * 0.035,
-        }),
-        marginBottom: 2,
-        fontWeight: "normal",
-    },
-    value: {
-        color: "#1E293B",
-        fontSize: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.03, 16),
-            native: Dimensions.get("window").width * 0.04,
-        }),
-        fontWeight: "normal",
-    },
-    footer: {
-        marginTop: Platform.select({
-            web: scale(Dimensions.get("window").height * 0.01, 20),
-            native: Dimensions.get("window").height * 0.02,
-        }),
-        color: "#fff",
-        fontSize: Platform.select({
-            web: scale(Dimensions.get("window").width * 0.02, 12),
-            native: Dimensions.get("window").width * 0.03,
-        }),
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#041635",
+    width: "100%",
+  },
+  contentContainer: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: Platform.OS === "web" ? 20 : 50,
+    paddingBottom: barHeight,
+    minHeight: Dimensions.get("window").height, // Garante altura mínima
+    paddingHorizontal: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.05, 30),
+      native: Dimensions.get("window").width * 0.05,
+    }),
+  },
+  backButton: {
+    position: "absolute",
+    top: Platform.OS === "android" ? 48 : 64,
+    left: 24,
+    zIndex: 10,
+    backgroundColor: "rgba(30, 58, 138, 0.7)",
+    padding: 8,
+    borderRadius: 20,
+  },
+  logo: {
+    width: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.1, 80),
+      native: Dimensions.get("window").width * 0.2,
+    }),
+    height: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.1, 80),
+      native: Dimensions.get("window").width * 0.2,
+    }),
+    marginBottom: Platform.select({
+      web: scale(Dimensions.get("window").height * 0.02, 20),
+      native: Dimensions.get("window").height * 0.03,
+    }),
+    resizeMode: "contain",
+  },
+  box: {
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    borderRadius: 20,
+    padding: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.05, 30),
+      native: Dimensions.get("window").width * 0.08,
+    }),
+    width: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.5, 400),
+      native:
+        Dimensions.get("window").width > 600
+          ? Dimensions.get("window").width * 0.5
+          : Dimensions.get("window").width * 0.9,
+    }),
+    alignItems: "center",
+  },
+  title: {
+    fontSize: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.05, 28),
+      native: Dimensions.get("window").width * 0.07,
+    }),
+    color: "#fff",
+    textAlign: "center",
+    marginBottom: Platform.select({
+      web: scale(Dimensions.get("window").height * 0.03, 30),
+      native: Dimensions.get("window").height * 0.05,
+    }),
+    fontWeight: "bold",
+  },
+  field: {
+    width: "100%",
+    backgroundColor: "#D1D5DB",
+    borderRadius: 10,
+    padding: Platform.select({
+      web: scale(Dimensions.get("window").height * 0.01, 12),
+      native: Dimensions.get("window").height * 0.015,
+    }),
+    marginBottom: Platform.select({
+      web: scale(Dimensions.get("window").height * 0.015, 15),
+      native: Dimensions.get("window").height * 0.02,
+    }),
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+  },
+  label: {
+    color: "#9CA3AF",
+    fontSize: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.03, 14),
+      native: Dimensions.get("window").width * 0.035,
+    }),
+    marginBottom: 2,
+    fontWeight: "normal",
+  },
+  value: {
+    color: "#1E293B",
+    fontSize: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.03, 16),
+      native: Dimensions.get("window").width * 0.04,
+    }),
+    fontWeight: "normal",
+  },
+  footer: {
+    marginTop: Platform.select({
+      web: scale(Dimensions.get("window").height * 0.01, 20),
+      native: Dimensions.get("window").height * 0.02,
+    }),
+    color: "#fff",
+    fontSize: Platform.select({
+      web: scale(Dimensions.get("window").width * 0.02, 12),
+      native: Dimensions.get("window").width * 0.03,
+    }),
+  },
 });
 
 export default Profile;
