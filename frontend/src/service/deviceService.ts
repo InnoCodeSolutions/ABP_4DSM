@@ -3,7 +3,7 @@ import config from "../config/config.json";
 import { getToken } from './getToken'; // No .native suffix
 
 // Base URL da API
-const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
+const BASE_URL = `https://${config.backend.host}`;
 
 // Interfaces
 export interface Derivador {

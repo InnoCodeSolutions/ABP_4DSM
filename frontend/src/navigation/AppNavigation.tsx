@@ -19,7 +19,7 @@ import Profile from '@/screens/Profile';
 import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
-const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
+const BASE_URL = `https://${config.backend.host}`;
 
 // Enhanced LoadingScreen with explicit Text import
 const LoadingScreen = () => (
