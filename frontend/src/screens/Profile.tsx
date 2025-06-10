@@ -119,6 +119,14 @@ const Profile: React.FC<Props> = ({ navigation }) => {
                     <Text style={styles.label}>Telefone</Text>
                     <Text style={styles.value}>{user.phone}</Text>
                 </View>
+
+                <TouchableOpacity
+                    style={styles.resetPasswordButton}
+                    onPress={() => navigation.navigate("Login", { showResetModal: true })}
+                >
+                    <Text style={styles.resetPasswordText}>Recuperar Senha</Text>
+                </TouchableOpacity>
+
             </View>
             <Text style={styles.footer}>Made by Innocode Solutions</Text>
             <NavBar
@@ -243,6 +251,18 @@ const styles = StyleSheet.create({
     }),
     fontWeight: "normal",
   },
+  resetPasswordButton: {
+    marginTop: 30,
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 8,
+    },
+  resetPasswordText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+    },
   footer: {
     marginTop: Platform.select({
       web: scale(Dimensions.get("window").height * 0.01, 20),

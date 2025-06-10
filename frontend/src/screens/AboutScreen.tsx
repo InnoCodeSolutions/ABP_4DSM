@@ -32,14 +32,17 @@ const AboutScreen: React.FC = () => {
       <Text style={styles.sectionTitle}>Objetivos:</Text>
       <Text style={styles.paragraph}>
         O floatData visa explorar e aplicar conceitos de Internet das Coisas (IoT) 
-        para melhorar a monitorização e resposta em situações de emergência em ambientes marítimos.
+        Seu propósito é o aprendizado sobre os sistemas GPS, em como eles funcionam e como implementá-los em um sistema mobile
+        para melhorar o entendimento sobre este recurso e como ele pode ser usado de diversas formas.
         Além disso, busca promover a inovação tecnológica e a segurança nas operações marítimas.
       </Text>
 
       <Text style={styles.sectionTitle}>Tecnologias:</Text>
       <Text style={styles.listItem}>• ESP32</Text>
       <Text style={styles.listItem}>• Sensor GPS (Modelo: NEO-6M)</Text>
-      <Text style={styles.listItem}>• Desenvolvimento de Aplicação Mobile (Linguagens usadas: Typescript, React)</Text>
+      <Text style={styles.listItem}>• Desenvolvimento de Aplicação Mobile:</Text>
+      <Text style={styles.listItem}>• Linguagens utilizadas: Typescript</Text>
+      <Text style={styles.listItem}>• Frameworks utilizados: React, ReactNative, NodeJS</Text>
       <Text style={styles.listItem}>• Integração de Dados e Dashboard</Text>
 
       <Text style={styles.sectionTitle}>Impacto esperado:</Text>
@@ -49,14 +52,8 @@ const AboutScreen: React.FC = () => {
       </Text>
 
       <Text style={styles.sectionTitle}>Contato:</Text>
-      <Text style={styles.paragraph}>
-        Para mais informações sobre o projeto floatData ou para colaborações futuras, entre em contato conosco através do e-mail:{' '}
-        <Text
-          style={styles.link}
-          onPress={() => Linking.openURL('mailto:innocodesolutions@gmail.com')}
-        >
-          innocodesolutions@gmail.com
-        </Text>
+      <Text style={styles.paragraphGithub}>
+        Para mais informações sobre o projeto floatData ou nossos outros projetos, como RAMG.O, nosso site de controle de calorias, visite nosso repositório do github.
       </Text>
 
       <TouchableOpacity style={styles.infoButton} onPress={() => Linking.openURL('https://github.com/InnoCodeSolutions')}>
@@ -110,6 +107,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 16,
     textAlign: "justify",
+    width: "100%",
+  },
+  paragraphGithub: {
+    fontSize: 16,
+    color: "#fff",
+    marginBottom: 16,
+    textAlign: "center",
     width: "100%",
   },
   listItem: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -23,13 +23,21 @@ const { width, height } = Dimensions.get("window");
 
 type Props = StackScreenProps<RootStackParamList, "Login">;
 
-const LoginScreen: React.FC<Props> = ({ navigation }) => {
+const LoginScreen: React.FC<Props> = ({ navigation, route }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetPopupVisible, setIsResetPopupVisible] = useState(false);
+
+    useEffect(() => {
+    if (route.params?.showResetModal) {
+      setIsModalVisible(true);
+      // Limpa o parâmetro para evitar reabrir toda hora
+      navigation.setParams({ showResetModal: false });
+    }
+  }, [route.params]);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -366,7 +374,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 20,
     padding: 20,
-    width: "80%",
+    width: "70%",
   },
   modalHeader: {
     flexDirection: "row",
@@ -393,6 +401,7 @@ const styles = StyleSheet.create({
   modalCancelText: {
     color: "#6B7280",
     fontWeight: "bold",
+    padding:10
   },
   modalSendButton: {
     backgroundColor: "#2563EB",
