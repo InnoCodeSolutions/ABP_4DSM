@@ -1,32 +1,56 @@
+// src/models/gpsDao.ts
 import { Pool } from 'pg';
-import config from '../models/config';
+import { dbConfig } from './config';
 import { GPSData } from '../types/GPSData';
 
-const pool = new Pool(config.database);
+const pool = new Pool(dbConfig);
 
-export const insertGPSData = async (data: GPSData): Promise<void> => {
-  const { device_id, latitude, longitude, altitude, speed, course, satellites, hdop } = data;
-  await pool.query(`
-    INSERT INTO login.gps_data (device_id, latitude, longitude, altitude, speed, course, satellites, hdop)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-  `, [device_id, latitude, longitude, altitude, speed, course, satellites, hdop]);
-};
+// Inserção de novo ponto GPS
+export async function insertGPSData(data: GPSData): Promise<void> {
+  const {
+    device_id,
+    latitude,
+    longitude,
+    altitude,
+    speed,
+    course,
+    satellites,
+    hdop,
+  } = data;
 
-export const getAllGPSData = async () => {
-  const result = await pool.query('SELECT * FROM login.gps_data ORDER BY timestamp DESC');
+  await pool.query(
+    `INSERT INTO login.gps_data 
+      (device_id, latitude, longitude, altitude, speed, course, satellites, hdop)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+    [device_id, latitude, longitude, altitude, speed, course, satellites, hdop]
+  );
+}
+
+// Retorna todos os pontos, do mais novo para o mais velho
+export async function getAllGPSData(): Promise<GPSData[]> {
+  const result = await pool.query(
+    `SELECT * FROM login.gps_data ORDER BY timestamp DESC`
+  );
   return result.rows;
-};
+}
 
-export const getDevices = async (): Promise<{ device_id: string, latitude: number, longitude: number, timestamp: string }[]> => {
-  const result = await pool.query(`
-    SELECT DISTINCT ON (device_id) device_id, latitude, longitude, timestamp
-    FROM login.gps_data
-    ORDER BY device_id, timestamp DESC
-  `);
+// Lista últimos registros por dispositivo
+export async function getDevices(): Promise<
+  { device_id: string; latitude: number; longitude: number; timestamp: Date }[]
+> {
+  const result = await pool.query(
+    `SELECT DISTINCT ON (device_id) device_id, latitude, longitude, timestamp
+     FROM login.gps_data
+     ORDER BY device_id, timestamp DESC`
+  );
   return result.rows;
-};
+}
 
-export const getDeviceHistory = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
+// Histórico completo (até 500) de um device, opcional período
+export async function getDeviceHistory(
+  deviceId: string,
+  timeRange?: string
+): Promise<GPSData[]> {
   let query = `
     SELECT * FROM login.gps_data
     WHERE device_id = $1
@@ -43,7 +67,7 @@ export const getDeviceHistory = async (deviceId: string, timeRange?: string): Pr
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 30);
     } else {
-      const [start, end] = timeRange.split('/'); // e.g., "2025-05-01/2025-05-20"
+      const [start, end] = timeRange.split('/');
       startDate = new Date(start);
       endDate.setTime(Date.parse(end) || endDate.getTime());
     }
@@ -51,19 +75,18 @@ export const getDeviceHistory = async (deviceId: string, timeRange?: string): Pr
     params.push(startDate, endDate);
   }
 
-  query += ` ORDER BY timestamp DESC`;
+  query += ` ORDER BY timestamp DESC LIMIT 500`;
   const result = await pool.query(query, params);
-  let points = result.rows;
+  return result.rows;
+}
 
-  // Sample to at most 500 points for performance
-  if (points.length > 500) {
-    points = points.slice(0, 500);
-  }
-
-  return points;
-};
-
-export const getActivitySummaryData = async (deviceId: string, timeRange?: string): Promise<GPSData[]> => {
+// Para relatórios: só lat,lon,speed,timestamp em ordem ASC
+export async function getActivitySummaryData(
+  deviceId: string,
+  timeRange?: string
+): Promise<
+  { latitude: number; longitude: number; speed: number | null; timestamp: Date }[]
+> {
   let query = `
     SELECT latitude, longitude, speed, timestamp
     FROM login.gps_data
@@ -92,16 +115,26 @@ export const getActivitySummaryData = async (deviceId: string, timeRange?: strin
   query += ` ORDER BY timestamp ASC`;
   const result = await pool.query(query, params);
   return result.rows;
-};
+}
 
-export const insertRoute = async (deviceId: string, routeGeojson: any, isMaritime: boolean): Promise<void> => {
-  await pool.query(`
-    INSERT INTO login.routes (device_id, route_geojson, is_maritime)
-    VALUES ($1, $2, $3)
-  `, [deviceId, routeGeojson, isMaritime]);
-};
+// Insere rota (GeoJSON) calculada
+export async function insertRoute(
+  deviceId: string,
+  routeGeojson: any,
+  isMaritime: boolean
+): Promise<void> {
+  await pool.query(
+    `INSERT INTO login.routes (device_id, route_geojson, is_maritime)
+     VALUES ($1, $2, $3)`,
+    [deviceId, routeGeojson, isMaritime]
+  );
+}
 
-export const getRoutes = async (deviceId: string, timeRange?: string): Promise<any[]> => {
+// Busca rotas já salvas
+export async function getRoutes(
+  deviceId: string,
+  timeRange?: string
+): Promise<{ route_geojson: any; is_maritime: boolean; created_at: Date }[]> {
   let query = `
     SELECT route_geojson, is_maritime, created_at
     FROM login.routes
@@ -130,22 +163,78 @@ export const getRoutes = async (deviceId: string, timeRange?: string): Promise<a
   query += ` ORDER BY created_at DESC`;
   const result = await pool.query(query, params);
   return result.rows;
-};
+}
 
-export const updateGPSData = async (id: number, data: Partial<GPSData>): Promise<void> => {
+// Atualiza um registro pelo ID
+export async function updateGPSData(
+  id: number,
+  data: Partial<GPSData>
+): Promise<void> {
   const fields = Object.keys(data);
   const values = Object.values(data);
-
   if (fields.length === 0) return;
 
-  const sets = fields.map((field, i) => `${field} = $${i + 1}`).join(', ');
-
+  const setClause = fields.map((f, i) => `${f} = $${i + 1}`).join(', ');
   await pool.query(
-    `UPDATE login.gps_data SET ${sets} WHERE id = $${fields.length + 1}`,
+    `UPDATE login.gps_data SET ${setClause} WHERE id = $${fields.length + 1}`,
     [...values, id]
   );
-};
+}
 
-export const deleteGPSData = async (id: number): Promise<void> => {
-  await pool.query('DELETE FROM login.gps_data WHERE id = $1', [id]);
-};
+// Deleta pelo ID
+export async function deleteGPSData(id: number): Promise<void> {
+  await pool.query(`DELETE FROM login.gps_data WHERE id = $1`, [id]);
+}
+
+
+// —————— NOVO: PARA MOVIMENTO ——————
+
+/**
+ * Linha simplificada para cálculo de movimento
+ */
+export interface MovementPointRow {
+  latitude: number;
+  longitude: number;
+  timestamp: Date;
+}
+
+/**
+ * Retorna pontos em ASC para calcular distância e velocidade entre pares.
+ */
+export async function getDeviceMovementData(
+  deviceId: string,
+  timeRange?: string
+): Promise<MovementPointRow[]> {
+  let query = `
+    SELECT latitude, longitude, timestamp
+    FROM login.gps_data
+    WHERE device_id = $1
+  `;
+  const params: any[] = [deviceId];
+
+  if (timeRange) {
+    let startDate: Date;
+    const endDate = new Date();
+    if (timeRange === 'last7days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 7);
+    } else if (timeRange === 'last30days') {
+      startDate = new Date();
+      startDate.setDate(endDate.getDate() - 30);
+    } else {
+      const [start, end] = timeRange.split('/');
+      startDate = new Date(start);
+      endDate.setTime(Date.parse(end) || endDate.getTime());
+    }
+    query += ` AND timestamp BETWEEN $2 AND $3`;
+    params.push(startDate, endDate);
+  }
+
+  query += ` ORDER BY timestamp ASC`;
+  const result = await pool.query(query, params);
+  return result.rows.map(r => ({
+    latitude: r.latitude,
+    longitude: r.longitude,
+    timestamp: r.timestamp,
+  }));
+}
