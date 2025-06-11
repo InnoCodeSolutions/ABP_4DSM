@@ -16,7 +16,6 @@ import { Derivador, GeoJSONRoute } from "../service/deviceService";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Animated, Easing } from "react-native";
-import config from "../config/config.json"; // Ajuste o caminho conforme a localização do config.json
 
 const { width, height } = Dimensions.get("window");
 

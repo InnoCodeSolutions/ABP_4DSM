@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchDerivadores } from "../service/deviceService";
 import NavBar from "../components/Navbar";
 import axios from "axios";
-import config from "../config/config.json";
+
 
 
 const decodeToken = (token: string): { id: number; email: string } | null => {
