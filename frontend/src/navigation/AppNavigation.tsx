@@ -3,7 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { ActivityIndicator, View, StyleSheet, Alert, Platform, Text } from 'react-native'; // Explicitly import Text
-import config from '../config/config.json';
+import { BACKEND_HOST } from '@env';
 import { RootStackParamList } from '../types/types';
 
 // Import screens
@@ -19,7 +19,7 @@ import Profile from '@/screens/Profile';
 import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
-const BASE_URL = `https://${config.backend.host}`;
+const BASE_URL = `https://${BACKEND_HOST}`;
 
 // Enhanced LoadingScreen with explicit Text import
 const LoadingScreen = () => (

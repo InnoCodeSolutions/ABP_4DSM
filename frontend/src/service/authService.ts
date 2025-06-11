@@ -1,9 +1,9 @@
 // authService.ts
 
 import axios from "axios";
-import config from "../config/config.json";
+import { BACKEND_HOST } from '@env';
 
-const BASE_URL = `https://${config.backend.host}`;
+const BASE_URL = `https://${BACKEND_HOST}`;
 
 // Função para decodificar o token JWT manualmente
 const jwtDecode = (token: string): { id: number; email: string } | null => {

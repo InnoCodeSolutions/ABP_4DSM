@@ -16,7 +16,7 @@ import { Derivador, GeoJSONRoute } from "../service/deviceService";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Animated, Easing } from "react-native";
-import config from "../config/config.json"; // Ajuste o caminho conforme a localização do config.json
+import { BACKEND_HOST } from '@env';
 
 const { width, height } = Dimensions.get("window");
 
@@ -45,7 +45,7 @@ const RouteSelectorPopup: React.FC<RouteSelectorPopupProps> = ({
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  const API_URL = `https://${config.backend.host}`;
+  const API_URL = `https://${BACKEND_HOST}`;
 
   const validateDate = (date: string): boolean => {
     return /^\d{4}-\d{2}-\d{2}$/.test(date); // YYYY-MM-DD

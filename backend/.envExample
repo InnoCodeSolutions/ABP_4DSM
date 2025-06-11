@@ -6,8 +6,7 @@ DB_PASSWORD=sua_senha              # ex: Senha do Railway
 DB_NAME=nome_do_banco              # ex: bdAbp
 
 # Aplicação
-HOST=0.0.0.0                        # ou localhost
-PORT=3000                          # porta onde o Express vai rodar
+BACKEND_HOST=                      # ex: innocodesutionsbackend.up.railway.app
 
 # SMTP (envio de e-mail)
 EMAIL_HOST=seu_smtp_host           # ex: smtp.gmail.com

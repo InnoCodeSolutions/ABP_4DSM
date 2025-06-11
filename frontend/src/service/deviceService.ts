@@ -1,9 +1,9 @@
 import axios from "axios";
-import config from "../config/config.json";
+import { BACKEND_HOST } from '@env';
 import { getToken } from './getToken';
 
 // Base URL da API
-const BASE_URL = `https://${config.backend.host}`;
+const BASE_URL = `https://${BACKEND_HOST}`;
 
 // Interfaces
 export interface Derivador {

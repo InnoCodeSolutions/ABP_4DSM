@@ -17,13 +17,13 @@
       "@config/*": ["config/*"]
     },
     "types": [
-      "jest", // Added for Jest globals
-      "@testing-library/react-native", // Added for testing library
+      "jest",
+      "@testing-library/react-native",
       "react",
       "react-native",
       "react-native-vector-icons"
     ]
   },
-  "include": ["src/**/*", "tests/**/*"], // Added tests folder
+  "include": ["src/**/*", "tests/**/*", "*.d.ts"], // Adicionado "*.d.ts" para incluir env.d.ts na raiz
   "exclude": ["node_modules"]
 }
