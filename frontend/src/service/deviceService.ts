@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../config/config.json";
-import { getToken } from './getToken'; // No .native suffix
+import { getToken } from './getToken';
 
 // Base URL da API
 const BASE_URL = `https://${config.backend.host}`;
@@ -12,10 +12,11 @@ export interface Derivador {
   longitude?: number;
   timestamp?: string;
   altitude?: number;
-  speed?: number;
+  speed?: number; // Speed in km/h
   course?: number;
   satellites?: number;
   hdop?: number;
+  distance?: number; // Distance in meters
 }
 
 export interface DeviceRoute {
@@ -88,9 +89,41 @@ export const fetchDeviceHistory = async (deviceId: string): Promise<Derivador[]>
       course: item.course,
       satellites: item.satellites,
       hdop: item.hdop,
+      distance: item.distance,
     }));
   } catch (error) {
     throw new Error("Erro ao buscar histórico do dispositivo");
+  }
+};
+
+// Movimento do dispositivo
+export const fetchDeviceMovement = async (deviceId: string): Promise<{ movement: Derivador[], averageSpeedKmh: number }> => {
+  try {
+    const url = `https://innocodesutionsbackend.up.railway.app/devices/${deviceId}/movement`;
+    const data = await authorizedGet(url);
+    console.log(`fetchDeviceMovement response for ${deviceId}:`, JSON.stringify(data, null, 2));
+    
+    const movementArray = Array.isArray(data.movement) ? data.movement : [];
+    const averageSpeedKmh = data.averageSpeedKmh || 0;
+
+    return {
+      movement: movementArray.map((item: any) => ({
+        device_id: data.device_id,
+        latitude: item.latitude ?? 0,
+        longitude: item.longitude ?? 0,
+        timestamp: item.timestamp ?? new Date().toISOString(),
+        altitude: item.altitude,
+        speed: item.speedKmh,
+        course: item.course,
+        satellites: item.satellites,
+        hdop: item.hdop,
+        distance: item.distanceM,
+      })),
+      averageSpeedKmh,
+    };
+  } catch (error) {
+    console.error(`Error fetching movement for ${deviceId}:`, error);
+    return { movement: [], averageSpeedKmh: 0 };
   }
 };
 

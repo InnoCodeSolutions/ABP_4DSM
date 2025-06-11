@@ -16,7 +16,7 @@ import { RootStackParamList } from "../types/types";
 import {
   Derivador,
   fetchDerivadores,
-  fetchDeviceHistory,
+  fetchDeviceMovement,
 } from "../service/deviceService";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
 import NavBar from "../components/Navbar";
@@ -41,7 +41,6 @@ const ViewDevice: React.FC = () => {
   const navigation = useNavigation<ViewDeviceNavigationProp>();
   const [derivadores, setDerivadores] = useState<Derivador[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
-  const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<{
     latitude: number;
     longitude: number;
@@ -76,14 +75,12 @@ const ViewDevice: React.FC = () => {
   const loadDeviceHistory = async (deviceId: string) => {
     try {
       setIsLoadingHistory(true);
-      console.log("Fetching history for deviceId:", deviceId);
-      const history = await fetchDeviceHistory(deviceId);
-      console.log("Device History Response:", history);
-      setDeviceHistory(Array.isArray(history) ? history : []);
+      console.log("Fetching movement for deviceId:", deviceId);
+      const { movement } = await fetchDeviceMovement(deviceId);
+      console.log("Device Movement Response:", movement);
       setSelectedDevice(deviceId);
     } catch (error) {
-      console.error("Erro ao buscar histórico:", error);
-      setDeviceHistory([]);
+      console.error("Erro ao buscar movimento:", error);
     } finally {
       setIsLoadingHistory(false);
     }
@@ -143,13 +140,12 @@ const ViewDevice: React.FC = () => {
         visible={!!selectedDevice}
         onClose={() => {
           setSelectedDevice(null);
-          setDeviceHistory([]);
           setSelectedLocation(null);
         }}
-        history={deviceHistory}
         deviceId={selectedDevice || ""}
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
+        isLoading={isLoadingHistory}
       />
 
       <NavBar
