@@ -18,7 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchDerivadores } from "../service/deviceService";
 import NavBar from "../components/Navbar";
 import axios from "axios";
-
+import config from "../config/config.json";
 
 
 const decodeToken = (token: string): { id: number; email: string } | null => {
@@ -97,7 +97,7 @@ const HomePage: React.FC = () => {
         if (!decoded || !decoded.id)
           throw new Error("Não foi possível decodificar o token");
 
-        const API_URL = `http://${config.backend.host}:${config.backend.port}`;
+        const API_URL = `https://${config.backend.host}`;
         const response = await axios.get(`${API_URL}/users/${decoded.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });

@@ -3,8 +3,7 @@ import config from "../config/config.json";
 import { getToken } from './getToken'; // No .native suffix
 
 // Base URL da API
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
-
+const BASE_URL = `https://${config.backend.host}`;
 
 // Interfaces
 export interface Derivador {
