@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform, Dimensions } from 'react-native';
+import { Platform, Dimensions, ScrollView } from 'react-native';
 import AppNavigation from './navigation/AppNavigation';
 
-// ✅ Corrigido: NÃO importa o CSS do Leaflet aqui (isso quebra o build!)
 if (Platform.OS === 'web') {
+  require('leaflet/dist/leaflet.css');
   import('smoothscroll-polyfill').then((smoothscroll) => {
     smoothscroll.polyfill();
   });
@@ -28,9 +28,12 @@ const App = () => {
       document.documentElement.style.scrollBehavior = 'smooth';
 
       const handleWheel = (event: WheelEvent) => {
+        // Skip custom scroll handling if the target is within a ScrollView or modal
         const target = event.target as HTMLElement;
         const isInScrollView = target.closest('.react-native-scrollview, [data-scrollview], .modal-container');
-        if (isInScrollView || event.ctrlKey) return;
+        if (isInScrollView || event.ctrlKey) {
+          return; // Let the default scroll behavior handle it
+        }
 
         event.preventDefault();
         window.scrollBy({
@@ -67,7 +70,6 @@ const App = () => {
   );
 };
 
-// ✅ CSS global só para web
 if (Platform.OS === 'web') {
   const style = document.createElement('style');
   style.textContent = `
