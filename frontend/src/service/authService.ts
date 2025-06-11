@@ -1,9 +1,8 @@
 // authService.ts
 
 import axios from "axios";
-import config from "../config/config.json";
+const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL!;
 
-const BASE_URL = `http://${config.backend.host}:${config.backend.port}`;
 
 // Função para decodificar o token JWT manualmente
 const jwtDecode = (token: string): { id: number; email: string } | null => {
