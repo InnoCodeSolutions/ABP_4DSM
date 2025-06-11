@@ -50,12 +50,7 @@ const MapScreen: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [showRouteSelector, setShowRouteSelector] = useState(false);
 
-  // Removido fallbackMarkers para evitar Rio de Janeiro como padrão
-  // const fallbackMarkers = [
-  //   { latitude: -22.9068, longitude: -43.1729, title: "Rio de Janeiro" },
-  // ];
-
-  // Fetch devices and load default route
+  // Fetch devices only, without loading a default route
   useEffect(() => {
     const loadDerivadores = async () => {
       try {
@@ -63,11 +58,7 @@ const MapScreen: React.FC = () => {
         console.log("MapScreen: Fetched derivadores:", JSON.stringify(data, null, 2));
         const validDerivadores = data.filter(d => d.latitude !== 0 && d.longitude !== 0);
         setDerivadores(validDerivadores.length > 0 ? validDerivadores : []);
-        // Load route for the first valid device if no route exists
-        if (validDerivadores.length > 0 && !deviceRoute) {
-          console.log("MapScreen: Loading default route for device:", validDerivadores[0].device_id);
-          loadDeviceRoute(validDerivadores[0].device_id);
-        } else if (validDerivadores.length === 0) {
+        if (validDerivadores.length === 0) {
           console.warn("MapScreen: No valid derivadores found, map will use initial region (Jacareí).");
         }
       } catch (error) {
@@ -92,6 +83,7 @@ const MapScreen: React.FC = () => {
     } catch (error) {
       console.error("MapScreen: Error fetching route:", error);
       setDeviceRoute(null);
+      setSelectedDevice(null); // Ensure popup doesn't show on error
     } finally {
       setIsLoadingRoute(false);
     }
@@ -116,7 +108,7 @@ const MapScreen: React.FC = () => {
         <CustomMapView
           markers={markers}
           style={styles.map}
-          onMarkerPress={(deviceId: string) => loadDeviceRoute(deviceId)} // Default: no time filter
+          onMarkerPress={(deviceId: string) => loadDeviceRoute(deviceId)} // Load route on marker press
           route={deviceRoute ?? undefined}
         />
         <TouchableOpacity
