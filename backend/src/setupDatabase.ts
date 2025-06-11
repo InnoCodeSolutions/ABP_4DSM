@@ -1,9 +1,7 @@
 import { Client } from 'pg';
-import config from './models/config';
+import { dbConfig } from './models/config';
 
 export const setupDatabase = async () => {
-  const dbConfig = config.database;
-
   const client = new Client({
     user: dbConfig.user,
     host: dbConfig.host,

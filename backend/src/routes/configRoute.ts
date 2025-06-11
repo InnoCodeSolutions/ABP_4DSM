@@ -1,10 +1,12 @@
 import express from 'express';
-import config from '../config/config.json';
 
 const router = express.Router();
 
 router.get('/config', (req, res) => {
-  res.json(config);
+  res.json({
+    apiUrl: process.env.API_URL || 'not-set',
+    frontendDomain: process.env.FRONTEND_DOMAIN || 'not-set'
+  });
 });
 
 export default router;

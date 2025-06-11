@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx ts-node ./index.ts",
-    "predev": "node ../../scripts/generateConfig.js",
-    "dev": "ts-node-dev --respawn --transpile-only ./index.ts",
-    "prestart": "node ../../scripts/generateConfig.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -41,5 +40,3 @@
     "typescript": "^5.8.2"
   }
 }
-
-

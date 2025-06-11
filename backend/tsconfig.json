@@ -1,15 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "strict": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
+    "target": "ES6",
+    "module": "CommonJS",
     "outDir": "dist",
-    "skipLibCheck": true,
-    "types": ["node", "leaflet"] // ✅ Tipos que realmente serão usados
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
   },
-  
-  "include": ["src"]
-  
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

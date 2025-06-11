@@ -1,15 +1,15 @@
 import { Client } from 'pg';
-import config from './models/config';
+import { dbConfig } from './models/config';
 
 export const createDatabaseIfNotExists = async () => {
-  const { host, port, user, password, database: dbName } = config.database;
+  const { host, port, user, password, database: dbName } = dbConfig;
 
   const client = new Client({
     host,
     port,
     user,
     password,
-    database: 'postgres' // conectar em postgres pra poder criar o novo
+    database: 'postgres' // conectar no banco padrão para criar o outro
   });
 
   try {
@@ -27,7 +27,7 @@ export const createDatabaseIfNotExists = async () => {
       console.log(`📦 Banco '${dbName}' já existe.`);
     }
   } catch (err) {
-        console.error('❌ Erro ao criar banco de dados:', err);
+    console.error('❌ Erro ao criar banco de dados:', err);
   } finally {
     await client.end();
   }
