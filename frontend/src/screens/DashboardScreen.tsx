@@ -174,7 +174,7 @@ const DashboardScreen: React.FC<Props> = ({ route }) => {
         <Text style={styles.headerText}>
           {selectedDevice
             ? `Dispositivo: ${selectedDevice.device_id}`
-            : "Nenhum dispositivo selecionado"}
+            : "Nenhum selecionado"}
         </Text>
         <TouchableOpacity
           style={styles.selectButton}
@@ -300,12 +300,14 @@ const styles = StyleSheet.create({
   },
   headerText: { fontSize: 16, color: "#fff" },
   selectButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    alignItems: "center",
-  },
+  paddingVertical: 6,
+  paddingHorizontal: 8, // Reduz o padding horizontal para evitar overflow
+  backgroundColor: "#fff",
+  borderRadius: 8,
+  alignItems: "center",
+  maxWidth: "40%", // Limita a largura máxima para caber na tela
+  flexShrink: 1, // Permite que o botão encolha se necessário
+},
   selectButtonText: { fontSize: 14, color: "#041635", fontWeight: "500" },
   deviceInfoContainer: {
     width: "90%",

@@ -4,13 +4,8 @@ import axios from "axios";
 import { BACKEND_HOST } from '@env';
 import { getToken } from './getToken';
 
-const DEFAULT_BACKEND_HOST = 'innocodesolutionsbackend.up.railway.app';
-// Base URL da API
-const BASE_URL = `https://${BACKEND_HOST}` || DEFAULT_BACKEND_HOST;
+const api = 'https://innocodesutionsbackend.up.railway.app';
 
-// --- Interfaces de resposta
-console.log('>>> BACKEND_HOST =', BACKEND_HOST);
-console.log('>>> BASE_URL    =', `https://${BACKEND_HOST}`);
 export interface Derivador {
   device_id: string;
   latitude: number;
@@ -66,7 +61,7 @@ async function authorizedGet<T>(url: string): Promise<T> {
 // --- 1) Lista de dispositivos (sem speed/distance)
 export async function fetchDerivadores(): Promise<Derivador[]> {
   const data = await authorizedGet<{ device_id: string; latitude: number; longitude: number; timestamp: string }[]>(
-    `${BASE_URL}/devices`
+    `${api}/devices`
   );
   return data.map(item => ({
     device_id: item.device_id,
@@ -81,7 +76,7 @@ export async function fetchDeviceHistory(deviceId: string): Promise<Derivador[]>
   try {
     // a) histórico "bruto"
     const history = await authorizedGet<any[]>(
-      `${BASE_URL}/devices/${deviceId}/history`
+      `${api}/devices/${deviceId}/history`
     );
 
     // b) movimento (distanceM & speedKmh)
@@ -90,7 +85,7 @@ export async function fetchDeviceHistory(deviceId: string): Promise<Derivador[]>
       averageSpeedKmh: number;
       movement: { timestamp: string; distanceM: number; speedKmh: number }[];
     }>(
-      `${BASE_URL}/devices/${deviceId}/movement`
+      `${api}/devices/${deviceId}/movement`
     );
 
     // c) montar um map para lookup rápido
@@ -137,7 +132,7 @@ export async function fetchDeviceMovement(deviceId: string): Promise<{
         distanceM: number;
         speedKmh: number;
       }[];
-    }>(`${BASE_URL}/devices/${deviceId}/movement`);
+    }>(`${api}/devices/${deviceId}/movement`);
 
     return {
       averageSpeedKmh: data.averageSpeedKmh,
@@ -159,7 +154,7 @@ export async function fetchDeviceMovement(deviceId: string): Promise<{
 // --- 4) Quantidade total de dispositivos
 export async function fetchDeviceQuantities(): Promise<DeviceQuantities> {
   return authorizedGet<DeviceQuantities>(
-    `${BASE_URL}/reports/device-quantities`
+    `${api}/reports/device-quantities`
   );
 }
 
@@ -168,7 +163,7 @@ export async function fetchDeviceHistoryForReport(
   deviceId: string,
   timeRange?: string
 ): Promise<Derivador[]> {
-  const url = `${BASE_URL}/reports/device-history/${deviceId}${
+  const url = `${api}/reports/device-history/${deviceId}${
     timeRange ? `?timeRange=${timeRange}` : ''
   }`;
   return authorizedGet<Derivador[]>(url);
@@ -179,7 +174,7 @@ export async function fetchDeviceRoutes(
   deviceId: string,
   timeRange?: string
 ): Promise<DeviceRoute[]> {
-  const url = `${BASE_URL}/reports/device-routes/${deviceId}${
+  const url = `${api}/reports/device-routes/${deviceId}${
     timeRange ? `?timeRange=${timeRange}` : ''
   }`;
   return authorizedGet<DeviceRoute[]>(url);
@@ -190,7 +185,7 @@ export async function fetchActivitySummary(
   deviceId: string,
   timeRange?: string
 ): Promise<ActivitySummary> {
-  const url = `${BASE_URL}/reports/activity-summary/${deviceId}${
+  const url = `${api}/reports/activity-summary/${deviceId}${
     timeRange ? `?timeRange=${timeRange}` : ''
   }`;
   return authorizedGet<ActivitySummary>(url);

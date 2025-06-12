@@ -1,13 +1,25 @@
 import React, { useState, useEffect, Component } from "react";
-import { View, StyleSheet, Dimensions, Platform, TouchableOpacity, Text } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  TouchableOpacity,
+  Text,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import CustomMapView from "../components/MapView";
 import NavBar from "../components/Navbar";
 import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
 import RouteSelectorPopup from "../components/RouteSelectorPopup";
-import { Derivador, fetchDerivadores, fetchDeviceRoute, GeoJSONRoute } from "../service/deviceService";
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  Derivador,
+  fetchDerivadores,
+  fetchDeviceRoute,
+  GeoJSONRoute,
+} from "../service/deviceService";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Define navigation types
 type RootStackParamList = {
@@ -22,7 +34,10 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const { height } = Dimensions.get("window");
 
 // Error Boundary Component
-class MapScreenErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+class MapScreenErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
   state = { hasError: false };
 
   static getDerivedStateFromError() {
@@ -33,7 +48,9 @@ class MapScreenErrorBoundary extends Component<{ children: React.ReactNode }, { 
     if (this.state.hasError) {
       return (
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>Erro ao carregar o mapa. Tente novamente.</Text>
+          <Text style={styles.errorText}>
+            Erro ao carregar o mapa. Tente novamente.
+          </Text>
         </View>
       );
     }
@@ -47,7 +64,10 @@ const MapScreen: React.FC = () => {
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [deviceRoute, setDeviceRoute] = useState<GeoJSONRoute | null>(null);
   const [isLoadingRoute, setIsLoadingRoute] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [showRouteSelector, setShowRouteSelector] = useState(false);
 
   // Fetch devices only, without loading a default route
@@ -55,11 +75,18 @@ const MapScreen: React.FC = () => {
     const loadDerivadores = async () => {
       try {
         const data = await fetchDerivadores();
-        console.log("MapScreen: Fetched derivadores:", JSON.stringify(data, null, 2));
-        const validDerivadores = data.filter(d => d.latitude !== 0 && d.longitude !== 0);
+        console.log(
+          "MapScreen: Fetched derivadores:",
+          JSON.stringify(data, null, 2)
+        );
+        const validDerivadores = data.filter(
+          (d) => d.latitude !== 0 && d.longitude !== 0
+        );
         setDerivadores(validDerivadores.length > 0 ? validDerivadores : []);
         if (validDerivadores.length === 0) {
-          console.warn("MapScreen: No valid derivadores found, map will use initial region (Jacareí).");
+          console.warn(
+            "MapScreen: No valid derivadores found, map will use initial region (Jacareí)."
+          );
         }
       } catch (error) {
         console.error("MapScreen: Error fetching derivadores:", error);
@@ -72,12 +99,22 @@ const MapScreen: React.FC = () => {
   }, []);
 
   // Fetch device route with optional time range and maritime flag
-  const loadDeviceRoute = async (deviceId: string, timeRange?: string, isMaritime: boolean = false) => {
+  const loadDeviceRoute = async (
+    deviceId: string,
+    timeRange?: string,
+    isMaritime: boolean = false
+  ) => {
     try {
       setIsLoadingRoute(true);
-      console.log("MapScreen: Fetching route for deviceId:", deviceId, { timeRange, isMaritime });
+      console.log("MapScreen: Fetching route for deviceId:", deviceId, {
+        timeRange,
+        isMaritime,
+      });
       const route = await fetchDeviceRoute(deviceId, timeRange, isMaritime);
-      console.log("MapScreen: Fetched route coordinates:", route?.features?.[0]?.geometry?.coordinates || "No coordinates");
+      console.log(
+        "MapScreen: Fetched route coordinates:",
+        route?.features?.[0]?.geometry?.coordinates || "No coordinates"
+      );
       setDeviceRoute(route);
       setSelectedDevice(deviceId);
     } catch (error) {
@@ -90,17 +127,23 @@ const MapScreen: React.FC = () => {
   };
 
   // Map derivadores to markers, use empty array if no valid devices
-  const markers = derivadores.length > 0
-    ? derivadores
-        .filter(device => device.latitude !== 0 && device.longitude !== 0)
-        .map(device => ({
-          latitude: device.latitude || 0,
-          longitude: device.longitude || 0,
-          title: device.device_id,
-        }))
-    : [];
+  const markers =
+    derivadores.length > 0
+      ? derivadores
+          .filter((device) => device.latitude !== 0 && device.longitude !== 0)
+          .map((device) => ({
+            latitude: device.latitude || 0,
+            longitude: device.longitude || 0,
+            title: device.device_id,
+          }))
+      : [];
 
-  console.log("MapScreen: Rendering with deviceRoute:", deviceRoute, "markers:", markers);
+  console.log(
+    "MapScreen: Rendering with deviceRoute:",
+    deviceRoute,
+    "markers:",
+    markers
+  );
 
   return (
     <MapScreenErrorBoundary>
@@ -115,7 +158,11 @@ const MapScreen: React.FC = () => {
           style={styles.routeSelectorButton}
           onPress={() => setShowRouteSelector(true)}
         >
-          <MaterialCommunityIcons name="calendar-clock" size={24} color="#fff" />
+          <MaterialCommunityIcons
+            name="calendar-clock"
+            size={24}
+            color="#fff"
+          />
           <Text style={styles.routeSelectorText}>Selecionar Rota</Text>
         </TouchableOpacity>
         <RouteSelectorPopup
@@ -123,7 +170,11 @@ const MapScreen: React.FC = () => {
           onClose={() => setShowRouteSelector(false)}
           devices={derivadores}
           onSelectRoute={(deviceId, timeRange, isMaritime) => {
-            console.log("MapScreen: Selected route:", { deviceId, timeRange, isMaritime });
+            console.log("MapScreen: Selected route:", {
+              deviceId,
+              timeRange,
+              isMaritime,
+            });
             loadDeviceRoute(deviceId, timeRange, isMaritime);
             setShowRouteSelector(false);
           }}
@@ -137,13 +188,14 @@ const MapScreen: React.FC = () => {
             setSelectedLocation(null);
           }}
           route={deviceRoute}
-          deviceId={selectedDevice || ''}
+          deviceId={selectedDevice || ""}
           selectedLocation={selectedLocation}
           onSelectLocation={(location) => {
             console.log("MapScreen: Selected location:", location);
             setSelectedLocation(location);
           }}
           isLoading={isLoadingRoute}
+          history={[]}
         />
         <NavBar
           onPressHome={() => navigation.navigate("Home")}
@@ -174,31 +226,31 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   routeSelectorButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
     right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#3B82F6',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#3B82F6",
     padding: 10,
     borderRadius: 8,
     zIndex: 1000,
   },
   routeSelectorText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     marginLeft: 8,
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#041635',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#041635",
   },
   errorText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 

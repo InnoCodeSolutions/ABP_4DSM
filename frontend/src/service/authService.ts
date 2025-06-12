@@ -1,12 +1,8 @@
 // authService.ts
 
 import axios from "axios";
-import { BACKEND_HOST } from '@env';
 
-const BASE_URL = `https://${BACKEND_HOST}`;
-console.log('>>> BACKEND_HOST =', BACKEND_HOST);
-console.log('>>> BASE_URL    =', `https://${BACKEND_HOST}`);
-
+const api = "https://innocodesutionsbackend.up.railway.app"
 
 // Função para decodificar o token JWT manualmente
 const jwtDecode = (token: string): { id: number; email: string } | null => {
@@ -31,7 +27,7 @@ export const getProfile = async (token: string) => {
     }
     const userId = decoded.id;
 
-    const response = await axios.get(`${BASE_URL}/users/${userId}`, {
+    const response = await axios.get(`${api}/users/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -47,7 +43,7 @@ export const getProfile = async (token: string) => {
 
 export const login = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/auth/login`, {
+    const response = await axios.post(`${api}/auth/login`, {
       email,
       password,
     });
@@ -66,7 +62,7 @@ export const register = async (
   password: string
 ) => {
   try {
-    const response = await axios.post(`${BASE_URL}/users`, {
+    const response = await axios.post(`${api}/users`, {
       name,
       email,
       lastname: surname,
@@ -81,7 +77,7 @@ export const register = async (
 
 export const requestPasswordReset = async (email: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/auth/forgot-password`, { email });
+    const response = await axios.post(`${api}/auth/forgot-password`, { email });
     return response.data;
   } catch (error: any) {
     throw error;
@@ -90,7 +86,7 @@ export const requestPasswordReset = async (email: string) => {
 
 export const resetPassword = async (email: string, code: string, newPassword: string) => {
   try {
-    const response = await axios.post(`${BASE_URL}/auth/reset-password`, {
+    const response = await axios.post(`${api}/auth/reset-password`, {
       email,
       code,
       newPassword,

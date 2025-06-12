@@ -19,7 +19,8 @@ import Profile from '@/screens/Profile';
 import AboutScreen from '../screens/AboutScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
-const BASE_URL = `https://${BACKEND_HOST}`;
+const api=  "https://innocodesutionsbackend.up.railway.app"
+
 
 // Enhanced LoadingScreen with explicit Text import
 const LoadingScreen = () => (
@@ -38,8 +39,8 @@ const AppNavigation: React.FC = () => {
         const token = await AsyncStorage.getItem('authToken');
         console.log("Token recuperado ao iniciar:", token || "Nenhum token encontrado");
         if (token) {
-          console.log("Verificando token com:", `${BASE_URL}/auth/verify-token`);
-          const response = await axios.get(`${BASE_URL}/auth/verify-token`, {
+          console.log("Verificando token com:", `${api}/auth/verify-token`);
+          const response = await axios.get(`${api}/auth/verify-token`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Resposta do servidor:", response.data);
@@ -52,7 +53,7 @@ const AppNavigation: React.FC = () => {
           message: error.message,
           response: error.response?.data,
           status: error.response?.status,
-          url: `${BASE_URL}/auth/verify-token`,
+          url: `${api}/auth/verify-token`,
         });
         await AsyncStorage.removeItem('authToken');
         setInitialRoute('Login');

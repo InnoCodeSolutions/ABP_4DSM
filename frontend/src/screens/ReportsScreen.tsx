@@ -81,10 +81,22 @@ const ReportsScreen: React.FC = () => {
   const generateReport = async (deviceId: string, format: 'csv' | 'pdf') => {
     try {
       const { movement } = await fetchDeviceMovement(deviceId);
+      const validMovement: MovementRecord[] = movement
+        .filter((item): item is Derivador & { speed: number; distance: number } => 
+          item.speed != null && item.distance != null
+        )
+        .map(item => ({
+          device_id: item.device_id,
+          latitude: item.latitude,
+          longitude: item.longitude,
+          timestamp: item.timestamp,
+          speed: item.speed,
+          distance: item.distance,
+        }));
       if (format === 'csv') {
-        await generateCSV(movement, deviceId);
+        await generateCSV(validMovement, deviceId);
       } else {
-        await generatePDF(movement, deviceId);
+        await generatePDF(validMovement, deviceId);
       }
     } catch (error: any) {
       Alert.alert('Erro', 'Falha ao gerar relatório: ' + error.message);
@@ -96,11 +108,11 @@ const ReportsScreen: React.FC = () => {
     const csv = Papa.unparse(
       data.map(item => ({
         device_id: item.device_id,
-        latitude:  item.latitude,
+        latitude: item.latitude,
         longitude: item.longitude,
         timestamp: item.timestamp,
-        speed:     item.speed.toFixed(2),
-        distance:  item.distance.toFixed(2),
+        speed: item.speed.toFixed(2),
+        distance: item.distance.toFixed(2),
       }))
     );
     const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.csv`;
@@ -195,7 +207,7 @@ const ReportsScreen: React.FC = () => {
           4: { cellWidth: columnWidths[4] },
           5: { cellWidth: columnWidths[5] },
         },
-        tableWidth,       // força a largura total da tabela
+        tableWidth,
         pageBreak: 'auto',
       };
 
@@ -295,7 +307,7 @@ const ReportsScreen: React.FC = () => {
         onPressHome={() => navigation.navigate('Home')}
         onPressDashboard={() => navigation.navigate('Dashboard')}
         onPressProfile={() => navigation.navigate('Profile')}
-        selected="reports"
+        selected=""
       />
     </ScrollView>
   );

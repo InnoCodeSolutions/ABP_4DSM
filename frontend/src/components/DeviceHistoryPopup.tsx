@@ -28,6 +28,7 @@ interface DeviceHistoryPopupProps {
   selectedLocation: { latitude: number; longitude: number } | null;
   onSelectLocation: (location: { latitude: number; longitude: number }) => void;
   isLoading?: boolean;
+  history: Derivador[]; // Adiciona a prop history
 }
 
 const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({

@@ -45,9 +45,8 @@ const RouteSelectorPopup: React.FC<RouteSelectorPopupProps> = ({
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
-  const API_URL = `https://${BACKEND_HOST}`;
-  console.log('>>> BACKEND_HOST =', BACKEND_HOST);
-  console.log('>>> BASE_URL    =', `https://${BACKEND_HOST}`);
+const api=  "https://innocodesutionsbackend.up.railway.app"
+
   const validateDate = (date: string): boolean => {
     return /^\d{4}-\d{2}-\d{2}$/.test(date); // YYYY-MM-DD
   };
@@ -64,7 +63,7 @@ const RouteSelectorPopup: React.FC<RouteSelectorPopupProps> = ({
       if (!token) {
         throw new Error("No token found in AsyncStorage");
       }
-      const response = await axios.get(`${API_URL}/api/routes/device/${deviceId}/route`, {
+      const response = await axios.get(`${api}/api/routes/device/${deviceId}/route`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { timeRange, isMaritime },
       });
