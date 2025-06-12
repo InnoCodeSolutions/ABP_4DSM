@@ -12,7 +12,7 @@ import {
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import autoTable, { UserOptions } from 'jspdf-autotable';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import {
@@ -52,7 +52,7 @@ const ReportsScreen: React.FC = () => {
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window'));
 
-  // Carrega lista completa de derivadores (inclui lat, lon, timestamp)
+  // 1) Carrega lista de dispositivos (com lat, lon, timestamp)
   useEffect(() => {
     (async () => {
       try {
@@ -65,7 +65,7 @@ const ReportsScreen: React.FC = () => {
     })();
   }, []);
 
-  // Ajusta dimensões em caso de resize/rotação
+  // 2) Ajuste de dimensões ao rotacionar/trocar tamanho
   useEffect(() => {
     const sub = Dimensions.addEventListener('change', ({ window }) => {
       setWindowDimensions(window);
@@ -91,6 +91,7 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
+  // 3) Gera CSV incluindo speed e distance
   const generateCSV = async (data: MovementRecord[], deviceId: string) => {
     const csv = Papa.unparse(
       data.map(item => ({
@@ -126,16 +127,27 @@ const ReportsScreen: React.FC = () => {
     }
   };
 
+  // 4) Gera PDF em A4 paisagem e centraliza a tabela
   const generatePDF = async (data: MovementRecord[], deviceId: string) => {
     try {
-      const doc = new jsPDF();
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4',
+      });
+
+      // 4.1) Título centralizado
+      const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(18);
       doc.setTextColor(0, 102, 204);
-      doc.text(`Relatório do Dispositivo ${deviceId}`, 105, 15, { align: 'center' });
+      doc.text(
+        `Relatório do Dispositivo ${deviceId}`,
+        pageWidth / 2,
+        15,
+        { align: 'center' }
+      );
 
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-
+      // 4.2) Define cabeçalho e linhas
       const headers = [[
         'Dispositivo',
         'Latitude',
@@ -144,7 +156,6 @@ const ReportsScreen: React.FC = () => {
         'Velocidade (km/h)',
         'Distância (m)',
       ]];
-
       const rows = data.map(item => [
         item.device_id,
         item.latitude.toFixed(4),
@@ -154,31 +165,43 @@ const ReportsScreen: React.FC = () => {
         item.distance.toFixed(2),
       ]);
 
-      autoTable(doc, {
+      // 4.3) Soma das larguras de coluna (em mm)
+      const columnWidths = [30, 30, 30, 50, 30, 30];
+      const tableWidth = columnWidths.reduce((sum, w) => sum + w, 0);
+      const marginLeft = (pageWidth - tableWidth) / 2;
+
+      // 4.4) Configurações do autoTable
+      const opts: UserOptions = {
+        startY: 25,
         head: headers,
         body: rows,
-        startY: 25,
         theme: 'grid',
+        margin: { left: marginLeft, top: 20 },
+        styles: {
+          fontSize: 8,
+          overflow: 'linebreak',
+          cellPadding: 2,
+        },
         headStyles: {
           fillColor: [0, 102, 204],
           textColor: [255, 255, 255],
-          fontSize: 12,
-        },
-        bodyStyles: {
-          textColor: [0, 0, 0],
-          fontSize: 10,
+          fontSize: 9,
         },
         columnStyles: {
-          0: { cellWidth: 40 },
-          1: { cellWidth: 30 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 50 },
-          4: { cellWidth: 30 },
-          5: { cellWidth: 30 },
+          0: { cellWidth: columnWidths[0] },
+          1: { cellWidth: columnWidths[1] },
+          2: { cellWidth: columnWidths[2] },
+          3: { cellWidth: columnWidths[3] },
+          4: { cellWidth: columnWidths[4] },
+          5: { cellWidth: columnWidths[5] },
         },
-        margin: { top: 20 },
-      });
+        tableWidth,       // força a largura total da tabela
+        pageBreak: 'auto',
+      };
 
+      autoTable(doc, opts);
+
+      // 4.5) Download / compartilhamento
       if (Platform.OS === 'web') {
         const blob = doc.output('blob');
         const url = URL.createObjectURL(blob);
@@ -191,7 +214,6 @@ const ReportsScreen: React.FC = () => {
         const base64 = doc.output('datauristring').split(',')[1];
         const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
         const uri = `${FileSystem.documentDirectory}${fileName}`;
-
         await FileSystem.writeAsStringAsync(uri, base64, {
           encoding: FileSystem.EncodingType.Base64,
         });
@@ -216,12 +238,8 @@ const ReportsScreen: React.FC = () => {
       onPress={() => openExportModal(device.device_id)}
     >
       <Text style={styles.deviceId}>{device.device_id}</Text>
-      <Text style={styles.dataText}>
-        Latitude: {device.latitude.toFixed(4)}
-      </Text>
-      <Text style={styles.dataText}>
-        Longitude: {device.longitude.toFixed(4)}
-      </Text>
+      <Text style={styles.dataText}>Latitude: {device.latitude.toFixed(4)}</Text>
+      <Text style={styles.dataText}>Longitude: {device.longitude.toFixed(4)}</Text>
       <Text style={styles.dataText}>
         Última Atualização: {new Date(device.timestamp).toLocaleString()}
       </Text>
@@ -238,10 +256,11 @@ const ReportsScreen: React.FC = () => {
       showsVerticalScrollIndicator
     >
       <View style={styles.deviceList}>
-        {devices.length > 0
-          ? devices.map(renderDeviceItem)
-          : <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
-        }
+        {devices.length > 0 ? (
+          devices.map(renderDeviceItem)
+        ) : (
+          <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
+        )}
       </View>
 
       <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
