@@ -8,18 +8,17 @@
     "jsonwebtoken": "^9.0.2",
     "leaflet": "^1.9.4",
     "pg": "^8.14.1"
-  },  
+  },
   "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.2.0",
     "@types/axios": "^0.9.36",
     "@types/jest": "^29.5.14",
     "@types/leaflet": "^1.9.18",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.14",
-    "@types/react-native": "^0.72.8"
+    "@types/react-native": "^0.72.8",
+    "jest": "^30.0.0",
+    "ts-jest": "^29.4.0"
   }
 }
-
-
-
-

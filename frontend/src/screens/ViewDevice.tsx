@@ -146,6 +146,7 @@ const ViewDevice: React.FC = () => {
         selectedLocation={selectedLocation}
         onSelectLocation={(location) => setSelectedLocation(location)}
         isLoading={isLoadingHistory}
+        history={[]}
       />
 
       <NavBar

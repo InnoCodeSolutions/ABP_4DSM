@@ -1,7 +1,6 @@
 // src/api.ts
 
 import axios from "axios";
-import { BACKEND_HOST } from '@env';
 import { getToken } from './getToken';
 
 const api = 'https://innocodesutionsbackend.up.railway.app';
