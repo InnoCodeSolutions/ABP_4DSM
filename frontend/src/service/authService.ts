@@ -4,6 +4,9 @@ import axios from "axios";
 import { BACKEND_HOST } from '@env';
 
 const BASE_URL = `https://${BACKEND_HOST}`;
+console.log('>>> BACKEND_HOST =', BACKEND_HOST);
+console.log('>>> BASE_URL    =', `https://${BACKEND_HOST}`);
+
 
 // Função para decodificar o token JWT manualmente
 const jwtDecode = (token: string): { id: number; email: string } | null => {
