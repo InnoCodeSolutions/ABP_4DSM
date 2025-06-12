@@ -46,7 +46,8 @@ const RouteSelectorPopup: React.FC<RouteSelectorPopupProps> = ({
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   const API_URL = `https://${BACKEND_HOST}`;
-
+  console.log('>>> BACKEND_HOST =', BACKEND_HOST);
+  console.log('>>> BASE_URL    =', `https://${BACKEND_HOST}`);
   const validateDate = (date: string): boolean => {
     return /^\d{4}-\d{2}-\d{2}$/.test(date); // YYYY-MM-DD
   };

@@ -15,7 +15,11 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { fetchDerivadores, fetchDeviceHistoryForReport } from '../service/deviceService';
+import {
+  fetchDerivadores,
+  fetchDeviceMovement,
+  Derivador,
+} from '../service/deviceService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -29,59 +33,44 @@ type RootStackParamList = {
   Dashboard: undefined;
   Profile: undefined;
 };
-
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
-
 const Icon: ComponentType<IconProps> = MaterialCommunityIcons as any;
 
-interface DeviceData {
+interface MovementRecord {
   device_id: string;
-  latitude?: number;
-  longitude?: number;
-  timestamp?: string;
+  latitude: number;
+  longitude: number;
+  timestamp: string;
+  speed: number;    // km/h
+  distance: number; // m
 }
 
 const ReportsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
-  const [devices, setDevices] = useState<DeviceData[]>([]);
+  const [devices, setDevices] = useState<Derivador[]>([]);
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
   const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window'));
 
+  // Carrega lista completa de derivadores (inclui lat, lon, timestamp)
   useEffect(() => {
-    const loadDevices = async () => {
+    (async () => {
       try {
         const derivadores = await fetchDerivadores();
         setDevices(derivadores);
       } catch (error: any) {
         console.error('Erro ao carregar dispositivos:', error);
-        Alert.alert('Erro', 'Falha ao carregar dispositivos do banco de dados');
+        Alert.alert('Erro', 'Falha ao carregar dispositivos');
       }
-    };
-    loadDevices();
+    })();
   }, []);
 
+  // Ajusta dimensões em caso de resize/rotação
   useEffect(() => {
-    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+    const sub = Dimensions.addEventListener('change', ({ window }) => {
       setWindowDimensions(window);
     });
-    return () => subscription?.remove();
-  }, []);
-
-  // Custom wheel event listener for web scrolling
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      const handleWheel = (event: WheelEvent) => {
-        const scrollView = document.querySelector('.reports-scrollview');
-        if (scrollView && scrollView.contains(event.target as Node)) {
-          // Allow scrolling within ScrollView
-        } else {
-          event.preventDefault();
-        }
-      };
-      window.addEventListener('wheel', handleWheel, { passive: false });
-      return () => window.removeEventListener('wheel', handleWheel);
-    }
+    return () => sub?.remove();
   }, []);
 
   const openExportModal = (deviceId: string) => {
@@ -91,24 +80,26 @@ const ReportsScreen: React.FC = () => {
 
   const generateReport = async (deviceId: string, format: 'csv' | 'pdf') => {
     try {
-      const data = await fetchDeviceHistoryForReport(deviceId);
+      const { movement } = await fetchDeviceMovement(deviceId);
       if (format === 'csv') {
-        await generateCSV(data, deviceId);
+        await generateCSV(movement, deviceId);
       } else {
-        await generatePDF(data, deviceId);
+        await generatePDF(movement, deviceId);
       }
     } catch (error: any) {
-      Alert.alert('Erro', 'Falha ao gerar o relatório: ' + error.message);
+      Alert.alert('Erro', 'Falha ao gerar relatório: ' + error.message);
     }
   };
 
-  const generateCSV = async (data: any[], deviceId: string) => {
+  const generateCSV = async (data: MovementRecord[], deviceId: string) => {
     const csv = Papa.unparse(
-      data.map((item) => ({
+      data.map(item => ({
         device_id: item.device_id,
-        latitude: item.latitude,
+        latitude:  item.latitude,
         longitude: item.longitude,
         timestamp: item.timestamp,
+        speed:     item.speed.toFixed(2),
+        distance:  item.distance.toFixed(2),
       }))
     );
     const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.csv`;
@@ -120,120 +111,137 @@ const ReportsScreen: React.FC = () => {
       link.download = fileName;
       link.click();
     } else {
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-      await FileSystem.writeAsStringAsync(fileUri, csv, {
+      const uri = `${FileSystem.documentDirectory}${fileName}`;
+      await FileSystem.writeAsStringAsync(uri, csv, {
         encoding: FileSystem.EncodingType.UTF8,
       });
-
       if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri, {
+        await Sharing.shareAsync(uri, {
           mimeType: 'text/csv',
-          dialogTitle: 'Salvar ou compartilhar relatório CSV',
+          dialogTitle: 'Compartilhar CSV',
         });
       } else {
-        Alert.alert('Sucesso', `CSV salvo em: ${fileUri}`);
+        Alert.alert('Sucesso', `CSV salvo em: ${uri}`);
       }
     }
   };
 
-  const generatePDF = async (data: any[], deviceId: string) => {
-  try {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.setTextColor(0, 102, 204); // Blue title
-    doc.text(`Relatório do Dispositivo ${deviceId}`, 105, 15, { align: 'center' });
+  const generatePDF = async (data: MovementRecord[], deviceId: string) => {
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.setTextColor(0, 102, 204);
+      doc.text(`Relatório do Dispositivo ${deviceId}`, 105, 15, { align: 'center' });
 
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0); // Black text
-    const headers = [['Dispositivo', 'Latitude', 'Longitude', 'Data/Hora']];
-    const rows = data.map(item => [
-      item.device_id,
-      item.latitude?.toFixed(4) || 'N/A',
-      item.longitude?.toFixed(4) || 'N/A',
-      item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'
-    ]);
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
 
-    autoTable(doc, {
-      head: headers,
-      body: rows,
-      startY: 25,
-      theme: 'grid',
-      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255], fontSize: 12 },
-      bodyStyles: { textColor: [0, 0, 0], fontSize: 10 },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 40 },
-        3: { cellWidth: 65 },
-      },
-      margin: { top: 20 },
-    });
+      const headers = [[
+        'Dispositivo',
+        'Latitude',
+        'Longitude',
+        'Data/Hora',
+        'Velocidade (km/h)',
+        'Distância (m)',
+      ]];
 
-    if (Platform.OS === 'web') {
-      const pdfBlob = doc.output('blob');
-      const url = URL.createObjectURL(pdfBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
-    } else {
-      const pdfBase64 = doc.output('datauristring').split(',')[1];
-      const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+      const rows = data.map(item => [
+        item.device_id,
+        item.latitude.toFixed(4),
+        item.longitude.toFixed(4),
+        new Date(item.timestamp).toLocaleString(),
+        item.speed.toFixed(2),
+        item.distance.toFixed(2),
+      ]);
 
-      await FileSystem.writeAsStringAsync(fileUri, pdfBase64, {
-        encoding: FileSystem.EncodingType.Base64,
+      autoTable(doc, {
+        head: headers,
+        body: rows,
+        startY: 25,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [0, 102, 204],
+          textColor: [255, 255, 255],
+          fontSize: 12,
+        },
+        bodyStyles: {
+          textColor: [0, 0, 0],
+          fontSize: 10,
+        },
+        columnStyles: {
+          0: { cellWidth: 40 },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 50 },
+          4: { cellWidth: 30 },
+          5: { cellWidth: 30 },
+        },
+        margin: { top: 20 },
       });
 
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri, {
-          mimeType: 'application/pdf',
-          dialogTitle: 'Salvar ou compartilhar relatório PDF',
-        });
+      if (Platform.OS === 'web') {
+        const blob = doc.output('blob');
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+        link.click();
+        URL.revokeObjectURL(url);
       } else {
-        Alert.alert('Sucesso', `PDF salvo em: ${fileUri}`);
-      }
-    }
-  } catch (error: any) {
-    Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
-  }
-};
+        const base64 = doc.output('datauristring').split(',')[1];
+        const fileName = `relatorio-${deviceId}-${new Date().toISOString()}.pdf`;
+        const uri = `${FileSystem.documentDirectory}${fileName}`;
 
-  const renderDeviceItem = (item: DeviceData) => (
+        await FileSystem.writeAsStringAsync(uri, base64, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'application/pdf',
+            dialogTitle: 'Compartilhar PDF',
+          });
+        } else {
+          Alert.alert('Sucesso', `PDF salvo em: ${uri}`);
+        }
+      }
+    } catch (error: any) {
+      Alert.alert('Erro', 'Falha ao gerar PDF: ' + error.message);
+    }
+  };
+
+  const renderDeviceItem = (device: Derivador) => (
     <TouchableOpacity
+      key={device.device_id}
       style={styles.deviceCard}
-      onPress={() => openExportModal(item.device_id)}
-      key={item.device_id}
+      onPress={() => openExportModal(device.device_id)}
     >
-      <Text style={styles.deviceId}>{item.device_id}</Text>
+      <Text style={styles.deviceId}>{device.device_id}</Text>
       <Text style={styles.dataText}>
-        Latitude: {item.latitude !== undefined ? item.latitude.toFixed(4) : 'N/A'}
+        Latitude: {device.latitude.toFixed(4)}
       </Text>
       <Text style={styles.dataText}>
-        Longitude: {item.longitude !== undefined ? item.longitude.toFixed(4) : 'N/A'}
+        Longitude: {device.longitude.toFixed(4)}
       </Text>
       <Text style={styles.dataText}>
-        Última Atualização: {item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A'}
+        Última Atualização: {new Date(device.timestamp).toLocaleString()}
       </Text>
     </TouchableOpacity>
   );
 
   return (
     <ScrollView
-          style={styles.container}
-          contentContainerStyle={[
-            styles.contentContainer,
-            { minHeight: windowDimensions.height },
-          ]}
-          showsVerticalScrollIndicator={true}
-        >
+      style={styles.container}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { minHeight: windowDimensions.height },
+      ]}
+      showsVerticalScrollIndicator
+    >
       <View style={styles.deviceList}>
-        {devices.length > 0 ? (
-          devices.map((item) => renderDeviceItem(item))
-        ) : (
-          <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
-        )}
+        {devices.length > 0
+          ? devices.map(renderDeviceItem)
+          : <Text style={styles.emptyText}>Nenhum dispositivo encontrado</Text>
+        }
       </View>
 
       <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
@@ -268,102 +276,55 @@ const ReportsScreen: React.FC = () => {
         onPressHome={() => navigation.navigate('Home')}
         onPressDashboard={() => navigation.navigate('Dashboard')}
         onPressProfile={() => navigation.navigate('Profile')}
-        selected=""
+        selected="reports"
       />
     </ScrollView>
   );
 };
 
-const barHeight = Platform.select({
-  ios: 54,
-  android: 54,
-  web: 60,
-  default: 54,
-});
-
+const barHeight = Platform.select({ ios: 54, android: 54, web: 60, default: 54 });
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#041635",
-    width: "100%",
-  },
+  container: { flex: 1, backgroundColor: '#041635', width: '100%' },
   contentContainer: {
-    alignItems: "center",
-    justifyContent: "flex-start",
+    alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingBottom: barHeight,
   },
-  deviceList: {
-    width: "90%",
-    marginBottom: 20,
-  },
+  deviceList: { width: '90%', marginVertical: 20 },
   deviceCard: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
-    marginVertical: 10,
-    width: Platform.select({
-      web: 400,
-      native: Dimensions.get("window").width * 0.9,
-    }),
+    marginVertical: 5,
+    width: Platform.select({ web: 400, native: Dimensions.get('window').width * 0.9 }),
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.5,
-    alignSelf: "center",
+    alignSelf: 'center',
   },
-  deviceId: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#041635",
-    marginBottom: 10,
-  },
-  dataText: {
-    fontSize: 14,
-    color: "#041635",
-    marginBottom: 5,
-  },
+  deviceId: { fontSize: 18, fontWeight: 'bold', color: '#041635' },
+  dataText: { fontSize: 14, color: '#041635', marginTop: 4 },
   modalContent: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
     borderRadius: 10,
-    width: Platform.select({
-      web: 300,
-      native: Dimensions.get("window").width * 0.8,
-    }),
-    alignSelf: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    ...(Platform.OS === "web" && {
-      overflowY: "auto",
-      WebkitOverflowScrolling: "touch",
-    }),
+    width: Platform.select({ web: 300, native: Dimensions.get('window').width * 0.8 }),
+    alignSelf: 'center',
+    alignItems: 'center',
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#041635",
-    marginBottom: 20,
-    textAlign: "center",
-  },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#041635', marginBottom: 20 },
   modalButton: {
-    backgroundColor: "#3B82F6",
+    backgroundColor: '#3B82F6',
     padding: 15,
     borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
-    width: "100%",
+    alignItems: 'center',
+    marginVertical: 5,
+    width: '100%',
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  emptyText: {
-    color: "#fff",
-    fontSize: 16,
-    textAlign: "center",
-    marginTop: 20,
-  },
+  buttonText: { color: '#fff', fontWeight: 'bold' },
+  emptyText: { color: '#fff', fontSize: 16, textAlign: 'center', marginTop: 20 },
 });
 
 export default ReportsScreen;
