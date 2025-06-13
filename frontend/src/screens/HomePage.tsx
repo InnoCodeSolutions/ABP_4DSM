@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -9,62 +9,179 @@ import {
   Alert,
   Platform,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import MapView from "../components/MapView";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchDerivadores } from "../service/deviceService";
+import NavBar from "../components/Navbar";
+import axios from "axios";
+import { BACKEND_HOST } from '@env';
 
-const { width, height } = Dimensions.get("window");
+
+const decodeToken = (token: string): { id: number; email: string } | null => {
+  try {
+    const payload = token.split(".")[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    return {
+      id: decodedPayload.id,
+      email: decodedPayload.email,
+    };
+  } catch (error) {
+    console.error("Erro ao decodificar o token:", error);
+    return null;
+  }
+};
+
+type RootStackParamList = {
+  Login: undefined;
+  Register: undefined;
+  Home: undefined;
+  About: undefined;
+  ViewDevice: { device: { id: string; name: string } };
+  Map: undefined;
+  Dashboard: undefined;
+  NotFound: undefined;
+  Reports: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, "Home">;
+
+interface Marker {
+  latitude: number;
+  longitude: number;
+  title: string;
+}
+
+interface UserProfile {
+  id: number;
+  name: string;
+  lastname: string;
+  email: string;
+  password: string;
+  phone?: string;
+  criado_em: string;
+}
+
+const Icon: any = MaterialCommunityIcons;
 
 const HomePage: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
+  const [derivadores, setDerivadores] = useState<Marker[]>([]);
+  const [userName, setUserName] = useState<string>("");
 
-  const derivadores = [
-    { latitude: -22.9068, longitude: -43.1729, title: "Derivador 1" },
-    { latitude: -22.9000, longitude: -43.1800, title: "Derivador 2" },
-  ];
+  useEffect(() => {
+    const loadDerivadores = async () => {
+      try {
+        const devices = await fetchDerivadores();
+        const markers = devices.map((device) => ({
+          latitude: device.latitude || 0,
+          longitude: device.longitude || 0,
+          title: device.device_id,
+        }));
+        setDerivadores(markers);
+      } catch (error: any) {
+        console.error("Erro ao carregar derivadores:", error);
+        Alert.alert("Erro", "Falha ao carregar dispositivos do banco de dados");
+      }
+    };
+
+    const loadUserProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (!token) throw new Error("Nenhum token de autenticação encontrado");
+
+        const decoded = decodeToken(token);
+        if (!decoded || !decoded.id)
+          throw new Error("Não foi possível decodificar o token");
+
+        const API_URL = `https://${BACKEND_HOST}`;
+        const response = await axios.get(`${API_URL}/users/${decoded.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const userData: UserProfile = response.data;
+        setUserName(userData.name || "Usuário");
+      } catch (error: any) {
+        console.error("Erro ao carregar perfil do usuário:", {
+          message: error.message,
+          status: error.response?.status,
+          data: error.response?.data,
+        });
+        setUserName("Usuário");
+      }
+    };
+
+    loadDerivadores();
+    loadUserProfile();
+  }, []);
 
   const handleLogout = () => {
     if (Platform.OS === "web") {
-      window.alert("Você foi desconectado com sucesso!");
-      navigation.navigate("Login" as never);
-    } else {
-      Alert.alert("Sair", "Você foi desconectado com sucesso!", [
-        { text: "OK", onPress: () => navigation.navigate("Login" as never) },
-      ]);
-    }
-  };
-
-  const handleAbout = () => {
-    if (Platform.OS === "web") {
-      window.alert(
-        "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
-      );
+      const confirm = window.confirm("Deseja realmente sair?");
+      if (confirm) {
+        AsyncStorage.removeItem("authToken").then(() => {
+          console.log("Token removido (web)");
+          navigation.navigate("Login");
+        });
+      }
     } else {
       Alert.alert(
-        "Sobre o App",
-        "Este aplicativo permite monitorar dispositivos, visualizar gráficos, acessar o mapa e tirar dúvidas sobre seu funcionamento."
+        "Confirmar Logout",
+        "Deseja realmente sair?",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
+          },
+          {
+            text: "Sair",
+            style: "destructive",
+            onPress: async () => {
+              await AsyncStorage.removeItem("authToken");
+              console.log("Token removido (mobile)");
+              navigation.navigate("Login");
+            },
+          },
+        ],
+        { cancelable: true }
       );
     }
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.headerText}>Sair</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("About")}
+          style={styles.aboutButton}
+        >
+          <Text style={styles.aboutText}>Sobre</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleAbout}>
-          <Text style={styles.headerText}>Sobre</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.iconButton}>
+          <Icon name="logout" size={28} color="#fff" />
         </TouchableOpacity>
       </View>
 
+<<<<<<< HEAD
         {/* Saudação */}
         <Text style={styles.greeting}>Olá, Usuário</Text>
+=======
+      <Text style={styles.greeting}>Olá, {userName}</Text>
+>>>>>>> develop
 
       <View style={styles.mapContainer}>
-        <MapView markers={derivadores} />
+        <MapView markers={derivadores} scrollEnabled={false} />
       </View>
 
+<<<<<<< HEAD
         {/* Botões */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
@@ -77,12 +194,32 @@ const HomePage: React.FC = () => {
             />
             <Text style={styles.buttonText}>Dispositivos</Text>
           </TouchableOpacity>
+=======
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("ViewDevice")}
+        >
+          <Image
+            source={require("../assets/dispositivo.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.buttonText}>Dispositivos</Text>
+        </TouchableOpacity>
+>>>>>>> develop
 
-        <TouchableOpacity style={styles.button}>
-          <Image source={require("../assets/grafico.png")} style={styles.icon} />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Dashboard")}
+        >
+          <Image
+            source={require("../assets/grafico.png")}
+            style={styles.icon}
+          />
           <Text style={styles.buttonText}>Dashboard</Text>
         </TouchableOpacity>
 
+<<<<<<< HEAD
           <TouchableOpacity style={styles.button}>
             <Image source={require("../assets/mapa.png")} style={styles.icon} />
             <Text style={styles.buttonText}>Mapa</Text>
@@ -97,10 +234,44 @@ const HomePage: React.FC = () => {
           </TouchableOpacity>
         </View>
       </View>
+=======
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Map")}
+        >
+          <Image source={require("../assets/mapa.png")} style={styles.icon} />
+          <Text style={styles.buttonText}>Mapa</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Reports")}
+        >
+          <Image
+            source={require("../assets/relatorios.png")}
+            style={styles.icon}
+          />
+          <Text style={styles.buttonText}>Relatórios</Text>
+        </TouchableOpacity>
+      </View>
+
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected="home"
+      />
+    </ScrollView>
+>>>>>>> develop
   );
 };
 
-const scale = (size: number, max: number) => Math.min(size, max);
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
 
 const styles = StyleSheet.create({
   scrollContent: {
@@ -110,138 +281,88 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#041635",
-    alignItems: "center",
-    paddingTop: Platform.select({
-      web: scale(height * 0.02, 30),
-      native: 50,
-    }),
     width: "100%",
-    minHeight: height,
-    maxWidth: Platform.select({
-      web: 1000,
-      native: width,
-    }),
-    alignSelf: "center",
+  },
+  contentContainer: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: Platform.OS === "web" ? 20 : 50,
+    paddingBottom: barHeight,
+    minHeight: Dimensions.get("window").height,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: Platform.select({
-      web: scale(width * 0.8, 800),
-      native: width * 0.9,
-    }),
-    paddingHorizontal: Platform.select({
-      web: scale(width * 0.05, 20),
-      native: 20,
-    }),
-    paddingVertical: Platform.select({
-      web: scale(height * 0.01, 10),
-      native: 2,
-    }),
-    zIndex: 10,
-  },
-  headerText: {
-    color: "#fff",
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 20),
-      native: 20,
-    }),
-    fontWeight: "bold",
+    width: "90%",
+    paddingVertical: 10,
   },
   greeting: {
-    fontSize: Platform.select({
-      web: scale(width * 0.05, 26),
-      native: 26,
-    }),
+    fontSize: 24,
     color: "#fff",
     fontWeight: "bold",
     alignSelf: "flex-start",
-    marginLeft: Platform.select({
-      web: scale(width * 0.1, 100), // Ajustado para alinhar com o mapa
-      native: width * 0.05,
-    }),
-    marginBottom: Platform.select({
-      web: scale(height * 0.01, 5),
-      native: 5,
-    }),
-    paddingTop: Platform.select({
-      web: scale(height * 0.03, 30),
-      native: 40,
-    }),
+    marginLeft: "5%",
+    marginTop: 10,
   },
   mapContainer: {
-    width: Platform.select({
-      web: scale(width * 0.8, 800),
-      native: width * 0.9,
-    }),
-    height: Platform.select({
-      web: 300,
-      native: 200,
-    }),
-    marginBottom: Platform.select({
-      web: scale(height * 0.02, 20),
-      native: 20,
-    }),
-    alignSelf: "center", // Centraliza o mapa
+    width: "90%",
+    height: 250,
+    marginTop: 10,
+    marginBottom: 20,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   buttonContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    width: Platform.select({
-      web: scale(width * 0.8, 800),
-      native: width * 0.9,
-    }),
-    marginTop: Platform.select({
-      web: scale(height * 0.02, 20),
-      native: 20,
-    }),
-    gap: Platform.select({
-      web: 10,
-      native: 10,
-    }),
-    alignSelf: "center", // Centraliza os botões
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "90%",
+    gap: 12,
+    marginTop: 10,
+    marginBottom: 20,
   },
   button: {
     backgroundColor: "#fff",
-    padding: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    width: Platform.select({
-      web: 160,
-      native: width * 0.42,
-    }),
-    height: Platform.select({
-      web: 160,
-      native: width * 0.42,
-    }),
-    marginBottom: 10,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
+    width: "100%",
+    marginBottom: 12,
+    elevation: 3,
+    flexDirection: "row",
+    gap: 12,
   },
   icon: {
-    width: Platform.select({
-      web: scale(width * 0.05, 50),
-      native: 50,
-    }),
-    height: Platform.select({
-      web: scale(width * 0.05, 50),
-      native: 50,
-    }),
-    marginBottom: 5,
+    width: 32,
+    height: 32,
+    resizeMode: "contain",
   },
   buttonText: {
-    fontSize: Platform.select({
-      web: scale(width * 0.03, 14),
-      native: 14,
-    }),
+    fontSize: 16,
     color: "#000",
+    fontWeight: "600",
+  },
+  aboutButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: "transparent",
+  },
+  aboutText: {
+    fontSize: 18,
+    color: "#fff",
     fontWeight: "bold",
+  },
+  headerText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  iconButton: {
+    padding: 6,
+    borderRadius: 20,
   },
 });
 

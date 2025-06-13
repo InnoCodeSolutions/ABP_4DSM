@@ -1,19 +1,26 @@
-import fs from 'fs';
-import yaml from 'yaml';
+import dotenv from 'dotenv';
+dotenv.config();
 
-interface DBConfig {
-  host: string;
-  port: number;
-  user: string;
-  password: string;
-  database: string;
+// Validação segura para evitar falhas silenciosas
+function requireEnv(key: string): string {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`❌ Variável de ambiente '${key}' não está definida`);
+  }
+  return value;
 }
 
-interface AppConfig {
-  database: DBConfig;
-}
+export const dbConfig = {
+  host: requireEnv('DB_HOST'),
+  port: parseInt(process.env.DB_PORT || '5432', 10),
+  user: requireEnv('DB_USER'),
+  password: requireEnv('DB_PASSWORD'),
+  database: requireEnv('DB_NAME'),
+};
 
-const file = fs.readFileSync('./config/config.yaml', 'utf8'); //Caminho da váriavel de ambiente do banco, sendo necessário criar conforme a conxão com o banco de dados.
-const config: AppConfig = yaml.parse(file);
-
-export default config;
+export const emailConfig = {
+  host: requireEnv('EMAIL_HOST'),
+  port: parseInt(process.env.EMAIL_PORT || '587', 10),
+  user: requireEnv('EMAIL_USER'),
+  pass: requireEnv('EMAIL_PASS'),
+};

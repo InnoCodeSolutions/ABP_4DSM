@@ -1,44 +1,48 @@
 import express from 'express';
 import cors from 'cors';
-import os from 'os';
+import dotenv from 'dotenv';
 import { createDatabaseIfNotExists } from './initDatabase';
 import { setupDatabase } from './setupDatabase';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
-import gpsRoutes from './routes/gpsRoutes'
+import gpsRoutes from './routes/gpsRoutes';
+import routeRoutes from './routes/routeRoutes';
 
-// Função auxiliar para obter o IP local
-function getLocalIP() {
-  const interfaces = os.networkInterfaces();
-  for (const name of Object.keys(interfaces)) {
-    for (const iface of interfaces[name] || []) {
-      if (iface.family === 'IPv4' && !iface.internal) {
-        return iface.address;
-      }
-    }
-  }
-  return 'localhost';
-}
+dotenv.config();
 
 const start = async () => {
-  await createDatabaseIfNotExists();
-  await setupDatabase();
+  try {
+    console.log('🔧 Iniciando criação/verificação do banco...');
+    await createDatabaseIfNotExists();
 
-  const app = express();
-  app.use(cors());
-  app.use(express.json());
+    console.log('🧱 Iniciando setup do banco...');
+    await setupDatabase();
 
-  // Rotas da aplicação
-  app.use('/users', userRoutes);  // ex: GET /users
-  app.use('/auth', authRoutes);   // ex: POST /auth/login
-  app.use('/',gpsRoutes)
+    const app = express();
 
-  const PORT = 3000;
-  const HOST = '0.0.0.0'; // escuta em todas interfaces de rede
+    app.use(cors({
+      origin: '*',         // Permite qualquer origem
+      credentials: false,  // ❌ Deve estar false se origin for '*'
+    }));
 
-  app.listen(PORT, HOST, () => {
-    console.log(`🚀 Server online em http://${getLocalIP()}:${PORT}`);
-  });
+    app.use(express.json());
+
+    app.use('/users', userRoutes);
+    app.use('/auth', authRoutes);
+    app.use('/', gpsRoutes);
+    app.use('/api/routes', routeRoutes);
+
+    const PORT = parseInt(process.env.PORT || '3000', 10);
+    const HOST = '0.0.0.0';
+
+    app.listen(PORT, HOST, () => {
+      console.log(`🚀 Server online em http://${HOST}:${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Erro ao iniciar o servidor:', error);
+    // Comentado para não encerrar automaticamente
+    // process.exit(1);
+  }
 };
 
 start();

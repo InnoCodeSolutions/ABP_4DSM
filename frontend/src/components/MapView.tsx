@@ -1,111 +1,119 @@
-import React, { useEffect, useState } from "react";
-import { Platform, View, StyleSheet, Text } from "react-native";
-import type { MapViewProps as RNMapViewProps, MapMarkerProps } from "react-native-maps";
-import type * as ReactNativeMaps from "react-native-maps";
+import React from "react";
+import { View, StyleSheet, Text, StyleProp, ViewStyle, Platform } from "react-native";
+import MapView, { Marker as MapMarker, Polyline } from "react-native-maps";
+import { GeoJSONRoute } from "../service/deviceService";
 
+// Define types for markers
+interface MarkerType {
+  latitude: number;
+  longitude: number;
+  title: string;
+}
+
+// Define props for MapView
 interface MapViewProps {
-  markers?: { latitude: number; longitude: number; title: string }[];
+  markers?: MarkerType[];
+  initialRegion?: {
+    latitude: number;
+    longitude: number;
+    latitudeDelta: number;
+    longitudeDelta: number;
+  };
+  style?: StyleProp<ViewStyle>;
+  route?: GeoJSONRoute | null | undefined;
+  onMarkerPress?: (deviceId: string) => void;
+  scrollEnabled?: boolean; // Adicionado para suportar scrollEnabled
 }
 
 const defaultRegion = {
-  latitude: -22.9068,
-  longitude: -43.1729,
+  latitude: -23.3036, // Jacareí center
+  longitude: -45.9657,
   latitudeDelta: 0.05,
   longitudeDelta: 0.05,
 };
 
-interface MapComponents {
-  MapView: React.ComponentType<RNMapViewProps>;
-  Marker: React.ComponentType<MapMarkerProps>;
-}
+const CustomMapView: React.FC<MapViewProps> = ({
+  markers = [],
+  initialRegion = defaultRegion,
+  style,
+  route,
+  onMarkerPress,
+  scrollEnabled = true, // Valor padrão: true
+}) => {
+  // Process markers with fallback to 0 for null/undefined
+  const validMarkers = markers
+    .map((marker) => ({
+      latitude: marker.latitude || 0,
+      longitude: marker.longitude || 0,
+      title: marker.title || "Unknown",
+    }))
+    .filter((marker) => !isNaN(marker.latitude) && !isNaN(marker.longitude));
 
-const MapView: React.FC<MapViewProps> = ({ markers = [] }) => {
-  const [mapComponents, setMapComponents] = useState<MapComponents | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const computedRegion = validMarkers.length > 0
+    ? {
+        latitude: validMarkers.reduce((sum, m) => sum + m.latitude, 0) / validMarkers.length,
+        longitude: validMarkers.reduce((sum, m) => sum + m.longitude, 0) / validMarkers.length,
+        latitudeDelta: initialRegion.latitudeDelta,
+        longitudeDelta: initialRegion.longitudeDelta,
+      }
+    : initialRegion;
 
-  useEffect(() => {
-    if (Platform.OS !== "web") {
-      import("react-native-maps")
-        .then((module: typeof ReactNativeMaps) => {
-          const { default: MapView, Marker } = module;
-          setMapComponents({ MapView, Marker });
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed to load react-native-maps:", err);
-          setError("Erro ao carregar o mapa no mobile.");
-          setIsLoading(false);
-        });
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
+  console.log("MapView (Mobile): Rendering with", {
+    hasRoute: !!route,
+    validMarkers,
+    center: [computedRegion.latitude, computedRegion.longitude],
+  });
 
-  if (isLoading) {
+  try {
     return (
-      <View style={styles.mapContainer}>
-        <Text style={{ color: "#fff" }}>Carregando mapa...</Text>
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.mapContainer}>
-        <Text style={{ color: "#fff" }}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (Platform.OS === "web") {
-    const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${
-      defaultRegion.longitude - 0.05
-    },${defaultRegion.latitude - 0.05},${defaultRegion.longitude + 0.05},${
-      defaultRegion.latitude + 0.05
-    }&layer=mapnik&marker=${defaultRegion.latitude},${defaultRegion.longitude}`;
-
-    return (
-      <View style={styles.mapContainer}>
-        <iframe
-          style={{
-            width: "100%",
-            height: "100%",
-            border: 0,
-            borderRadius: 10,
-          }}
-          src={mapUrl}
-          title="OpenStreetMap"
-        />
-      </View>
-    );
-  }
-
-  if (mapComponents) {
-    const { MapView: MapViewComponent, Marker: MarkerComponent } = mapComponents;
-    return (
-      <MapViewComponent style={styles.map} initialRegion={defaultRegion}>
-        {markers.map((marker, index) => (
-          <MarkerComponent
+      <MapView
+        style={[styles.map, style]}
+        initialRegion={computedRegion}
+        showsUserLocation={true}
+        followsUserLocation={true}
+        scrollEnabled={scrollEnabled} // Passa a propriedade scrollEnabled
+      >
+        {validMarkers.map((marker, index) => (
+          <MapMarker
             key={index}
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude,
             }}
             title={marker.title}
+            pinColor="#FF0000"
+            onPress={() => {
+              console.log("MapView (Mobile): Marker clicked:", marker.title);
+              onMarkerPress && onMarkerPress(marker.title);
+            }}
           />
         ))}
-      </MapViewComponent>
+        {route && Array.isArray(route.features) && route.features[0]?.geometry.coordinates && (
+          <Polyline
+            coordinates={route.features[0].geometry.coordinates.map(([lng, lat]) => ({
+              latitude: lat,
+              longitude: lng,
+            }))}
+            strokeColor="#FF0000"
+            strokeWidth={5}
+          />
+        )}
+      </MapView>
+    );
+  } catch (err) {
+    console.error("MapView (Mobile): Failed to render map:", err);
+    return (
+      <View style={[styles.mapContainer, style]}>
+        <Text style={{ color: "#fff" }}>Erro ao carregar o mapa no mobile.</Text>
+      </View>
     );
   }
-
-  return null;
 };
 
 const styles = StyleSheet.create({
   mapContainer: {
-    width: "100%", // Ocupa o espaço do container pai
-    height: "100%", // Respeita o height definido no HomePage
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
     overflow: "hidden",
     justifyContent: "center",
@@ -118,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapView;
+export default CustomMapView;

@@ -1,9 +1,7 @@
 import { Client } from 'pg';
-import config from './models/config';
+import { dbConfig } from './models/config';
 
 export const setupDatabase = async () => {
-  const dbConfig = config.database;
-
   const client = new Client({
     user: dbConfig.user,
     host: dbConfig.host,
@@ -28,10 +26,22 @@ export const setupDatabase = async () => {
         lastname VARCHAR(100) NOT NULL,
         email VARCHAR(150) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
-        phone VARCHAR(20), -- Adicionado aqui
+        phone VARCHAR(20),
         criado_em TIMESTAMP DEFAULT NOW()
       );
     `);
+
+    // Cria tabela devices
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS login.devices (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES login.users(id),
+        name VARCHAR(100) NOT NULL,
+        device_id VARCHAR(50) UNIQUE NOT NULL,
+        criado_em TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
     // Cria tabela gps_data
     await client.query(`
       CREATE TABLE IF NOT EXISTS login.gps_data (
@@ -48,14 +58,25 @@ export const setupDatabase = async () => {
       );
     `);
 
-
     // Adiciona a coluna phone em tabelas existentes (migração)
     await client.query(`
-      ALTER TABLE login.users 
+      ALTER TABLE login.users
       ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
     `);
 
-    console.log('✅ Schema e tabela criados com sucesso!');
+    // Cria nova tabela verification_codes com email
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS login.verification_codes (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(150) NOT NULL,
+        code VARCHAR(6) NOT NULL,
+        type VARCHAR(20) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+
+    console.log('✅ Schema e tabelas criados com sucesso!');
   } catch (err) {
     console.error('❌ Erro ao criar schema/tabela:', err);
   } finally {

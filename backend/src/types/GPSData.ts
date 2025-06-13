@@ -1,6 +1,7 @@
 // src/types/GPSData.ts
 
 export interface GPSData {
+    timestamp: any;
     device_id: string;
     latitude: number;
     longitude: number;
@@ -9,5 +10,6 @@ export interface GPSData {
     course?: number;
     satellites?: number;
     hdop?: number;
+    
   }
   

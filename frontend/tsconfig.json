@@ -6,11 +6,24 @@
     "noEmit": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["react", "react-native"],
     "moduleResolution": "nodenext",
     "module": "nodenext",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
-  }
+    "resolveJsonModule": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"],
+      "@config/*": ["config/*"]
+    },
+    "types": [
+      "jest",
+      "@testing-library/react-native",
+      "react",
+      "react-native",
+      "react-native-vector-icons"
+    ]
+  },
+  "include": ["src/**/*", "tests/**/*", "*.d.ts"], // Adicionado "*.d.ts" para incluir env.d.ts na raiz
+  "exclude": ["node_modules"]
 }

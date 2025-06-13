@@ -8,6 +8,7 @@ export interface AuthRequest extends Request {
   user?: string | jwt.JwtPayload;
 }
 
+
 export const authenticateToken = (
   req: AuthRequest,
   res: Response,

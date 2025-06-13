@@ -1,0 +1,15 @@
+# Banco de Dados
+DB_HOST=seu_host_do_banco          # ex: shuttle.proxy.rlwy.net
+DB_USER=seu_usuario                # ex: postgres
+DB_PORT=porta_do_banco             # ex: 19968
+DB_PASSWORD=sua_senha              # ex: Senha do Railway
+DB_NAME=nome_do_banco              # ex: bdAbp
+
+# Aplicação
+BACKEND_HOST=                      # ex: innocodesutionsbackend.up.railway.app
+
+# SMTP (envio de e-mail)
+EMAIL_HOST=seu_smtp_host           # ex: smtp.gmail.com
+EMAIL_PORT=porta_smtp              # ex: 587
+EMAIL_USER=seu_email               # ex: innocodesolutions@gmail.com
+EMAIL_PASS=sua_senha_smtp          # ex: senha de app do Gmail
