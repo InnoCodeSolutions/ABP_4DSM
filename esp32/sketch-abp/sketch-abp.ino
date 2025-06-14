@@ -12,7 +12,7 @@ const char* password = "SENHA DO SEU WIFI";
 const char* serverEndpoint = "https://innocodesutionsbackend.up.railway.app/gps";
 
 // LCD: endereço I2C, 16 colunas, 2 linhas
-LiquidCrystal_I2C lcd(0x27, 16, 2); // Tente 0x3F se 0x27 não funcionar
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // GPS
 #define RXPin 16  // Pino RX do ESP32 conectado ao TX do GPS
@@ -20,8 +20,8 @@ LiquidCrystal_I2C lcd(0x27, 16, 2); // Tente 0x3F se 0x27 não funcionar
 #define GPSBaud 9600 // Baud rate do GPS
 
 // Instâncias
-TinyGPSPlus gps;  // Nome correto da classe
-HardwareSerial GPSSerial(1);  // ESP32 tem múltiplas portas seriais (use UART1)
+TinyGPSPlus gps;
+HardwareSerial GPSSerial(1);
 
 // Variáveis para armazenar dados do GPS
 float latitude = 0.0;
@@ -244,7 +244,7 @@ void sendGPSData() {
   
   // Monta o JSON com os dados GPS reais
   String payload = "{";
-  payload += "\"device_id\": \"Drifter-XX\",";
+  payload += "\"device_id\": \"Drifter-XX\","; // Substitua "XX" pelo ID do seu dispositivo
   payload += "\"latitude\": " + String(latitude, 6) + ",";
   payload += "\"longitude\": " + String(longitude, 6);
   payload += "}";
