@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+/*import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Alert,
   Dimensions,
   ScrollView,
-  
+
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Papa from 'papaparse';
@@ -357,6 +357,187 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#fff', fontWeight: 'bold' },
   emptyText: { color: '#fff', fontSize: 16, textAlign: 'center', marginTop: 20 },
+});
+
+export default ReportsScreen;*/
+
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { RootStackParamList } from "../types/types";
+import {
+  Derivador,
+  fetchDerivadores,
+  fetchDeviceMovement,
+} from "../service/deviceService";
+import DeviceHistoryPopup from "../components/DeviceHistoryPopup";
+import NavBar from "../components/Navbar";
+
+type ReportsNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Reports"
+>;
+
+const { height } = Dimensions.get("window");
+
+const ReportsScreen: React.FC = () => {
+  const navigation = useNavigation<ReportsNavigationProp>();
+  const [derivadores, setDerivadores] = useState<Derivador[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
+  const [deviceHistory, setDeviceHistory] = useState<Derivador[]>([]); // Added history state
+  const [selectedLocation, setSelectedLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+
+  // Fetch devices
+  useEffect(() => {
+    const loadDerivadores = async () => {
+      try {
+        const data = await fetchDerivadores();
+        console.log("ReportsScreen: Fetched derivadores:", data.length);
+        setDerivadores(data.length > 0 ? data : []);
+      } catch (error) {
+        console.error("ReportsScreen: Error fetching derivadores:", error);
+        setDerivadores([]);
+      }
+    };
+    loadDerivadores();
+    const interval = setInterval(loadDerivadores, 60000); // Refresh every 60s
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch device movement history
+  const loadDeviceHistory = async (deviceId: string) => {
+    try {
+      setIsLoadingHistory(true);
+      console.log("ReportsScreen: Fetching movement for deviceId:", deviceId);
+      const { movement } = await fetchDeviceMovement(deviceId);
+      console.log("ReportsScreen: Fetched history entries:", movement?.length || "No entries");
+      setDeviceHistory(movement || []);
+      setSelectedDevice(deviceId);
+    } catch (error) {
+      console.error("ReportsScreen: Error fetching movement:", error);
+      setDeviceHistory([]);
+      setSelectedDevice(null);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        <Text style={styles.headerText}>Relatórios de Dispositivos</Text>
+        <View style={styles.deviceList}>
+          {derivadores.length > 0 ? (
+            derivadores.map((device, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.deviceItem}
+                onPress={() => loadDeviceHistory(device.device_id)}
+              >
+                <Text style={styles.deviceText}>{device.device_id}</Text>
+                <Text style={styles.deviceSubText}>
+                  Última atualização:{" "}
+                  {device.timestamp
+                    ? new Date(device.timestamp).toLocaleString("pt-BR")
+                    : "N/A"}
+                </Text>
+              </TouchableOpacity>
+            ))
+          ) : (
+            <Text style={styles.noDevicesText}>Nenhum dispositivo disponível.</Text>
+          )}
+        </View>
+      </ScrollView>
+
+      <DeviceHistoryPopup
+        visible={!!selectedDevice}
+        onClose={() => {
+          console.log("ReportsScreen: Closing history popup");
+          setSelectedDevice(null);
+          setDeviceHistory([]); // Clear history on close
+          setSelectedLocation(null);
+        }}
+        deviceId={selectedDevice || ""}
+        selectedLocation={selectedLocation}
+        onSelectLocation={(location) => {
+          console.log("ReportsScreen: Selected location:", location);
+          setSelectedLocation(location);
+        }}
+        isLoading={isLoadingHistory}
+        history={deviceHistory} // Pass history to DeviceHistoryPopup
+      />
+
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected=""
+      />
+    </View>
+  );
+};
+
+const barHeight = Platform.select({
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
+});
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#041635",
+    paddingBottom: barHeight,
+  },
+  contentContainer: {
+    padding: 20,
+    alignItems: "center",
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+  },
+  deviceList: {
+    width: "100%",
+    maxWidth: 800,
+  },
+  deviceItem: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+  },
+  deviceText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
+  },
+  deviceSubText: {
+    fontSize: 14,
+    color: "#666",
+  },
+  noDevicesText: {
+    fontSize: 16,
+    color: "#fff",
+    textAlign: "center",
+  },
 });
 
 export default ReportsScreen;
