@@ -1,0 +1,8 @@
+# Ignorar arquivos gerados no build
+generated/* linguist-generated
+dist/* linguist-generated
+frontend/coverage/* linguist-generated
+
+# Forçar TypeScript como linguagem para .ts
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript

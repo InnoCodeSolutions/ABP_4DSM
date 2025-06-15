@@ -21,9 +21,10 @@
       "@testing-library/react-native",
       "react",
       "react-native",
-      "react-native-vector-icons"
+      "react-native-vector-icons",
+      "node" // Added to recognize process.env
     ]
   },
-  "include": ["src/**/*", "tests/**/*", "*.d.ts"], // Adicionado "*.d.ts" para incluir env.d.ts na raiz
+  "include": ["src/**/*", "tests/**/*", "*.d.ts"],
   "exclude": ["node_modules"]
 }
