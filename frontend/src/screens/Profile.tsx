@@ -15,7 +15,6 @@ import { MaterialIcons } from "@expo/vector-icons";
 import NavBar from "@/components/Navbar";
 import { getProfile } from "@/service/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BACKEND_HOST } from "@env";
 
 const scale = (size: number, max: number): number => Math.min(size, max);
 

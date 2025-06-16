@@ -66,19 +66,22 @@ const HomePage: React.FC = () => {
     const loadUserProfile = async () => {
       try {
         const token = await AsyncStorage.getItem("authToken");
-        console.log("Home - Token:", token); // Log para debug
-        if (token) {
-          const userData = await getProfile(token);
-          console.log("Home - Dados do perfil:", JSON.stringify(userData, null, 2)); // Log detalhado
-          setUserName(userData.name || "Usuário");
-        } else {
-          console.error("Home - Token não encontrado no AsyncStorage");
+        if (!token) {
+          setUserName("Usuário");
+          return;
         }
-      } catch (error: any) {
-        console.error("Home - Erro ao carregar perfil do usuário:", JSON.stringify(error, null, 2));
+
+        // Aqui a gente chama getProfile e pega diretamente o objeto de dados do usuário
+        const profile = await getProfile(token);
+        // Desestrutura o campo `name`
+        const { name } = profile;
+        // Atualiza o estado com esse nome (ou "Usuário" caso não exista)
+        setUserName(name || "Usuário");
+      } catch (error) {
+        console.error("Erro ao carregar perfil:", error);
         setUserName("Usuário");
       }
-    };
+    };;
 
     loadDerivadores();
     loadUserProfile();
