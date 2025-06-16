@@ -1,149 +1,140 @@
 import React, { useEffect, useState } from "react";
 import {
-    View,
-    Text,
-    Image,
-    TouchableOpacity,
-    StyleSheet,
-    Platform,
-    Dimensions,
-    ActivityIndicator,
-    ScrollView, // Adicionado
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Platform,
+  Dimensions,
+  ActivityIndicator,
+  ScrollView,
 } from "react-native";
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/types';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MaterialIcons } from '@expo/vector-icons';
+import { StackScreenProps } from "@react-navigation/stack";
+import { RootStackParamList } from "../types/types";
+import { MaterialIcons } from "@expo/vector-icons";
 import NavBar from "@/components/Navbar";
 import { getProfile } from "@/service/authService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BACKEND_HOST } from "@env";
 
 const scale = (size: number, max: number): number => Math.min(size, max);
 
-type Props = StackScreenProps<RootStackParamList, 'Profile'>;
+type Props = StackScreenProps<RootStackParamList, "Profile">;
 
 const Profile: React.FC<Props> = ({ navigation }) => {
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [windowDimensions, setWindowDimensions] = useState(Dimensions.get('window')); // Estado para dimensões da tela
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [windowDimensions, setWindowDimensions] = useState(Dimensions.get("window"));
 
-    // Listener para mudanças na orientação da tela
-    useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window }) => {
-            setWindowDimensions(window);
-        });
-        return () => subscription?.remove();
-    }, []);
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener("change", ({ window }) => {
+      setWindowDimensions(window);
+    });
+    return () => subscription?.remove();
+  }, []);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const token = await AsyncStorage.getItem('authToken');
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        console.log("Profile - Token:", token); // Log para debug
+        if (token) {
+          const data = await getProfile(token);
+          console.log("Profile - Dados do perfil:", JSON.stringify(data, null, 2)); // Log detalhado
+          setUser(data);
+        } else {
+          console.error("Profile - Token não encontrado no AsyncStorage");
+        }
+      } catch (error) {
+        console.error("Profile - Erro ao buscar perfil:", JSON.stringify(error, null, 2));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfile();
+  }, []);
 
-                if (token) {
-                    const data = await getProfile(token);
-                    setUser(data);
-                } else {
-                    console.error("Token não encontrado no AsyncStorage");
-                }
-            } catch (error) {
-                console.error("Erro ao buscar perfil:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchProfile();
-    }, []);
-
-    if (loading) {
-        return (
-            <ScrollView
-                style={styles.container}
-                contentContainerStyle={styles.contentContainer}
-                showsVerticalScrollIndicator={true}
-            >
-                <ActivityIndicator size="large" color="#fff" />
-            </ScrollView>
-        );
-    }
-
-    if (!user) {
-        return (
-            <ScrollView
-                style={styles.container}
-                contentContainerStyle={styles.contentContainer}
-                showsVerticalScrollIndicator={true}
-            >
-                <Text style={{ color: "#fff" }}>Não foi possível carregar o perfil.</Text>
-            </ScrollView>
-        );
-    }
-
+  if (loading) {
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={styles.contentContainer}
-            showsVerticalScrollIndicator={true}
-        >
-            <Image source={require("../assets/icon.png")} style={styles.logo} />
-            <View style={styles.box}>
-                <View
-                    style={{
-                        backgroundColor: "#000",
-                        borderRadius: 100,
-                        padding: 8,
-                        marginBottom: Platform.select({
-                            web: scale(windowDimensions.height * 0.02, 20),
-                            native: windowDimensions.height * 0.03,
-                        }),
-                        borderWidth: 2,
-                        borderColor: "#fff",
-                    }}
-                >
-                    <MaterialIcons
-                        name="person-pin"
-                        size={Platform.select({
-                            web: scale(windowDimensions.width * 0.13, 80),
-                            native: windowDimensions.width * 0.25,
-                        })}
-                        color="#fff"
-                    />
-                </View>
-                <Text style={styles.title}>{user.name}</Text>
-
-                <View style={styles.field}>
-                    <Text style={styles.label}>E-mail</Text>
-                    <Text style={styles.value}>{user.email}</Text>
-                </View>
-                <View style={styles.field}>
-                    <Text style={styles.label}>Telefone</Text>
-                    <Text style={styles.value}>{user.phone}</Text>
-                </View>
-
-                <TouchableOpacity
-                    style={styles.resetPasswordButton}
-                    onPress={() => navigation.navigate("Login", { showResetModal: true })}
-                >
-                    <Text style={styles.resetPasswordText}>Recuperar Senha</Text>
-                </TouchableOpacity>
-
-            </View>
-            <Text style={styles.footer}>Made by Innocode Solutions</Text>
-            <NavBar
-                onPressHome={() => navigation.navigate("Home")}
-                onPressDashboard={() => navigation.navigate("Dashboard")}
-                onPressProfile={() => navigation.navigate("Profile")}
-                selected="profile"
-            />
-        </ScrollView>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={true}
+      >
+        <ActivityIndicator size="large" color="#fff" />
+      </ScrollView>
     );
+  }
+
+  if (!user) {
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={true}
+      >
+        <Text style={{ color: "#fff" }}>Não foi possível carregar o perfil.</Text>
+      </ScrollView>
+    );
+  }
+
+  return (
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
+      <Image source={require("../assets/icon.png")} style={styles.logo} />
+      <View style={styles.box}>
+        <View
+          style={{
+            backgroundColor: "#000",
+            borderRadius: 100,
+            padding: 8,
+            marginBottom: Platform.select({
+              web: scale(windowDimensions.height * 0.02, 20),
+              native: windowDimensions.height * 0.03,
+            }),
+            borderWidth: 2,
+            borderColor: "#fff",
+          }}
+        >
+          <MaterialIcons
+            name="person-pin"
+            size={Platform.select({
+              web: scale(windowDimensions.width * 0.13, 80),
+              native: windowDimensions.width * 0.25,
+            })}
+            color="#fff"
+          />
+        </View>
+        <Text style={styles.title}>{user.name || "Usuário não identificado"}</Text>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>E-mail</Text>
+          <Text style={styles.value}>{user.email || "E-mail não disponível"}</Text>
+        </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Telefone</Text>
+          <Text style={styles.value}>{user.phone || "Telefone não disponível"}</Text>
+        </View>
+      </View>
+      <Text style={styles.footer}>Made by Innocode Solutions</Text>
+      <NavBar
+        onPressHome={() => navigation.navigate("Home")}
+        onPressDashboard={() => navigation.navigate("Dashboard")}
+        onPressProfile={() => navigation.navigate("Profile")}
+        selected="profile"
+      />
+    </ScrollView>
+  );
 };
 
 const barHeight = Platform.select({
-    ios: 54,
-    android: 54,
-    web: 60,
-    default: 54,
+  ios: 54,
+  android: 54,
+  web: 60,
+  default: 54,
 });
 
 const styles = StyleSheet.create({
@@ -157,20 +148,11 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     paddingTop: Platform.OS === "web" ? 20 : 50,
     paddingBottom: barHeight,
-    minHeight: Dimensions.get("window").height, // Garante altura mínima
+    minHeight: Dimensions.get("window").height,
     paddingHorizontal: Platform.select({
       web: scale(Dimensions.get("window").width * 0.05, 30),
       native: Dimensions.get("window").width * 0.05,
     }),
-  },
-  backButton: {
-    position: "absolute",
-    top: Platform.OS === "android" ? 48 : 64,
-    left: 24,
-    zIndex: 10,
-    backgroundColor: "rgba(30, 58, 138, 0.7)",
-    padding: 8,
-    borderRadius: 20,
   },
   logo: {
     width: Platform.select({
@@ -251,18 +233,6 @@ const styles = StyleSheet.create({
     }),
     fontWeight: "normal",
   },
-  resetPasswordButton: {
-    marginTop: 30,
-    backgroundColor: "#007AFF",
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-    },
-  resetPasswordText: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: 16,
-    },
   footer: {
     marginTop: Platform.select({
       web: scale(Dimensions.get("window").height * 0.01, 20),

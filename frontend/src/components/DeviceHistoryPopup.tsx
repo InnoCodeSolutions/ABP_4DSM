@@ -636,18 +636,7 @@ const DeviceHistoryPopup: React.FC<DeviceHistoryPopupProps> = ({
                   <Text style={styles.entryText}>
                     Velocidade: {entry.speed != null ? entry.speed.toFixed(2) : "N/A"} km/h
                   </Text>
-                  <Text style={styles.entryText}>
-                    Altitude: {entry.altitude != null ? entry.altitude : "N/A"}
-                  </Text>
-                  <Text style={styles.entryText}>
-                    Curso: {entry.course != null ? entry.course : "N/A"}
-                  </Text>
-                  <Text style={styles.entryText}>
-                    Satélites: {entry.satellites != null ? entry.satellites : "N/A"}
-                  </Text>
-                  <Text style={styles.entryText}>
-                    HDOP: {entry.hdop != null ? entry.hdop : "N/A"}
-                  </Text>
+                  
                   <TouchableOpacity
                     style={styles.mapButton}
                     onPress={() =>
