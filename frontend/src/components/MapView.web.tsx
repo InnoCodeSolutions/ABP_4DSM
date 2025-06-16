@@ -146,20 +146,21 @@ const styles = StyleSheet.create({
 
 export default CustomMapView;*/
 
-import React from "react";
-import { View, StyleSheet, Text, StyleProp, ViewStyle } from "react-native";
-import { MapContainer, TileLayer, GeoJSON, Marker as LeafletMarker, Popup } from "react-leaflet";
-import L from "leaflet";
-import { GeoJSONRoute, Derivador } from "../service/deviceService";
 
-// Define types for markers
+import React from 'react';
+import { View, StyleSheet, Text, StyleProp, ViewStyle } from 'react-native';
+import { MapContainer, TileLayer, Polyline, Marker as LeafletMarker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import { GeoJSONRoute, Derivador } from '../service/deviceService';
+
+// Define tipos para marcadores
 interface MarkerType {
   latitude: number;
   longitude: number;
   title: string;
 }
 
-// Define props for MapView
+// Define props para o MapView
 interface MapViewProps {
   markers?: MarkerType[];
   initialRegion?: {
@@ -170,8 +171,9 @@ interface MapViewProps {
   };
   style?: StyleProp<ViewStyle>;
   route?: GeoJSONRoute | null | undefined;
-  history?: Derivador[]; // Added history prop
+  history?: Derivador[];
   onMarkerPress?: (deviceId: string) => void;
+  scrollEnabled?: boolean;
 }
 
 const defaultRegion = {
@@ -181,20 +183,11 @@ const defaultRegion = {
   longitudeDelta: 0.05,
 };
 
-// Custom Leaflet icon using FontAwesome (car icon)
-const customIcon = L.divIcon({
-  html: '<i class="fa fa-car" style="color: #FF0000; font-size: 24px;"></i>',
-  className: "custom-div-icon",
-  iconSize: [24, 24],
-  iconAnchor: [12, 24],
-  popupAnchor: [0, -24],
-});
-
-// Fallback to default Leaflet icon
-const fallbackIcon = L.icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+// Define o ícone padrão do Leaflet
+const defaultIcon = L.icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -206,17 +199,20 @@ const CustomMapView: React.FC<MapViewProps> = ({
   initialRegion = defaultRegion,
   style,
   route,
-  history = [], // Default to empty array
+  history = [],
   onMarkerPress,
+  scrollEnabled = true,
 }) => {
+  // Processa marcadores
   const validMarkers = markers
     .map((marker) => ({
       latitude: marker.latitude || 0,
       longitude: marker.longitude || 0,
-      title: marker.title || "Unknown",
+      title: marker.title || 'Unknown',
     }))
     .filter((marker) => !isNaN(marker.latitude) && !isNaN(marker.longitude));
 
+  // Calcula o centro do mapa
   const computedCenter: [number, number] = validMarkers.length > 0
     ? [
         validMarkers.reduce((sum, m) => sum + m.latitude, 0) / validMarkers.length,
@@ -224,67 +220,59 @@ const CustomMapView: React.FC<MapViewProps> = ({
       ]
     : [initialRegion.latitude, initialRegion.longitude];
 
-  // Generate GeoJSON from history if available, otherwise use route
-  const geoJSONData: GeoJSONRoute | undefined = history.length > 0
-    ? {
-        type: "FeatureCollection",
-        features: [
-          {
-            type: "Feature",
-            geometry: {
-              type: "LineString",
-              coordinates: history
-                .filter((entry) => entry.latitude != null && entry.longitude != null)
-                .map((entry) => [entry.longitude!, entry.latitude!]),
-            },
-            properties: {
-              timestamps: history.map((entry) => entry.timestamp || "N/A"),
-            },
-          },
-        ],
-      }
-    : route && Array.isArray(route.features) && route.features[0]?.geometry.coordinates
-    ? route
-    : undefined;
+  // Converte latitudeDelta para nível de zoom
+  const zoomLevel = Math.round(Math.log(360 / initialRegion.latitudeDelta) / Math.LN2);
 
-  console.log("MapView (Web): Rendering with", {
+  // Processa as coordenadas da rota
+  const routeCoordinates: [number, number][] = history.length > 0
+    ? history
+        .filter((entry) => entry.latitude != null && entry.longitude != null)
+        .map((entry) => [entry.latitude!, entry.longitude!] as [number, number])
+    : route && Array.isArray(route.features) && route.features[0]?.geometry.coordinates
+    ? route.features[0].geometry.coordinates
+        .filter((coord): coord is [number, number] => Array.isArray(coord) && coord.length === 2 && !isNaN(coord[0]) && !isNaN(coord[1]))
+        .map(([lng, lat]) => [lat, lng] as [number, number])
+    : [];
+
+  console.log('MapView (Web): Rendering with', {
     hasRoute: !!route,
     hasHistory: history.length > 0,
     validMarkers: validMarkers.length,
     center: computedCenter,
-    routeCoordinatesCount: geoJSONData?.features[0]?.geometry.coordinates.length || 0,
-    dataSource: history.length > 0 ? "history" : route ? "route" : "none",
+    routeCoordinatesCount: routeCoordinates.length,
+    dataSource: history.length > 0 ? 'history' : route ? 'route' : 'none',
   });
-
-  // Use fallback icon if FontAwesome is not loaded
-  const iconToUse = window.document.querySelector(".fa") ? customIcon : fallbackIcon;
 
   try {
     return (
       <View style={[styles.mapContainer, style]}>
         <MapContainer
           center={computedCenter}
-          zoom={13}
-          style={{ width: "100%", height: "100%" }}
+          zoom={zoomLevel}
+          style={{ width: '100%', height: '100%' }}
+          scrollWheelZoom={scrollEnabled}
+          dragging={scrollEnabled}
+          zoomControl={true}
         >
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {geoJSONData && (
-            <GeoJSON
-              data={geoJSONData}
-              style={{ color: "#FF0000", weight: 5, opacity: 0.8 }}
+          {routeCoordinates.length > 0 && (
+            <Polyline
+              positions={routeCoordinates}
+              color="#FF0000"
+              weight={5}
             />
           )}
           {validMarkers.map((marker, index) => (
             <LeafletMarker
               key={index}
               position={[marker.latitude, marker.longitude]}
-              icon={iconToUse}
+              icon={defaultIcon}
               eventHandlers={{
                 click: () => {
-                  console.log("MapView (Web): Marker clicked:", marker.title);
+                  console.log('MapView (Web): Marker clicked:', marker.title);
                   onMarkerPress && onMarkerPress(marker.title);
                 },
               }}
@@ -296,10 +284,10 @@ const CustomMapView: React.FC<MapViewProps> = ({
       </View>
     );
   } catch (err) {
-    console.error("MapView (Web): Failed to render map:", err);
+    console.error('MapView (Web): Failed to render map:', err);
     return (
       <View style={[styles.mapContainer, style]}>
-        <Text style={{ color: "#fff" }}>Erro ao carregar o mapa na web.</Text>
+        <Text style={{ color: '#fff' }}>Erro ao carregar o mapa na web.</Text>
       </View>
     );
   }
@@ -307,12 +295,12 @@ const CustomMapView: React.FC<MapViewProps> = ({
 
 const styles = StyleSheet.create({
   mapContainer: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     borderRadius: 10,
-    overflow: "hidden",
-    justifyContent: "center",
-    alignItems: "center",
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
