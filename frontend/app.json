@@ -1,26 +1,27 @@
 {
   "expo": {
-    "name": "abpteste",
-    "slug": "abpteste",
+    "name": "FloatData",
+    "slug": "fatecabp",
     "version": "1.0.0",
     "icon": "./src/assets/icon.png",
     "splash": {
-      "image": "./src/assets/splash-icon.png",
+      "image": "./src/assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "foregroundImage": "./src/assets/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.yourcompany.abpteste",
       "versionCode": 1,
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
-      
     },
     "plugins": [
       [
@@ -35,17 +36,16 @@
       ],
       "expo-router",
       "expo-font",
-      "expo-location",
-      //"expo-web-browser"
-      // "expo-sharing" REMOVIDO AQUI
+      "expo-location"
     ],
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "a460754c-d75f-45d5-8e4f-d351450ca1bb"
+        "projectId": "af47c691-0395-4ce4-bcb6-698333801521"
       }
-    }
+    },
+    "owner": "apb_teste"
   }
 }
