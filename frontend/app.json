@@ -3,25 +3,29 @@
     "name": "abpteste",
     "slug": "abpteste",
     "version": "1.0.0",
-    "sdkVersion": "52.0.0",
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.abpteste"
+    "icon": "./src/assets/icon.png",
+    "splash": {
+      "image": "./src/assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yourcompany.abpteste"
+      "package": "com.yourcompany.abpteste",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ]
+      
     },
     "plugins": [
       [
         "expo-build-properties",
         {
-          "ios": {
-            "useFrameworks": "static"
-          },
           "android": {
             "compileSdkVersion": 34,
             "targetSdkVersion": 34,
@@ -30,7 +34,18 @@
         }
       ],
       "expo-router",
-      "expo-font"
-    ]
+      "expo-font",
+      "expo-location",
+      //"expo-web-browser"
+      // "expo-sharing" REMOVIDO AQUI
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "a460754c-d75f-45d5-8e4f-d351450ca1bb"
+      }
+    }
   }
 }
