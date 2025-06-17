@@ -111,12 +111,10 @@ A solução consiste em um dispositivo IoT (Hardware), que coleta e envia dados 
 <p align="center">
   <img src="https://img.shields.io/badge/node.js-%23339933?style=for-the-badge&logo=nodedotjs&logoColor=black">
   <img src="https://img.shields.io/badge/ts--node.js-%23339933?style=for-the-badge&logo=ts-node&logoColor=black">
-  <img src="https://img.shields.io/badge/mongodb-%23339933?style=for-the-badge&logo=mongodb&logoColor=white">
   <img src="https://img.shields.io/badge/typescript-%233178C6?style=for-the-badge&logo=typescript&logoColor=black">
   <img src="https://img.shields.io/badge/react-%2361DAFB?style=for-the-badge&logo=react&logoColor=black">
   <img src="https://img.shields.io/badge/react%20native-%2361DAFB?style=for-the-badge&logo=react&logoColor=black">
   <img src="https://img.shields.io/badge/android-%2334C759?style=for-the-badge&logo=android&logoColor=white">
-  <img src="https://img.shields.io/badge/ios-%23000000?style=for-the-badge&logo=apple&logoColor=white">
   <img src="https://img.shields.io/badge/c++-%230059A5?style=for-the-badge&logo=c%2B%2B&logoColor=white">
   <img src="https://img.shields.io/badge/trello-%234169E1?style=for-the-badge&logo=trello&logoColor=black">
   <img src="https://img.shields.io/badge/Kanban-%234169E1?style=for-the-badge&logo=kanban&logoColor=white">
