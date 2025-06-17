@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "FloatData",
-    "slug": "abp-dsm",
+    "slug": "floatdata",
     "version": "1.0.0",
     "icon": "./src/assets/icon1.png",
     "splash": {
@@ -43,9 +43,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "90fc0208-7d20-4f06-ab00-3bb3a0f7f215"
+        "projectId": "6b2f9268-34f3-40a1-99da-5a3175b9fb0d"
       }
     },
-    "owner": "casa23"
+    "owner": "13demaio198179"
   }
 }
