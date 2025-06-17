@@ -67,9 +67,10 @@ export async function getDeviceHistory(
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 30);
     } else {
-      const [start, end] = timeRange.split('/');
-      startDate = new Date(start);
-      endDate.setTime(Date.parse(end) || endDate.getTime());
+      // Suporte a separadores ',' ou '/' e remoção de 'T' e 'Z' para horários
+      const [start, end] = timeRange.includes(',') ? timeRange.split(',') : timeRange.split('/');
+      startDate = new Date(start.replace('T', ' ').replace('Z', ''));
+      endDate.setTime(Date.parse(end.replace('T', ' ').replace('Z', '')) || endDate.getTime());
     }
     query += ` AND timestamp BETWEEN $2 AND $3`;
     params.push(startDate, endDate);
@@ -104,9 +105,10 @@ export async function getActivitySummaryData(
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 30);
     } else {
-      const [start, end] = timeRange.split('/');
-      startDate = new Date(start);
-      endDate.setTime(Date.parse(end) || endDate.getTime());
+      // Suporte a separadores ',' ou '/' e remoção de 'T' e 'Z' para horários
+      const [start, end] = timeRange.includes(',') ? timeRange.split(',') : timeRange.split('/');
+      startDate = new Date(start.replace('T', ' ').replace('Z', ''));
+      endDate.setTime(Date.parse(end.replace('T', ' ').replace('Z', '')) || endDate.getTime());
     }
     query += ` AND timestamp BETWEEN $2 AND $3`;
     params.push(startDate, endDate);
@@ -152,9 +154,10 @@ export async function getRoutes(
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 30);
     } else {
-      const [start, end] = timeRange.split('/');
-      startDate = new Date(start);
-      endDate.setTime(Date.parse(end) || endDate.getTime());
+      // Suporte a separadores ',' ou '/' e remoção de 'T' e 'Z' para horários
+      const [start, end] = timeRange.includes(',') ? timeRange.split(',') : timeRange.split('/');
+      startDate = new Date(start.replace('T', ' ').replace('Z', ''));
+      endDate.setTime(Date.parse(end.replace('T', ' ').replace('Z', '')) || endDate.getTime());
     }
     query += ` AND created_at BETWEEN $2 AND $3`;
     params.push(startDate, endDate);
@@ -222,9 +225,10 @@ export async function getDeviceMovementData(
       startDate = new Date();
       startDate.setDate(endDate.getDate() - 30);
     } else {
-      const [start, end] = timeRange.split('/');
-      startDate = new Date(start);
-      endDate.setTime(Date.parse(end) || endDate.getTime());
+      // Suporte a separadores ',' ou '/' e remoção de 'T' e 'Z' para horários
+      const [start, end] = timeRange.includes(',') ? timeRange.split(',') : timeRange.split('/');
+      startDate = new Date(start.replace('T', ' ').replace('Z', ''));
+      endDate.setTime(Date.parse(end.replace('T', ' ').replace('Z', '')) || endDate.getTime());
     }
     query += ` AND timestamp BETWEEN $2 AND $3`;
     params.push(startDate, endDate);
