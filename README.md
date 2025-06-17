@@ -25,9 +25,6 @@ A solução consiste em um dispositivo IoT (Hardware), que coleta e envia dados 
 <p align="center">
   Experimente a aplicação ou faça o download do instalador para Android.
 <br><br>
-  <a href="https://#SUA_URL_DA_VERSAO_WEB" target="_blank">
-    <img src="https://img.shields.io/badge/Acessar-Versão_Web-blue?style=for-the-badge&logo=webapp" alt="Acessar Versão Web">
-  </a>
   <a href="https://drive.google.com/drive/folders/1tS6or5PHtIv53zI0pEh2FFMHF4uFuJse" target="_blank">
     <img src="https://img.shields.io/badge/Download-APK-green?style=for-the-badge&logo=android" alt="Download APK">
   </a>
@@ -64,7 +61,7 @@ A solução consiste em um dispositivo IoT (Hardware), que coleta e envia dados 
 
 <div align="center">
   <p><i>Gráfico de Burndown do Sprint 1</i></p>
-  <img src="burndown_sprint1.png" alt="Gráfico de Burndown do Sprint 1">
+  <img src="entregas/sprint1/burndown_sprint1.png" alt="Gráfico de Burndown do Sprint 1">
 </div>
 
 </details>
@@ -85,7 +82,7 @@ A solução consiste em um dispositivo IoT (Hardware), que coleta e envia dados 
 
 <div align="center">
   <p><i>Gráfico de Burndown do Sprint 2</i></p>
-  <img src="burndown_sprint2.png" alt="Gráfico de Burndown do Sprint 2">
+  <img src="entregas/sprint2/burndown_sprint2.png" alt="Gráfico de Burndown do Sprint 2">
 </div>
 </details>
 
@@ -105,7 +102,7 @@ A solução consiste em um dispositivo IoT (Hardware), que coleta e envia dados 
 
 <div align="center">
   <p><i>Gráfico de Burndown do Sprint 3</i></p>
-  <img src="burndown_sprint3.png" alt="Gráfico de Burndown do Sprint 3">
+  <img src="entregas/sprint3/burndown_sprint3.png" alt="Gráfico de Burndown do Sprint 3">
 </div>
 </details>
 
